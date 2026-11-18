@@ -1,0 +1,13 @@
+# Ad Studio on Railway. Link the project to this repo's main branch with "Wait for CI" on.
+[build]
+builder = "RAILPACK"
+
+[deploy]
+startCommand = "honcho start -f Procfile"   # web (gunicorn) + worker in one service
+healthcheckPath = "/healthz"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[[volumes]]
+mountPath = "/app/creative_intelligence_data"

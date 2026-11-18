@@ -1,0 +1,86 @@
+# The sample brand pack: a made-up specialty-food shop. Copy this folder to brands/<your-brand>/, edit it, and set
+# BRAND=<your-brand>. Everything here is read through creative_intelligence/brand.py; see brands/README.md.
+
+name: Example Brand                 # in prompts, the top bar, end cards, consent text
+short: EXB                          # ad-name prefix and short mentions
+website: example.com                # the brand's own site (claims about the brand may only come from it)
+category: specialty fruit           # what the brand sells, in a few words
+description: a direct-to-consumer shop for specialty fruit and gift boxes   # one line, used to introduce the brand to Claude
+about: a small family-run fruit shop                                        # "who we are" in brand-story videos
+packaging: plain kraft box          # what the products ship in, as it should appear in images and shots
+packaging_detail: >-
+  OUR BOX: a plain kraft shipping box, open, lined with tissue paper; the products sit neatly inside in rows,
+  filling it. No printing, logos or labels on the box.
+
+# The store (catalogue sync reads its public Shopify feed, /products.json, no token)
+store:
+  public_url: ""                    # e.g. https://shop.example.com ; empty = no sync until set (or SHOPIFY_PUBLIC_URL)
+  hidden_tags: [hidden]             # products with these tags are left out (bundles, twins)
+  season_in_tags: [in-season]       # a product with one of these is "in season"
+  season_out_tags: [preorder]       # ... or "out of season"
+  type_map:                         # Shopify product type (the part before ":") -> app product type
+    fruit: fruit
+    mix box: gift_box
+    candle: candle
+
+timezone: Europe/London            # daily spending caps reset at 00:00 here
+
+# Meta ad names: every asset's file name and the name the ad must carry in Meta, so results link back
+asset_id_template: "{short}_{concept}_{angle}_{hook}_{format}_{product}_v{version:02d}"
+
+# Look of code-drawn ads, video captions and end cards (hex). The app's own UI accent follows `accent`.
+colors:
+  accent: "#2f7d5b"
+  accent_ink: "#ffffff"
+  ink: "#1b1f1d"
+  paper: "#f7f5ef"
+  muted: "#6b706c"
+fonts:                              # files in creative_intelligence/adstudio/fonts/ (add yours there, OFL or licensed)
+  headline: Poppins-Bold.ttf
+  body: Poppins-Medium.ttf
+  hand: Caveat.ttf
+
+end_card:
+  cta: Shop now
+
+# Claim rules on top of the facts library
+rules:
+  no_origin_claims: false           # true = copy never says where products come from or are grown
+
+# House voices for voice-overs (text-to-speech on Replicate). model: kokoro | elevenlabs | gemini (see config.py)
+voices:
+  - {name: Alex, gender: man, tone: "warm, relaxed", model: kokoro, voice: am_michael}
+  - {name: Maya, gender: woman, tone: "bright, friendly", model: kokoro, voice: af_heart}
+  - {name: Sam, gender: man, tone: "calm, low", model: elevenlabs, voice: Mark}
+default_voice: Alex
+persona_only_voices: {}            # a voice used only when its own presenter is on camera: {voice: stand-in voice}
+
+# AI presenters: brand narrators only (never shown as customers or staff), one per voice. look + setting describe
+# the portrait the image model makes; framing: portrait | selfie
+presenters:
+  - name: Alex
+    role: Friendly guide
+    voice: Alex
+    framing: portrait
+    look: a relaxed man in his late 30s, short dark hair, light stubble, an easy smile, a plain sage-green shirt
+    setting: a bright kitchen with a wooden table and a bowl of fruit
+  - name: Maya
+    role: Taste expert
+    voice: Maya
+    framing: selfie
+    look: a cheerful woman in her early 30s, shoulder-length curly hair, a plain cream knit top
+    setting: a sunny garden in late afternoon with leafy trees
+
+# Where real customer reviews come from (Ideas > Customer voice). Leave a source empty to skip it.
+reviews:
+  fera_public_key: ""               # the Fera reviews app's public storefront key, if the store uses Fera
+  trustpilot: ""                    # e.g. https://www.trustpilot.com/review/example.com
+  testimonials: ""                  # e.g. example.com testimonials
+  bbb: false                        # look the brand up on bbb.org
+
+# Competitors to watch in the Meta Ad Library (Ideas > Market), seeded on first run; edit them in the app after
+market:
+  tiers: {A: Direct competitors, B: Premium gifting, C: Same audience}
+  brands:
+    - {name: Example Competitor, tier: A, website: competitor.example, page_name: Example Competitor, why: "Same products, same price range"}
+  keywords: [specialty fruit delivery, fruit gift box]

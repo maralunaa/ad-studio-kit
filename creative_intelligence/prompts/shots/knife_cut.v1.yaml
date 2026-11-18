@@ -1,0 +1,34 @@
+version: 1
+name: knife_cut
+label: Knife cut
+summary: A knife slices cleanly through the fruit.
+use: Reveal beat; the turn from outside to inside
+duration_s: 5
+energy: high
+product_types:
+- fruit
+route: kling
+audio: none
+from_images:
+- kitchen_prep
+- cut_reveal
+strict_qa: true
+still:
+  locks: One fruit exactly as in the reference photos on a wooden board; a chef's knife resting against it; one
+    hand steadying it.
+  freedom: Board, kitchen background.
+  composition: Close, three-quarter view, board in the lower two-thirds.
+  lighting: Bright kitchen window light.
+motion:
+  camera: the camera holds still
+  change: the knife slices down through the fruit and the half falls open to show the flesh
+params:
+- name: cut
+  value: one clean stroke
+  feel: sawing motion looks fake
+pitfalls:
+- the inside does not match the real flesh colour or stone
+- the knife bends
+- the fruit regrows after the cut
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

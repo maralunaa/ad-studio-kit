@@ -1,0 +1,37 @@
+version: 1
+name: supermarket_fruit
+label: Supermarket fruit (comparison)
+summary: The ordinary supermarket version of the fruit, cut open, for the Us vs supermarket split screen.
+use: Top half of the Us vs supermarket split screen; never used on its own
+duration_s: 5
+energy: low
+product_types:
+- fruit
+styles:
+- us_vs_supermarket
+route: kling
+audio: none
+strict_qa: false
+qa_note: >-
+  This clip deliberately shows an ordinary, early-picked supermarket version of the fruit (paler, duller, firmer) for a
+  side-by-side comparison. Do not score it against the reference photos for colour or ripeness; check only that it is
+  recognisably the same kind of fruit and free of artefacts.
+qa_skip:
+- fruit_accuracy
+still:
+  locks: The same kind of fruit as the reference photos, but an ordinary early-picked supermarket one, cut in half on a
+    plain white cutting board; paler skin, duller and firmer flesh than the reference; no stickers, labels or brands.
+  freedom: Plain countertop, flat background.
+  composition: Close, straight-on, the cut halves filling the middle third.
+  lighting: Flat, cool overhead store-like light.
+motion:
+  camera: a slow push in
+  change: a knife tip presses the flesh, which barely gives
+params:
+- name: push
+  value: slow, a few percent
+  feel: faster looks like an ad for this fruit instead of the comparison
+pitfalls:
+- the model makes it look as ripe as the real one
+- a store logo or price sticker appears
+negative: labels, stickers, logos, brand names, price tags, text, watermarks, extra fruit, warped hands

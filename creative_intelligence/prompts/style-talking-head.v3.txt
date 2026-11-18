@@ -1,0 +1,4 @@
+TALKING HEAD. The presenter talks the whole video, but the picture is a montage of close product shots that fill the frame; the presenter's head talks in a small circle in the corner. So EVERY line is kind presenter, and every line also names the shot_type shown behind it: pick a different shot for each line (the fruit whole, cut open, the inside, being eaten, the box), matched to what the line says. Lines are short, under 8 seconds each, warm and conversational, spoken straight to the viewer.
+
+
+{{knowledge:styles.talking_head}}

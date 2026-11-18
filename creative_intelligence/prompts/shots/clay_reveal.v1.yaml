@@ -1,0 +1,42 @@
+version: 1
+name: clay_reveal
+label: Clay fruit, the reveal (claymation)
+summary: The lid of a little clay box lifts and the clay fruit pops up, pleased with itself.
+use: Claymation hooks and middle beats; never on its own as the product
+duration_s: 5
+energy: high
+product_types:
+- fruit
+styles:
+- claymation
+cast: true
+stop_motion_fps: 12
+route: kling
+audio: none
+strict_qa: false
+count_check: true
+qa_note: >-
+  This is an intended claymation (handmade clay) look, not a photograph: judge that it is clearly the same kind of
+  fruit (shape, colours, markings) made of clay, and free of artefacts. Do not fail it for not being photorealistic.
+qa_skip:
+- fruit_accuracy
+- appetite
+still:
+  locks: A small handmade clay gift box with its lid on, on a little clay set, with visible fingerprints and tool
+    marks; the fruit from the reference photos, made of clay in its true shape, colours and markings, peeking from
+    under the lid.
+  freedom: Box and set colours, small clay props (leaves, a ribbon).
+  composition: Centred, three-quarter view, the clay box filling the middle third.
+  lighting: Soft studio light with gentle shadows, like a stop-motion set.
+motion:
+  camera: the camera holds still
+  change: the lid lifts off in small stepped moves and the clay fruit pops up out of the box with a little bounce
+params:
+- name: steps
+  value: a few small moves
+  feel: smooth motion loses the stop-motion feel
+pitfalls:
+- it turns photorealistic
+- extra clay fruit appear
+- the box has writing on it
+negative: photorealistic fruit, text, letters, logos, watermarks, extra fruit, hands, people, melting

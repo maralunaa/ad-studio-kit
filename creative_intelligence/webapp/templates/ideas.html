@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ideas · Ad Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='studio.css') }}"><link rel="stylesheet" href="/brand.css">
+</head>
+<body data-stage="{{ stage }}">
+{#- Ideas (Phase 2a): the idea bank (Direction A: table and detail, plus the weekly brief's suggestions), the market
+    (competitor ads, patterns, the brief) and the customer voice (real reviews and comments). routes/ideas.py. -#}
+{% set chip = true %}{% include "_top.html" %}
+
+<div class="layout">
+  <div class="main">
+    <div class="pane active" id="body"><div class="empty"><span class="spinner"></span></div></div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const money=v=>v==null?'—':'$'+Number(v).toFixed(2);
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}).then(r=>r.json());
+const nice=k=>(k||'').replace(/_/g,' ');
+const STAGE=document.body.dataset.stage;
+let PID=+new URLSearchParams(location.search).get('product_id')||null, PNAME='';
+
+async function boot(){
+  if(PID){
+    const r=await fetch('/api/adstudio/product/'+PID);
+    if(r.ok){const d=await r.json();PNAME=d.product.name;$('ctxName').textContent=PNAME;
+      const ph=d.photos.find(x=>x.is_hero)||d.photos.find(x=>x.is_primary)||d.photos[0];
+      $('pickerThumb').innerHTML=ph?`<img src="/api/adstudio/photo/${ph.id}" alt="">`:'';}
+    else PID=null;
+  }
+  ({visuals:loadVisuals,bank:loadBank,market:loadResearch,voice:loadVoice})[STAGE]();
+}
+
+/* ---------- VISUALS: the library of ads and posts to repurpose (feedback 2026-10-22, 2026-10-27) ---------- */
+let VIS={kind:'',items:[],kinds:{},products:null,sel:new Set(),sort:'',ig:null,act:null,msg:''};
+const vkey=it=>it.kind+':'+it.id;
+async function loadVisuals(){
+  const d=await (await fetch('/api/adstudio/visuals'+(VIS.kind?'?kind='+VIS.kind:''))).json();
+  VIS.items=d.items; VIS.kinds=d.kinds;
+  if(!VIS.products)VIS.products=(await (await fetch('/api/adstudio/products')).json()).products;
+  VIS.ig=await (await fetch('/api/adstudio/instagram')).json();
+  renderVisuals();
+}
+function sortedItems(){
+  const it=[...VIS.items], by={roas:x=>-(x.roas||0),spend:x=>-(x.spend||0),buys:x=>-(x.buys||0),likes:x=>-(x.likes||0),reach:x=>-(x.reach||0)}[VIS.sort];
+  return by?it.sort((a,b)=>by(a)-by(b)):it;
+}
+function igBar(){
+  if(VIS.kind!=='organic'&&VIS.kind!=='')return '';
+  const g=VIS.ig||{}, last=g.last;
+  const state=!last?'Not synced yet.':last.status==='failed'?esc(last.message):last.status==='running'?'Syncing…':`${g.posts} posts · last synced ${esc((last.finished_at||'').slice(0,16).replace('T',' '))}`;
+  return `<div class="hint flush row"><span><b>Our Instagram posts:</b> ${state}</span><button class="btn sm ml-auto" id="igRefresh">Refresh from Instagram</button></div>`;
+}
+function renderVisuals(){
+  const chips=[['','All'],...Object.entries(VIS.kinds)].map(([k,l])=>`<button class="chip ${VIS.kind===k?'on':''}" data-vk="${k}">${esc(l)}</button>`).join('');
+  const sorts=VIS.kind==='ours'?[['','Best return'],['spend','Most spend'],['buys','Most purchases']]:VIS.kind==='organic'?[['','Newest'],['likes','Most likes'],['reach','Most reach']]:[];
+  const items=sortedItems(), n=VIS.sel.size;
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">Visuals</h2><span class="muted">Our winners, our Instagram, competitors' ads and saved ones. Select any to repurpose for a product.</span>
+      <label class="btn ml-auto">Add competitor ads<input type="file" id="visUp" accept="image/png,image/jpeg,image/webp" multiple hidden></label></div>
+    <div class="hint flush">Add a competitor ad by uploading, dragging in, or pasting a screenshot (Cmd+V) anywhere on this page; Claude reads each one (brand, words, format, angle, why it works). Repurposing keeps a picture's idea, composition and mood, never its brand, words, claims or product.</div>
+    ${igBar()}
+    <p class="muted" id="visMsg">${esc(VIS.msg)}</p>
+    <div class="row mb-3"><div class="chips" id="visChips">${chips}</div>${sorts.length?`<div class="seg ml-auto" id="visSort">${sorts.map(([k,l])=>`<button data-sort="${k}" class="${VIS.sort===k?'on':''}">${l}</button>`).join('')}</div>`:''}</div>
+    <div class="wall">${items.map((it,i)=>`<div class="ad selectable ${VIS.sel.has(vkey(it))?'sel':''}" data-pick="${esc(vkey(it))}" tabindex="0"><div class="imgwrap"><img src="${esc(it.image)}" alt="" loading="lazy"></div>
+        <div class="meta"><span class="ttl">${esc(it.title)}</span><span class="muted tiny">${esc(VIS.kinds[it.kind]||it.kind)}${it.note?' · '+esc(it.note):''}</span>${it.link?`<a class="tiny" href="${esc(it.link)}" target="_blank" rel="noopener">Open on Instagram</a>`:''}</div></div>`).join('')
+      ||`<div class="empty"><b>Nothing here yet</b>${VIS.kind==='organic'?'Connect Instagram (see above), then Refresh.':VIS.kind==='competitor'?'Paste, drag in or upload competitor ad screenshots.':'Add competitor ads, refresh Instagram, or wait for the next Meta sync for our own ads.'}</div>`}</div>
+    <div class="bulkbar" id="visBar"><b id="visN">${n} selected</b>
+      <button class="btn sm" data-act="statics">Static ads like these</button><button class="btn sm" data-act="hooks">Hooks from their angle</button>
+      <button class="btn sm" data-act="idea">Save as an idea</button><button class="btn sm" data-act="video">Video from this winner</button>
+      <span class="spacer"></span><button class="btn sm" id="visClear">Clear</button></div>
+    <div class="modal ${VIS.act?'open':''}" id="actModal" role="dialog" aria-modal="true" aria-labelledby="actTitle">${VIS.act?actPanel():''}</div>`;
+  $('visBar').style.display=n?'flex':'none';
+  document.querySelectorAll('[data-vk]').forEach(b=>b.onclick=()=>{VIS.kind=b.dataset.vk;VIS.sort='';loadVisuals();});
+  document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{VIS.sort=b.dataset.sort;renderVisuals();});
+  document.querySelectorAll('[data-pick]').forEach(el=>{const f=e=>{if(e.target.closest('a'))return;const k=el.dataset.pick;   // no redraw: the grid stays put
+    VIS.sel.has(k)?VIS.sel.delete(k):VIS.sel.add(k);el.classList.toggle('sel',VIS.sel.has(k));
+    $('visN').textContent=`${VIS.sel.size} selected`;$('visBar').style.display=VIS.sel.size?'flex':'none';};
+    el.onclick=f;el.onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();f(e);}};});
+  document.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{VIS.act=b.dataset.act;openAct();});
+  $('visClear').onclick=()=>{VIS.sel.clear();VIS.act=null;renderVisuals();};
+  document.onkeydown=e=>{if(e.key==='Escape'&&VIS.act)closeAct();};
+  if($('igRefresh'))$('igRefresh').onclick=async()=>{await post('/api/adstudio/instagram/refresh');VIS.msg='Reading your Instagram posts: they appear here in a minute or two.';setTimeout(loadVisuals,60000);renderVisuals();};
+  $('visUp').onchange=e=>uploadScreens([...e.target.files]);
+  if(VIS.act)wireAct();
+}
+function openAct(){$('actModal').innerHTML=actPanel();$('actModal').classList.add('open');wireAct();}
+function closeAct(){VIS.act=null;$('actModal').classList.remove('open');$('actModal').innerHTML='';}
+const ACT_NAMES={statics:'Static ads like these',hooks:'Hooks from their angle',idea:'Save as an idea',video:'A video from this winner'};
+function actPanel(){
+  const a=VIS.act;
+  return `<section class="card" id="actCard"><div class="row"><h3 id="actTitle">${ACT_NAMES[a]} · ${VIS.sel.size} selected</h3><button class="btn sm ml-auto" id="actX">Close</button></div>
+    <div class="row mt-2 end"><div><label class="fl" for="actP">For which product</label><select class="f" id="actP">${VIS.products.map(p=>`<option value="${p.id}" ${p.id===PID?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div>
+      ${a==='statics'?`<div><label class="fl" for="actN">Ads per picture</label><select class="f w-num" id="actN">${[1,2,3,4].map(n=>`<option ${n===2?'selected':''}>${n}</option>`).join('')}</select></div>
+        <div><label class="fl" for="actS">Size</label><select class="f w-num" id="actS"><option>4:5</option><option>9:16</option><option>1:1</option></select></div>`:''}
+      <button class="btn btn-p" id="actGo">${a==='statics'?'Make them (AI-designed, about $0.20 each)':a==='hooks'?'Write 5 hooks (claims-checked)':a==='idea'?'Save to the idea bank':'Open it in Video'}</button></div>
+    <div class="muted mt-2">${a==='statics'?'Each picture guides composition, light and mood; the words come from the product\'s best hooks. They land in Gallery.':a==='hooks'?'The angle and structure, never their words, claims or numbers. They land in the product\'s hooks.':a==='idea'?'An idea pointing back at these pictures, ready to steer images, hooks and videos.':'Rebuilds this winning video\'s structure for the product (From a winning ad).'}</div>
+    <p class="err" id="actErr"></p></section>`;
+}
+function wireAct(){
+  $('actX').onclick=closeAct;
+  $('actModal').onclick=e=>{if(e.target===$('actModal'))closeAct();};
+  $('actGo').onclick=async()=>{const b=$('actGo');b.disabled=true;
+    const items=[...VIS.sel].map(k=>{const i=k.indexOf(':');return {kind:k.slice(0,i),id:k.slice(i+1)};});
+    const r=await post('/api/adstudio/visuals/repurpose',{items,product_id:+$('actP').value,action:VIS.act,n:$('actN')?+$('actN').value:2,size:$('actS')?$('actS').value:'4:5'});
+    b.disabled=false;
+    if(r.error&&!r.queued){$('actErr').textContent=r.error;return;}
+    if(r.goto){location.href=r.goto;return;}
+    VIS.msg=r.queued?`Making ${r.queued} ad${r.queued>1?'s':''}: they land in Gallery in a few minutes.`:r.written!=null?`${r.written} hooks written for the product (Products › Hooks).`:r.idea_id?'Saved to the idea bank.':'';
+    VIS.sel.clear();VIS.act=null;renderVisuals();};
+}
+async function uploadScreens(files){
+  files=files.filter(f=>/^image\//.test(f.type)); if(!files.length)return;
+  const fd=new FormData(); files.forEach(f=>fd.append('files',f));
+  VIS.msg='Uploading…'; renderVisuals();
+  const r=await (await fetch('/api/adstudio/market/screens',{method:'POST',body:fd})).json();
+  VIS.msg=`${r.queued} competitor ad${r.queued===1?'':'s'} queued: Claude reads each one and it appears here in a minute or two.`+(r.problems.length?' '+r.problems.join('; '):'');
+  renderVisuals();
+}
+document.addEventListener('paste',e=>{if(STAGE!=='visuals')return;const fs=[...(e.clipboardData||{}).files||[]];if(fs.length){e.preventDefault();uploadScreens(fs);}});
+document.addEventListener('dragover',e=>{if(STAGE==='visuals')e.preventDefault();});
+document.addEventListener('drop',e=>{if(STAGE!=='visuals')return;e.preventDefault();uploadScreens([...(e.dataTransfer||{}).files||[]]);});
+
+/* ---------- IDEA BANK ---------- */
+let BANK=null, F={status:'',mine:!!PID}, SEL=null, EDIT=null;
+async function loadBank(){
+  const q=new URLSearchParams(); if(F.status)q.set('status',F.status); if(F.mine&&PID)q.set('product_id',PID);
+  BANK=await (await fetch('/api/adstudio/ideas?'+q)).json();
+  if(SEL&&!BANK.ideas.some(i=>i.id===SEL))SEL=null;
+  if(!SEL&&!EDIT&&BANK.ideas.length)SEL=BANK.ideas[0].id;
+  renderBank();
+}
+function bar(p){return `<div class="ev-part"><i><b class="w${p.bar||0}"></b></i><span title="${esc(p.label)}">${esc(p.label)}</span></div>`;}
+function renderBank(){
+  const B=BANK, C=B.counts, all=Object.values(C).reduce((a,b)=>a+b,0), share=Math.round(B.mix.share*100);
+  const chips=[['','All',all],...B.statuses.map(s=>[s.key,s.name,C[s.key]||0])].map(([k,l,n])=>`<button class="chip ${F.status===k?'on':''}" data-st="${k}">${l} <span class="n">${n}</span></button>`).join('');
+  const rows=B.ideas.map(i=>`<tr class="pick-row ${i.id===SEL?'on':''}" data-id="${i.id}"><td><div class="row">${i.picture?`<img class="thumb" src="${esc(i.picture)}" alt="" loading="lazy" onerror="this.remove()">`:''}<div><b>${esc(i.title)}</b><div class="muted">${esc(i.style_name)} · ${esc(i.products.join(', '))}</div></div></div></td>
+      <td><div class="ev">${bar(i.ev.ours)}${bar(i.ev.market)}${bar(i.ev.customers)}</div></td><td><span class="tagb">${esc(i.status_name)}</span></td></tr>`).join('');
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">Idea bank</h2><span class="muted">${all} idea${all===1?'':'s'} · evidence from our results, the market and customers</span>
+      <button class="btn ml-auto" id="btnSeed" title="Free: our winners, winning patterns, Hook University angles and what customers say">Fill from what we have</button><button class="btn" id="btnDraft">Draft ideas from evidence</button><button class="btn btn-p" id="btnNew">New idea</button></div>
+    <div class="hint flush row"><span>Ideas steer <b>${share}%</b> of the images, hooks, AI ads and videos made for each product. The other ${100-share}% follow the playbook, Hook University and the winning patterns. An idea you pick with “Use” always applies.</span>
+      <label class="fl tight ml-auto" for="mixShare">Share</label><select class="f w-mid" id="mixShare">${[0,10,20,30,40,50].map(v=>`<option value="${v}" ${v===share?'selected':''}>${v}%</option>`).join('')}</select></div>
+    <p class="err" id="bankErr"></p>
+    <div class="row mb-3"><div class="chips" id="stChips">${chips}</div>${PID?`<div class="seg ml-auto" id="mine"><button data-v="1" class="${F.mine?'on':''}">${esc(PNAME)}</button><button data-v="0" class="${F.mine?'':'on'}">All products</button></div>`:''}</div>
+    <div class="split"><section class="card"><div class="table-wrap"><table class="data text"><thead><tr><th>Idea</th><th>Evidence: ours · market · customers</th><th>Status</th></tr></thead>
+      <tbody>${rows||`<tr><td colspan="3" class="dim">No ideas here yet. Use “Fill from what we have” (free), draft some from the evidence, approve the weekly brief's suggestions below, or add one.</td></tr>`}</tbody></table></div></section>
+      <section class="card" id="detail"></section></div>
+    <section class="card mt-3" id="sugg"></section>`;
+  document.querySelectorAll('#stChips [data-st]').forEach(b=>b.onclick=()=>{F.status=b.dataset.st;loadBank();});
+  if($('mine'))$('mine').querySelectorAll('button').forEach(b=>b.onclick=()=>{F.mine=b.dataset.v==='1';loadBank();});
+  document.querySelectorAll('tr.pick-row').forEach(tr=>tr.onclick=()=>{SEL=+tr.dataset.id;EDIT=null;renderBank();});
+  $('mixShare').onchange=async e=>{const d=await post('/api/adstudio/ideas/mix',{share:+e.target.value/100});if(d.error){$('bankErr').textContent=d.error;return;}loadBank();};
+  $('btnNew').onclick=()=>{EDIT={product_ids:PID?[PID]:[],evidence:{}};renderBank();};
+  $('btnDraft').onclick=confirmDraft;
+  $('btnSeed').onclick=async()=>{const b=$('btnSeed');b.disabled=true;const d=await post('/api/adstudio/ideas/seed',{});
+    b.disabled=false;$('bankErr').textContent=d.added?'':'Nothing new to add.';F.status='new';loadBank();};
+  EDIT?renderForm():renderDetail(); renderSuggestions();
+}
+function renderDetail(){
+  const i=BANK.ideas.find(x=>x.id===SEL);
+  if(!i){$('detail').innerHTML='<div class="muted">Pick an idea to see its evidence.</div>';return;}
+  const E=i.ev, q=E.customers.quote, pid=i.product_ids.includes(PID)||!i.product_ids.length?PID:i.product_ids[0];
+  const style=BANK.styles.find(s=>s.key===i.style), medium=style?style.medium:'any';
+  const use=pid?`${medium!=='video'?`<a class="btn btn-p" href="/images/compose?product_id=${pid}&idea_id=${i.id}&compose=ai">Use in Images</a>`:''}${medium!=='static'?`<a class="btn ${medium==='video'?'btn-p':''}" href="/video/create?product_id=${pid}&idea_id=${i.id}${i.style?'&style='+i.style:''}">Use in Video</a>`:''}`
+    :'<span class="muted">Pick a product in the top bar to use this idea.</span>';
+  const live=BANK.mix.statuses.includes(i.status);
+  $('detail').innerHTML=`<strong>${esc(i.title)}</strong>
+    <p class="muted mt-1">${[i.angle&&'Angle: '+nice(i.angle),i.hook_type&&'hook type: '+nice(i.hook_type),'style: '+i.style_name].filter(Boolean).map(esc).join(' · ')}</p>
+    <p class="muted">${esc(i.products.join(', '))}</p>
+    <div class="stats mt-2"><div class="stat"><b>${E.ours.roas!=null?E.ours.roas.toFixed(1):E.ours.ctr!=null?E.ours.ctr+'%':'—'}</b><span>${E.ours.roas!=null?'ROAS':E.ours.ctr!=null?'CTR':'not tested'}${E.ours.basis==='angle'&&(E.ours.roas!=null||E.ours.ctr!=null)?', same angle':''}</span></div>
+      <div class="stat"><b>${E.market.brands}</b><span>brands${E.market.longest_days?`, longest ${E.market.longest_days} d`:''}</span></div>
+      <div class="stat"><b>${E.customers.mentions}</b><span>customer mentions</span></div></div>
+    ${q?`<div class="quote mt-3">“${esc(q.text)}”<cite>${esc(q.by)}, ${esc(q.source)}, ${esc(q.posted_on)}</cite></div>`:''}
+    ${i.hook?`<label class="fl">Hook pattern</label><div>${esc(i.hook)}</div>`:''}
+    ${i.why?`<label class="fl">Why it might work</label><div class="muted">${esc(i.why)}</div>`:''}
+    ${E.customers.terms.length?`<label class="fl">Customer words counted</label><div class="muted">${esc(E.customers.terms.join(', '))}</div>`:''}
+    <label class="fl">Made from it</label><div class="muted">${i.used.image} images · ${i.used.hooks} hooks · ${i.used.aiads} AI ad briefs · ${i.used.video} videos · ${i.used.assets} finished ads</div>
+    <div class="row mt-3 end"><div><label class="fl" for="ideaStatus">Status</label><select class="f w-mid" id="ideaStatus">${BANK.statuses.map(s=>`<option value="${s.key}" ${s.key===i.status?'selected':''}>${s.name}</option>`).join('')}</select></div>
+      <button class="btn ml-auto" id="ideaEdit">Edit</button></div>
+    <p class="muted mt-2">${live?'Generation can use this idea for its share.':'Approve it to let generation use it for its share.'}</p>
+    <div class="row mt-2">${use}</div><p class="err" id="detErr"></p>`;
+  $('ideaStatus').onchange=async e=>{const d=await post('/api/adstudio/ideas/'+i.id,{status:e.target.value});if(d.error){$('detErr').textContent=d.error;return;}loadBank();};
+  $('ideaEdit').onclick=()=>{EDIT=JSON.parse(JSON.stringify(i));renderBank();};
+}
+function renderForm(){
+  const I=EDIT, B=BANK, terms=(I.evidence&&I.evidence.customer_terms||[]).join(', ');
+  const opt=(list,cur,blank)=>(blank?`<option value="">${blank}</option>`:'')+list.map(o=>`<option value="${o.key}" ${o.key===cur?'selected':''}>${esc(o.name)}</option>`).join('');
+  $('detail').innerHTML=`<strong>${I.id?'Edit idea':'New idea'}</strong>
+    <label class="fl" for="fTitle">Idea</label><input class="f" id="fTitle" value="${esc(I.title)}" placeholder="Arrives firm, ready in 2 to 3 days">
+    <label class="fl" for="fAngle">Angle (why someone buys)</label><select class="f" id="fAngle">${opt(B.angles.map(a=>({key:a,name:nice(a)})),I.angle,'Pick an angle')}</select>
+    <label class="fl" for="fHook">Hook pattern (a pattern, not copy)</label><input class="f" id="fHook" value="${esc(I.hook)}" placeholder="Name the worry, then the fact that answers it">
+    <label class="fl" for="fType">Hook type</label><select class="f" id="fType">${opt(B.hook_types,I.hook_type,'Any')}</select>
+    <label class="fl" for="fStyle">Style</label><select class="f" id="fStyle">${opt(B.styles.map(s=>({key:s.key,name:s.name+(s.medium==='video'?' (video)':'')})),I.style,'Any style')}</select>
+    <label class="fl" for="fProds">Products (none picked = every product)</label><select class="f" id="fProds" multiple size="6">${B.products.map(p=>`<option value="${p.id}" ${(I.product_ids||[]).includes(p.id)?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
+    <label class="fl" for="fWhy">Why it might work (the evidence)</label><textarea class="f" id="fWhy" rows="3">${esc(I.why)}</textarea>
+    <label class="fl" for="fTerms">Customer words to count in reviews (comma separated)</label><input class="f" id="fTerms" value="${esc(terms)}" placeholder="ripe, ready in, firm">
+    <div class="row mt-3 jc-end"><button class="btn" id="fCancel">Cancel</button><button class="btn btn-p" id="fSave">Save</button></div><p class="err" id="fErr"></p>`;
+  $('fCancel').onclick=()=>{EDIT=null;renderBank();};
+  $('fSave').onclick=async()=>{
+    const body={title:$('fTitle').value,angle:$('fAngle').value,hook:$('fHook').value,hook_type:$('fType').value,style:$('fStyle').value,
+      product_ids:[...$('fProds').selectedOptions].map(o=>+o.value),why:$('fWhy').value,
+      evidence:{...(I.evidence||{}),customer_terms:$('fTerms').value.split(',').map(t=>t.trim()).filter(Boolean)}};
+    const d=await post('/api/adstudio/ideas'+(I.id?'/'+I.id:''),body);
+    if(d.error){$('fErr').textContent=d.error;return;}
+    if(d.id)SEL=d.id; EDIT=null; loadBank();};
+}
+function renderSuggestions(){
+  const b=BANK.brief;
+  $('sugg').innerHTML=`<strong>This week's suggestions</strong><p class="muted mt-1">${b?`From the Monday brief of ${esc(b.created_at.slice(0,10))} (the full read is in <a class="accent-text" href="/ideas/market">Market</a>). Approve one to add it to the bank.`:'The Monday research brief suggests 6 to 10 ideas here. Approve them into the bank in one click.'}</p>
+    ${b&&b.suggestions.length?`<div class="table-wrap mt-2"><table class="data text"><tbody>${b.suggestions.map(s=>`<tr><td><b>${esc(s.title||s.style_name+': '+s.angle)}</b><div class="muted">${esc(s.style_name)}${s.hook?' · '+esc(s.hook):''}</div></td><td>${esc((s.products||[s.product]).filter(Boolean).join(', ')||'Every product')}</td><td class="muted">${esc(s.why)}</td><td><button class="btn sm btn-p" data-sg="${s.index}">Approve</button></td></tr>`).join('')}</tbody></table></div>`
+      :b?'<p class="muted">All of this week\'s suggestions are in the bank.</p>':''}`;
+  document.querySelectorAll('[data-sg]').forEach(x=>x.onclick=async()=>{const d=await post('/api/adstudio/ideas/suggestion',{brief_id:b.id,index:+x.dataset.sg});
+    if(d.error){$('bankErr').textContent=d.error;return;} SEL=d.id; loadBank();});
+}
+function confirmDraft(){
+  const B=BANK;
+  $('bankErr').innerHTML=`<span class="row"><span>Claude drafts about 12 ideas from our results, the market and real customer words. About ${money(B.draft_estimate)}, on the research cap (${money(B.research_spent)} of ${money(B.research_cap)} used this month). They arrive as New for you to approve.</span>
+    <button class="btn btn-p" id="drGo">Draft ideas</button><button class="btn" id="drNo">Cancel</button></span>`;
+  $('drNo').onclick=()=>{$('bankErr').textContent='';};
+  $('drGo').onclick=async()=>{$('drGo').disabled=true;$('drGo').innerHTML='<span class="spinner"></span>';
+    const d=await post('/api/adstudio/ideas/draft',{confirm:true});
+    if(d.error){$('bankErr').textContent=d.error;return;}
+    F.status='new'; SEL=null; await loadBank(); $('bankErr').textContent=`${d.created} new ideas drafted (${money(d.cost_usd)}).`;};
+}
+
+/* ---------- CUSTOMER VOICE (R3): imports, then themes with counts and real quotes, per product or shop-wide ---------- */
+let VQ='', VK='desire', VG=PID?String(PID):'shop';
+const KIND_TABS={desire:'Desires',objection:'Objections',moment:'Moments',phrase:'Phrases'};
+async function loadVoice(){
+  const q=new URLSearchParams(); if(VG==='shop')q.set('shop_wide','1'); else q.set('product_id',VG); if(VQ)q.set('q',VQ);
+  const d=await (await fetch('/api/adstudio/voice?'+q)).json();
+  const total=d.groups.reduce((a,g)=>a+g.reviews,0), g=d.groups.find(x=>String(x.product_id||'shop')===VG);
+  const T=d.themes[VK]||[];
+  const rows=T.map(t=>`<tr><td><b>${esc(t.theme)}</b>${VK==='objection'?(t.fact?`<div class="muted">Answered by an approved fact: ${esc(t.fact)}</div>`:'<div class="muted">No approved fact answers this yet</div>'):''}</td>
+      <td>${t.mentions}</td><td>${t.quotes.slice(0,VK==='phrase'?1:2).map(x=>`<div class="quote">“${esc(x.text.length>260?x.text.slice(0,260)+'…':x.text)}”<cite>${esc(x.by)}, ${esc(x.source)}, ${esc(x.posted_on)}</cite></div>`).join('')}</td>
+      <td>${VK==='phrase'?'':(VK!=='objection'||t.fact_id)?`<button class="btn sm" data-mk="${t.id}">Make idea</button>`:''}</td></tr>`).join('');
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">Customer voice</h2><span class="muted">${total} real reviews with words · exact words only, never edited</span>
+      <a class="btn ml-auto" href="/admin#secReviews">Add a review by hand</a></div>
+    <p class="err" id="vErr"></p>
+    <div class="split"><section class="card"><div class="row jc-between"><strong>${esc(g?g.product:'Pick a product')}${g?` · ${g.reviews} reviews`:''}</strong>
+        <div class="seg" id="vKind">${Object.entries(d.kinds).map(([k,l])=>`<button data-v="${k}" class="${VK===k?'on':''}">${KIND_TABS[k]}</button>`).join('')}</div></div>
+      ${g&&!g.themes?`<div class="hint">No themes read yet for this group. Claude reads up to 400 of its latest reviews and counts what comes up. About ${money(g.estimate)}, on the research cap.<button class="btn sm btn-p ml-auto" data-ex="${g.product_id||''}">Read the themes</button></div>`:''}
+      <div class="table-wrap mt-2"><table class="data text"><thead><tr><th>${esc(d.kinds[VK])}</th><th>Mentions</th><th>In their words</th><th></th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="4" class="dim">Nothing here yet.</td></tr>'}</tbody></table></div>
+      <div class="row mt-3"><strong>Search their words</strong><input class="f w-wide ml-auto" type="search" id="vq" placeholder="e.g. ripe" value="${esc(VQ)}"></div>
+      <div class="table-wrap mt-2"><table class="data text"><tbody>${d.quotes.slice(0,VQ?50:8).map(r=>`<tr><td><div class="quote">“${esc(r.text)}”<cite>${esc(r.shown_as)}, ${esc(r.source_name)}${r.curated?' (curated)':''}, ${esc(r.posted_on)}${r.rating?` · ${r.rating} of 5`:''}</cite></div></td></tr>`).join('')||'<tr><td class="dim">No reviews match.</td></tr>'}</tbody></table></div></section>
+      <div><section class="card"><strong>Products</strong><div class="table-wrap mt-2"><table class="data"><thead><tr><th>Product</th><th>Reviews</th><th>Themes</th></tr></thead><tbody>
+        ${d.groups.map(x=>`<tr class="pick-row ${String(x.product_id||'shop')===VG?'on':''}" data-g="${x.product_id||'shop'}"><td>${esc(x.product)}</td><td>${x.reviews}</td><td>${x.themes?x.themes:`<button class="btn sm" data-ex="${x.product_id||''}" title="About ${money(x.estimate)}">Read</button>`}</td></tr>`).join('')||'<tr><td colspan="3" class="dim">No reviews yet: import them below.</td></tr>'}</tbody></table></div></section>
+        <section class="card mt-3"><strong>Imports</strong><p class="muted">Re-runnable; a review is never added twice. Fera (site and Google reviews) is free and runs weekly; Trustpilot and BBB are read monthly with Claude (about ${money(0.25)} each); testimonials are marked curated.</p>
+          <div class="row mt-2"><button class="btn sm" data-imp="fera">Fera: site and Google</button><button class="btn sm" data-imp="trustpilot">Trustpilot</button><button class="btn sm" data-imp="testimonials">Site testimonials</button>
+            <label class="btn sm">CSV<input type="file" id="vCsv" accept=".csv,text/csv" hidden></label></div>
+          <div class="table-wrap mt-2"><table class="data text"><tbody>${d.runs.map(r=>`<tr><td>${esc(r.kind.replace('import_','').replace('_',' '))}</td><td class="muted">${esc((r.started_at||'').slice(0,16).replace('T',' '))}</td><td>${r.status==='failed'?`<span class="err" title="${esc(r.error)}">failed</span>`:r.status==='running'?'<span class="spinner"></span>':esc([r.result.added!=null?r.result.added+' added':'',r.result.themes!=null?r.result.themes+' themes':''].filter(Boolean).join(', '))}</td></tr>`).join('')||'<tr><td class="dim">Nothing imported yet.</td></tr>'}</tbody></table></div></section></div></div>`;
+  $('vKind').querySelectorAll('button').forEach(x=>x.onclick=()=>{VK=x.dataset.v;loadVoice();});
+  document.querySelectorAll('tr[data-g]').forEach(tr=>tr.onclick=e=>{if(e.target.closest('button'))return;VG=tr.dataset.g;loadVoice();});
+  $('vq').onchange=e=>{VQ=e.target.value.trim();loadVoice();};
+  document.querySelectorAll('[data-imp]').forEach(x=>x.onclick=async()=>{const r=await post('/api/adstudio/voice/import',{source:x.dataset.imp});$('vErr').textContent=r.error||'Queued: the import runs in the background. Refresh in a minute.';});
+  $('vCsv').onchange=async e=>{const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);
+    const r=await (await fetch('/api/adstudio/voice/csv',{method:'POST',body:fd})).json(); if(!r.error)await loadVoice();
+    $('vErr').textContent=r.error||`${r.added} of ${r.rows} added.${r.errors.length?' '+r.errors.join('; '):''}`;};
+  document.querySelectorAll('[data-ex]').forEach(x=>x.onclick=async()=>{const pid=x.dataset.ex||null, est=(await post('/api/adstudio/voice/extract',{product_id:pid})).estimate;
+    if(!confirm(`Claude reads up to 400 of the latest reviews and counts the themes. About ${money(est)}, on the research cap. Go?`))return;
+    const r=await post('/api/adstudio/voice/extract',{product_id:pid,confirm:true}); $('vErr').textContent=r.error||'Queued: the themes appear here in a minute or two.';});
+  document.querySelectorAll('[data-mk]').forEach(x=>x.onclick=async()=>{const r=await post('/api/adstudio/voice/theme/'+x.dataset.mk+'/idea');
+    if(r.error){$('vErr').textContent=r.error;return;} x.outerHTML=`<a class="accent-text" href="/ideas/bank${PID?'?product_id='+PID:''}">In the bank</a>`;});
+}
+
+/* ---------- MARKET (R1/R2): brands, competitor ads by how long they run, patterns, the weekly brief ----------
+   Ads come from the Ad Library API (EU/UK delivery only) and by hand from the US Ad Library: open a brand's link,
+   screenshot an ad, and Claude fills the form. No scraper (Meta's terms). routes/ideas.py + routes/results.py. */
+let MK={brand:'',stage:'proven',by:'angle'}, ADD={};
+const BY_NAMES={angle:'Angle',hook_type:'Hook type',format:'Format',style:'Style'};
+async function loadResearch(){
+  const q=new URLSearchParams(); if(MK.brand)q.set('brand_id',MK.brand); if(MK.stage)q.set('stage',MK.stage);
+  const [m,r,sw]=await Promise.all([fetch('/api/adstudio/market?'+q).then(x=>x.json()),fetch('/api/adstudio/research').then(x=>x.json()),fetch('/api/adstudio/swipe').then(x=>x.json())]);
+  const P=r.patterns, nm=k=>P.names[k]||nice(k), b=r.brief, sc=m.scan;
+  const stages=[['proven','Proven 30+ d'],['evergreen','Evergreen 90+ d'],['traction','Traction'],['new','New tests'],['','All']];
+  const styleRows=[...new Set([...Object.keys(P.style.theirs),...Object.keys(P.style.ours)])].map(k=>`<tr><td>${esc(nm(k))}</td><td>${P.style.theirs[k]||0}</td><td>${P.style.ours[k]||0}</td></tr>`).join('');
+  const hookRows=[...new Set([...Object.keys(P.hook_type.theirs),...Object.keys(P.hook_type.ours)])].map(k=>`<tr><td>${esc(nice(k))}</td><td>${P.hook_type.theirs[k]||0}</td><td>${P.hook_type.ours[k]||0}</td></tr>`).join('');
+  const ads=m.ads.map(a=>`<tr><td>${esc(a.brand)}${a.tier?` <span class="muted">(${a.tier})</span>`:''}</td>
+      <td>${esc(((a.headline?a.headline+' · ':'')+a.body).slice(0,160))}${a.landing_url?`<div class="muted">${esc(a.landing_url.slice(0,60))}</div>`:''}</td>
+      <td title="${esc(a.why_it_works||'')}">${a.style?esc(nm(a.style)):'<span class="dim">not tagged</span>'}${a.hook_type?' · '+esc(nice(a.hook_type)):''}${a.format?`<div class="muted">${esc(nice(a.format))}${a.offer_type&&a.offer_type!=='no_offer'?' · '+esc(nice(a.offer_type)):''}</div>`:''}</td>
+      <td>${a.days==null?'—':a.days+' d'}${a.active?'':' <span class="muted">ended</span>'}</td><td>${a.stage?`<span class="tagb ${a.stage==='evergreen'||a.stage==='proven'?'pat-b':''}">${esc(a.stage_name)}</span>`:''}</td>
+      <td>${a.variants}</td><td>${a.url?`<a class="accent-text" href="${esc(a.url)}" target="_blank" rel="noopener">ad</a>`:''}${a.has_media?` <a class="accent-text" href="/api/adstudio/market/ad/${a.id}/media" target="_blank" rel="noopener">shot</a>`:''}
+        ${a.template_status==='done'?` <a class="accent-text" href="/video/create?style=template">template</a>`:a.template_status?` <span class="muted">decoding</span>`:''}
+          <button class="btn sm" data-sw="${a.id}" title="Save to the swipe file with a note">save</button>${a.template_status?'':`<label class="btn sm" title="Save the ad's video and add it here. Proven and Evergreen ads are decoded into a competitor-derived structure template.">video<input type="file" accept="video/mp4,video/quicktime,video/webm" data-vid="${a.id}" hidden></label>`}</td></tr>`).join('');
+  const brands=m.brands.filter(x=>x.active).map(x=>`<tr><td><b>${esc(x.name)}</b> <span class="muted">${x.tier}</span><div class="muted">${esc(x.why)}</div></td>
+      <td>${x.ads} ads${x.longest_days?`, longest ${x.longest_days} d`:''}</td>
+      <td class="muted">${x.context&&x.context.offer?esc([x.context.offer,x.context.prices,x.context.guarantee].filter(v=>v&&v!=='not stated').join(' · ').slice(0,220))+`<div class="dim">${esc((x.context_at||'').slice(0,10))}</div>`:(x.tier==='C'?'':'Refreshed monthly')}</td>
+      <td><a class="btn sm" href="${esc(x.us_library_url)}" target="_blank" rel="noopener">US Ad Library</a>${x.tier!=='C'&&x.website?` <button class="btn sm" data-ctx="${x.id}">Refresh offer</button>`:''}</td></tr>`).join('');
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">Market</h2><span class="muted">${m.concepts} ad concepts from ${m.brands.filter(x=>x.active).length} brands · research spend this month ${money(m.spent_month)} of ${money(m.cap_month)}</span>
+      <button class="btn ml-auto" id="mkRefresh">Refresh now</button><button class="btn btn-p" id="rsRun">Tag new ads and write the brief now</button></div>
+    <div class="hint flush">Refreshed monthly from Meta's Ad Library API, which only covers ads delivered in the EU and UK. For US ads, open a brand's US Ad Library below, screenshot an ad and add it: Claude reads it. ${sc?`Last refresh ${esc(sc.started_at.slice(0,10))}: ${sc.result.added||0} new, ${sc.result.updated||0} updated${sc.error?` (${esc(sc.error.slice(0,140))})`:''}.`:'No refresh yet.'}</div>
+    <p class="err" id="rsErr"></p>
+    <section class="card"><div class="row jc-between"><strong>Competitor ads, longest-running first</strong>
+        <div class="row"><select class="f w-wide" id="mkBrand"><option value="">Every brand</option>${m.brands.map(x=>`<option value="${x.id}" ${String(x.id)===String(MK.brand)?'selected':''}>${esc(x.name)} (${x.tier})</option>`).join('')}</select>
+        <div class="seg" id="mkStage">${stages.map(([k,l])=>`<button data-v="${k}" class="${MK.stage===k?'on':''}">${l}</button>`).join('')}</div></div></div>
+      <div class="table-wrap mt-2"><table class="data text"><thead><tr><th>Brand</th><th>Words</th><th>Style · hook</th><th>Running</th><th>Stage</th><th>Variants</th><th></th></tr></thead>
+        <tbody>${ads||'<tr><td colspan="7" class="dim">No ads here yet.</td></tr>'}</tbody></table></div></section>
+    <section class="card mt-3"><strong>Add an ad you saw</strong>
+      <p class="muted">Screenshot it in the US Ad Library (or your feed) and Claude reads the words, the button, the start date and the variant count; or paste the brand's landing page. Check the fields, then add. About ${money(m.estimates.read)} a read.</p>
+      <div class="row mt-2 end"><div><label class="fl" for="adShot">Screenshot</label><input class="f" type="file" id="adShot" accept="image/png,image/jpeg,image/webp"></div>
+        <div class="field-grow"><label class="fl" for="adLanding">or the landing page</label><input class="f" id="adLanding" placeholder="https://"></div><button class="btn" id="adReadLanding">Read the page</button></div>
+      <div class="row mt-3 end"><div><label class="fl" for="rsPage">Brand page</label><input class="f w-mid" id="rsPage" value="${esc(ADD.page_name)}"></div><div class="field-grow"><label class="fl" for="rsBody">The ad's words</label><input class="f" id="rsBody" placeholder="Primary text as shown" value="${esc(ADD.body)}"></div>
+        <div><label class="fl" for="rsHead">Headline</label><input class="f w-mid" id="rsHead" value="${esc(ADD.headline)}"></div><div><label class="fl" for="rsCta">Button</label><input class="f w-mid" id="rsCta" value="${esc(ADD.cta)}"></div>
+        <div><label class="fl" for="rsSeen">Started running</label><input class="f w-mid" type="date" id="rsSeen" value="${esc(ADD.started_on)}"></div></div>
+      <div class="row mt-2"><input class="f field-grow" id="rsUrl" placeholder="Ad Library link, optional"><button class="btn btn-p" id="rsAdd">Add ad</button><span class="muted" id="adMsg">${ADD.media_path?'Screenshot kept with the ad.':''}</span></div></section>
+    <section class="card mt-3"><strong>Brands</strong><p class="muted">Tiers: ${Object.entries(m.tiers).map(([k,v])=>k+' '+esc(v)).join(' · ')}. Edit the list in <a class="accent-text" href="/admin#secResearch">Admin › Research</a>.</p>
+      <div class="table-wrap mt-2"><table class="data text"><tbody>${brands}</tbody></table></div>
+      <label class="fl">US keyword searches</label><div class="row">${m.keywords.filter(k=>k.active).map(k=>`<a class="btn sm" href="${esc(k.us_library_url)}" target="_blank" rel="noopener">${esc(k.term)}</a>`).join('')}</div></section>
+    <section class="card mt-3"><strong>This week's brief</strong>${b?`<span class="muted"> · ${esc(b.created_at.replace('T',' ').slice(0,16))} · approve its ideas in the <a class="accent-text" href="/ideas/bank">idea bank</a></span><p class="mt-1">${esc(b.summary)}</p>
+      ${briefSections(b.sections||null, nm)}
+      <div class="table-wrap mt-2"><table class="data text"><thead><tr><th>Idea</th><th>Style</th><th>Products</th><th>Why</th></tr></thead><tbody>${b.suggestions.map(s=>`<tr><td>${esc(s.title||s.angle)}</td><td>${esc(s.style_name)}</td><td>${esc((s.products||[s.product]).filter(Boolean).join(', '))}</td><td class="muted">${esc(s.why)}</td></tr>`).join('')||'<tr><td colspan="4" class="dim">No suggestions this time.</td></tr>'}</tbody></table></div>`
+      :'<p class="muted mt-1">No brief yet. It runs every Monday once there is something to read (competitor ads, customer themes or Meta results), or run it now.</p>'}</section>
+    <section class="card mt-3"><strong>Swipe file</strong><p class="muted">Ads worth remembering, with why. Save any competitor ad above, any of our ads from its Gallery details, or a screenshot or link here. Inspiration only: never their footage, images or words.</p>
+      <div class="row mt-2 end"><div class="field-grow"><label class="fl" for="swNotes">Note</label><input class="f" id="swNotes" placeholder="What makes it work"></div>
+        <div class="field-grow"><label class="fl" for="swUrl">Link</label><input class="f" id="swUrl" placeholder="https://"></div><button class="btn" id="swLink">Save link</button>
+        <label class="btn">Screenshot<input type="file" id="swShot" accept="image/png,image/jpeg,image/webp" hidden></label></div>
+      <div class="table-wrap mt-2"><table class="data text"><tbody>${sw.items.map(i=>`<tr><td>${i.has_image?`<a href="/api/adstudio/swipe/${i.id}/image" target="_blank" rel="noopener" class="accent-text">image</a>`:i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener" class="accent-text">link</a>`:''}</td>
+        <td><b>${esc(i.title)}</b><div class="muted">${esc({competitor_ad:'Competitor ad',own_asset:'Our ad',screenshot:'Screenshot',link:'Link'}[i.kind])} · ${esc(i.created_at.slice(0,10))}</div></td>
+        <td><input class="f" data-swn="${i.id}" value="${esc(i.notes)}" placeholder="Add a note"></td><td><button class="btn sm" data-swx="${i.id}" aria-label="Remove">Remove</button></td></tr>`).join('')||'<tr><td class="dim">Nothing saved yet.</td></tr>'}</tbody></table></div></section>
+    <section class="card mt-3"><div class="row jc-between"><strong>Taste rubric</strong><button class="btn sm" id="tsPropose">Propose from the swipe file</button></div>
+      <p class="muted">Monthly, Claude proposes criteria for the QA rubric from the swipe file and our winners. Nothing changes until you approve each one; approved ones score every new image. About ${money(sw.estimate)} a proposal.</p>
+      ${sw.proposals.map(pr=>`<div class="mt-2"><div class="muted">${esc(pr.created_at.slice(0,10))} · ${esc(pr.summary)}</div><div class="table-wrap"><table class="data text"><tbody>${pr.items.map((it,n)=>`<tr><td><b>${esc(it.name)}</b><div class="muted">${esc(it.question)}</div><div class="dim">${esc(it.evidence)}</div></td><td>${esc(it.applies_to.join(', '))} · weight ${it.weight}</td>
+        <td>${it.status==='pending'?`<button class="btn sm btn-p" data-ts="${pr.id}:${n}:1">Approve</button> <button class="btn sm" data-ts="${pr.id}:${n}:0">Reject</button>`:`<span class="tagb ${it.status==='approved'?'pat-b':''}">${esc(it.status)}</span>`}</td></tr>`).join('')||'<tr><td class="dim">Nothing proposed.</td></tr>'}</tbody></table></div></div>`).join('')||'<p class="dim">No proposals yet (it needs at least 3 saved ads).</p>'}
+      ${sw.approved.length?`<label class="fl">In the rubric now</label><ul class="plain-list">${sw.approved.map(c=>`<li>${esc(c.name)} <span class="muted">· ${esc(c.question)}</span> <button class="btn sm" data-tr="${esc(c.key)}">Retire</button></li>`).join('')}</ul>`:''}</section>
+    <section class="card mt-3"><div class="row jc-between"><strong>Crowded vs gaps</strong><div class="seg" id="mkBy">${[['angle','Angle'],['hook_type','Hook'],['format','Format'],['style','Style']].map(([k,l])=>`<button data-v="${k}" class="${MK.by===k?'on':''}">${l}</button>`).join('')}</div></div>
+      <p class="muted mt-1">Proven and Evergreen ads only (30+ days). Crowded: 3 or more brands run it. Gap: one brand runs it for a long time.</p>
+      <div class="table-wrap mt-2"><table class="data"><thead><tr><th>${BY_NAMES[MK.by]}</th><th>Brands</th><th>Ads</th><th>Longest</th><th></th></tr></thead><tbody>
+        ${(P.crowding[MK.by]||[]).map(g=>`<tr title="${esc(g.brand_names.join(', '))}"><td>${esc(MK.by==='style'?nm(g.key):nice(g.key))}</td><td>${g.brands}</td><td>${g.ads}</td><td>${g.longest} d</td><td>${g.label?`<span class="tagb ${g.label==='gap'?'pat-b':''}">${g.label}</span>`:''}</td></tr>`).join('')||'<tr><td colspan="5" class="dim">No tagged ads running 30+ days yet.</td></tr>'}</tbody></table></div></section>
+    <section class="card mt-3"><strong>Styles: the category vs us</strong>
+      <p class="muted">Our styles and hook types from styles.yaml and hooks.yaml, so both sides compare on one taxonomy.${P.competitor_ads&&P.unused_by_competitors.length?` No competitor ad here uses: ${esc(P.unused_by_competitors.map(nm).join(', '))}.`:''}</p>
+      <div class="two"><div class="table-wrap"><table class="data"><thead><tr><th>Style</th><th>Competitors</th><th>Us</th></tr></thead><tbody>${styleRows||'<tr><td colspan="3" class="dim">Nothing tagged yet.</td></tr>'}</tbody></table></div>
+        <div class="table-wrap"><table class="data"><thead><tr><th>Hook type</th><th>Competitors</th><th>Us</th></tr></thead><tbody>${hookRows||'<tr><td colspan="3" class="dim">Nothing tagged yet.</td></tr>'}</tbody></table></div></div></section>
+    <section class="card mt-3"><strong>Customer comments</strong><p class="muted">Import real comments from the {{ BRAND.name }} Page into the reviews library (for customer language and the Comment-reply style). Needs the Page token.</p>
+      <div class="row"><button class="btn" id="rsComments">Import Page comments</button><span class="muted" id="rsCmMsg"></span></div></section>`;
+  $('mkBrand').onchange=e=>{MK.brand=e.target.value;loadResearch();};
+  document.querySelectorAll('[data-sw]').forEach(x=>x.onclick=async()=>{const notes=prompt('Why save it? (optional note)'); if(notes===null)return;
+    const d=await post('/api/adstudio/swipe',{kind:'competitor_ad',ref_id:+x.dataset.sw,notes}); if(!d.error)await loadResearch(); $('rsErr').textContent=d.error||'Saved to the swipe file.';});
+  $('swLink').onclick=async()=>{const d=await post('/api/adstudio/swipe',{kind:'link',url:$('swUrl').value,notes:$('swNotes').value}); if(!d.error)await loadResearch(); else $('rsErr').textContent=d.error;};
+  $('swShot').onchange=async e=>{const f=e.target.files[0]; if(!f)return; const fd=new FormData(); fd.append('file',f); fd.append('notes',$('swNotes').value);
+    const d=await (await fetch('/api/adstudio/swipe',{method:'POST',body:fd})).json(); if(!d.error)await loadResearch(); else $('rsErr').textContent=d.error;};
+  document.querySelectorAll('[data-swn]').forEach(i=>i.onchange=()=>post('/api/adstudio/swipe/'+i.dataset.swn,{notes:i.value}));
+  document.querySelectorAll('[data-swx]').forEach(x=>x.onclick=async()=>{await post('/api/adstudio/swipe/'+x.dataset.swx,{remove:true}); loadResearch();});
+  $('tsPropose').onclick=async()=>{if(!confirm(`Claude proposes taste criteria from the swipe file and our winners. About ${money(sw.estimate)}, on the research cap. Go?`))return;
+    const d=await post('/api/adstudio/taste/propose',{confirm:true}); $('rsErr').textContent=d.error||'Queued: the proposal appears here in a minute.';};
+  document.querySelectorAll('[data-ts]').forEach(x=>x.onclick=async()=>{const [pid,n,ok]=x.dataset.ts.split(':'); const d=await post('/api/adstudio/taste/'+pid+'/decide',{index:+n,approve:ok==='1'});
+    if(d.error){$('rsErr').textContent=d.error;return;} loadResearch();});
+  document.querySelectorAll('[data-tr]').forEach(x=>x.onclick=async()=>{if(!confirm('Take this criterion out of the rubric?'))return; await post('/api/adstudio/taste/retire',{key:x.dataset.tr}); loadResearch();});
+  $('mkBy').querySelectorAll('button').forEach(x=>x.onclick=()=>{MK.by=x.dataset.v;loadResearch();});
+  document.querySelectorAll('[data-vid]').forEach(i=>i.onchange=async()=>{const f=i.files[0]; if(!f)return; $('rsErr').innerHTML='<span class="spinner"></span> Uploading the video…';
+    const fd=new FormData(); fd.append('file',f); const d=await (await fetch('/api/adstudio/market/ad/'+i.dataset.vid+'/video',{method:'POST',body:fd})).json();
+    if(!d.error)await loadResearch(); $('rsErr').textContent=d.error||d.why||'Decoding in the background: the template appears in Video › Create › From a winning ad, labelled competitor-derived.';});
+  $('mkStage').querySelectorAll('button').forEach(x=>x.onclick=()=>{MK.stage=x.dataset.v;loadResearch();});
+  $('mkRefresh').onclick=async()=>{const d=await post('/api/adstudio/market/refresh');$('rsErr').textContent=d.error||'Queued: the refresh runs in the background (Ad Library, tagging, brand offers that are due).';};
+  $('rsRun').onclick=async()=>{const d=await post('/api/adstudio/research/run',{});$('rsErr').textContent=d.error||'Queued: tagging and the brief run in the background.';};
+  $('adShot').onchange=async e=>{const f=e.target.files[0]; if(!f)return; $('adMsg').innerHTML='<span class="spinner"></span> Reading…';
+    const fd=new FormData(); fd.append('file',f); const d=await (await fetch('/api/adstudio/market/read',{method:'POST',body:fd})).json(); readInto(d);};
+  $('adReadLanding').onclick=async()=>{$('adMsg').innerHTML='<span class="spinner"></span> Reading…'; readInto(await post('/api/adstudio/market/read',{landing_url:$('adLanding').value}));};
+  $('rsAdd').onclick=async()=>{const d=await post('/api/adstudio/research/ads',{...ADD,page_name:$('rsPage').value,body:$('rsBody').value,headline:$('rsHead').value,cta:$('rsCta').value,started_on:$('rsSeen').value,url:$('rsUrl').value});
+    if(d.error){$('adMsg').textContent=d.error;return;} ADD={}; MK.stage=''; loadResearch();};
+  $('rsComments').onclick=async()=>{const d=await post('/api/adstudio/research/comments',{});$('rsCmMsg').textContent=d.error||`${d.added} new comment${d.added===1?'':'s'} added.`;};
+  document.querySelectorAll('[data-ctx]').forEach(x=>x.onclick=async()=>{
+    if(!confirm(`Refresh this brand's offer, prices and guarantee from its website? About ${money(m.estimates.context)}, on the research cap.`))return;
+    x.disabled=true; x.innerHTML='<span class="spinner"></span>'; const d=await post('/api/adstudio/market/brand/'+x.dataset.ctx+'/context',{confirm:true});
+    if(d.error){$('rsErr').textContent=d.error;x.disabled=false;x.textContent='Refresh offer';return;} loadResearch();});
+}
+function briefSections(S, nm){
+  if(!S)return '';
+  const li=(arr,f)=>arr.length?`<ul class="plain-list">${arr.map(f).join('')}</ul>`:'<div class="dim">None this week.</div>';
+  return `<div class="two mt-2"><div><label class="fl">New long-running competitor ads</label>${li(S.long_runners.slice(0,6),a=>`<li>${esc(a.brand)}: ${esc((a.headline||a.body||'').slice(0,80))} <span class="muted">· ${a.days} d</span></li>`)}
+      <label class="fl">Angles gaining · fading</label>${li([...S.angles.gaining.map(t=>({...t,s:'+'})),...S.angles.fading.map(t=>({...t,s:''}))],t=>`<li>${esc(nice(t.angle))} <span class="muted">${t.s}${t.change} (${t.now} running)</span></li>`)}</div>
+    <div><label class="fl">New customer themes</label>${li(S.themes.slice(0,6),t=>`<li>${esc(t.theme)} <span class="muted">· ${t.mentions} · ${esc(t.product||'shop-wide')}</span></li>`)}
+      <label class="fl">Our winners · fatigued</label>${li([...S.winners.map(w=>`<li>${esc(w.name)} <span class="muted">· ROAS ${w.roas}</span></li>`),...S.fatigued.map(f=>`<li>${esc(f.name)} <span class="muted">· fatigued: ${esc(f.trips.join(', '))}</span></li>`)],x=>x)}</div></div>`;
+}
+function readInto(d){
+  if(d.error){$('adMsg').textContent=d.error;return;}
+  ADD={page_name:d.page_name,body:d.body,headline:d.headline,cta:d.cta,started_on:d.started_on,media_path:d.media_path||'',media_kind:d.media_kind||'',landing_url:d.landing_url||'',
+       active:d.active!==false};
+  const keep=MK.stage; loadResearch().then(()=>{$('adMsg').textContent=`Read. Check the fields, then add.${d.variants>1?` Meta shows ${d.variants} ads using this creative.`:''}`;});
+  MK.stage=keep;
+}
+
+boot();
+</script>
+</body>
+</html>

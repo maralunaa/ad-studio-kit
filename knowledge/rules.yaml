@@ -1,0 +1,124 @@
+# Hard limits for every ad, derived from the Meta Creative Playbook. Code checks read these numbers;
+# change them here (with the playbook), never in the checks.
+# Lengths are characters unless named *_words. Fractions are of the frame (0.14 = 14%).
+
+version: 1
+
+copy_fields:
+  source: "Copy, CTA and compliance › Field rules"
+  primary_text:
+    cold: {min: 50, max: 150}
+    warm: {min: 250, max: 400}
+    hook_within: 125            # the rest hides behind "See more"
+  headline: {target: 27, max: 40, rule: Adds something new; never repeats the primary text}
+  description: {max: 30, rule: Optional; a guarantee or shipping line}
+  variations_per_field: 5
+
+on_image_text:
+  source: "Static ads › Design rules"
+  headline_words: {min: 3, max: 7}
+  total_words_max: 20           # headline + sub + CTA + badge; a real review quote only warns
+  contrast_min: 4.5             # WCAG AA, text against what is behind it
+  fruit_fill: {min: 0.40, max: 0.60}
+
+# Native lo-fi layouts (notes list, text thread, post-it, handwritten letter) are text by design: the playbook's
+# "Styles to test next" puts letters, post-its and text-only ads among the formats that win. They keep the headline
+# rule but get a higher total.
+lofi_text:
+  source: "Styles to test next"
+  total_words_max: 45
+
+# Keep text and logo inside: top/bottom are where the safe band starts and ends, side is each margin.
+safe_zones:
+  source: "Static ads › Sizes and safe zones"
+  "4:5":  {size: [1080, 1350], top: 0.05, bottom: 0.95, side: 0.05}
+  "9:16": {size: [1080, 1920], top: 0.14, bottom: 0.65, side: 0.06}   # decision c: statics and video captions
+  "1:1":  {size: [1080, 1080], top: 0.05, bottom: 0.95, side: 0.05, fallback: true}
+
+captions:
+  source: "Video ads › Rules"
+  min_pt: 24
+  # 24 pt read as 24 px at a 360-px phone width (the legibility convention), = 72 px on a 1080-wide frame.
+  min_px_at_phone: 24
+  phone_width_px: 360
+  burned_in: true
+  position: centred or lower third, inside the safe zone
+
+video_pacing:
+  source: "Video ads › Rules"
+  hook_window_s: [1, 3]
+  stories_hook_max_s: 2
+  change_every_s: 2
+  max_shot_s_between_5_and_15: 3
+  deliver_by_s: 5
+  feed_cta_last_s: [3, 5]
+
+video_length:
+  source: "Video ads › Length by placement"
+  reels:       {min: 6, max: 30, sweet: [9, 20], aspect: ["9:16"]}
+  stories:     {min: 6, max: 15, aspect: ["9:16"]}
+  feed:        {min: 15, max: 30, aspect: ["4:5", "9:16"]}
+  retargeting: {min: 15, max: 60, aspect: ["4:5", "9:16"]}
+
+export:
+  source: "Video ads › Length by placement"
+  container: mp4
+  video_codec: h264
+  audio_codec: aac
+  fps: 30
+  min_bitrate_mbps: 8           # at 1080p (decision d)
+  sizes: ["9:16", "4:5"]
+
+cta:
+  source: "Copy, CTA and compliance › CTA rules"
+  one_per_ad: true
+  allowed:
+    shop_now:   {label: Shop now, intent: purchase}
+    order_now:  {label: Order now, intent: purchase}
+    get_offer:  {label: Get offer, intent: offer, requires: real_offer}
+    learn_more: {label: Learn more, intent: explainer}
+  must_match: [on_image, button, landing_page]
+  reason_to_act_now: must be true (season ending, gift deadline, free gift)
+
+# Decision e: about 15% of ads may carry 1–2 emoji, in the primary text only; none anywhere else.
+emoji:
+  source: "Copy, CTA and compliance › CTA rules"
+  share_of_ads: 0.15
+  max_per_ad: 2
+  fields: [primary_text]
+
+# The idea bank (Ideas section) steers part of what Ad Studio makes, never all of it: the rest follows the playbook,
+# Hook University and the winning patterns as before. share = the part of each product's images, hooks, AI ads and
+# videos that follow an idea, kept over the last `window` of each; an idea picked by hand ("Use this idea") or typed in
+# always applies. Only ideas in `statuses` are used.
+ideas_mix:
+  source: "house: Phase 2a idea bank, share set by the user"
+  share: 0.30
+  window: 40
+  statuses: [approved, in_production, testing, winner]
+
+checklists:
+  source: "Pre-launch checklists"
+  # auto: true = Ad Studio checks it (check names the rubric criterion or pre-export check that does);
+  # auto: false = a person checks it. The user's brief also makes word count and CTA consistency automatic.
+  static:
+    - {text: "Fruit is accurate: shape, flesh colour, seeds or stone match the reference photos", auto: true, check: fruit_accuracy}
+    - {text: "Fruit fills 40–60% of the frame; one focal point", auto: false}
+    - {text: "Headline 3–7 words; total on-image text under about 20 words", auto: true, check: word_count}
+    - {text: "Text contrast at least 4.5:1, readable at 25% zoom", auto: true, check: legibility}
+    - {text: "Text doesn't cover the fruit; logo small, in a corner", auto: true, check: text_clear_of_fruit}
+    - {text: "Text inside the safe zone for every size: 9:16, 4:5, 1:1", auto: true, check: safe_zone}
+    - {text: "Every claim is an approved fact; price matches Shopify", auto: true, check: claims}
+    - {text: "One CTA, matching the button and the landing page", auto: true, check: cta_match, note: landing page stays a person check}
+    - {text: "Angle, hook and format tagged; asset ID set as the Meta ad name", auto: true, check: tags}
+    - {text: "AI-generated flag set", auto: true, check: ai_flag}
+  video:
+    - {text: "Fruit or hook on screen in the first second", auto: false}
+    - {text: "Makes sense with sound off; captions burned in, 24 pt or larger, inside the safe zone", auto: true, check: caption_size}
+    - {text: "Something changes about every 2 seconds; no dead air between 5 and 15 s", auto: false}
+    - {text: "Hook paid off by second 5", auto: false}
+    - {text: "Fruit count and shape stay consistent from first to last frame", auto: true, check: consistency}
+    - {text: "Length fits the placement (Reels 9–20 s sweet spot; Stories 6–15 s)", auto: false}
+    - {text: "Presenter lines use approved facts only; AI person flagged", auto: true, check: claims}
+    - {text: "Music licensed; CTA in the last 3–5 s", auto: false}
+    - {text: "Exported 9:16 and 4:5, MP4 H.264, 30 fps", auto: true, check: export_spec}

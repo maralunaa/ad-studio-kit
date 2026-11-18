@@ -1,0 +1,64 @@
+# Compliance rules, derived from the Meta Creative Playbook (§Copy, CTA and compliance › Compliance).
+# Non-negotiable. The house rules at the bottom sit above the playbook.
+
+version: 1
+
+rules:
+  source: "Copy, CTA and compliance › Compliance (non-negotiable)"
+  items:
+    - key: facts_only
+      text: Every claim comes from the approved facts library.
+    - key: shopify_prices
+      text: Prices only from Shopify.
+    - key: real_reviews_only
+      text: >-
+        Reviews and testimonials must be real: no invented, AI-written or paid-for-sentiment reviews.
+        Attribute real quotes and keep their meaning. Brand-voice cards are allowed only when they are not
+        presented as customer reviews (decision i declined).
+    - key: no_personal_attribute
+      text: Speak to what people want, not what they are. Never imply a personal condition or identity.
+    - key: health_wording
+      text: >-
+        Describe the fruit and its nutrients with a source from the approved facts; never claim to cure or
+        treat; qualify any result ("can help", not "will").
+    - key: ai_disclosure
+      text: >-
+        AI people and AI-made scenes are flagged. Presenters are brand narrators, never customers or a
+        real farmer.
+    - key: no_fake_scarcity
+      text: >-
+        No false scarcity, bait pricing or "free" with hidden charges. Urgency only with a real deadline or
+        real stock limit (harvest season counts). The landing page matches the ad.
+    - key: no_other_fruit
+      text: >-
+        Name only the product's own fruit. Never compare it to or name another fruit, for taste or colour ("tastes
+        like peach", "peach-sunset flesh"); describe the fruit in its own words. A box names only fruits it holds.
+    - key: plain_words
+      text: >-
+        Say it plainly. Hooks, headlines and on-screen text must make sense to someone scrolling past in one second:
+        no riddles, puzzles or metaphors that need decoding ("snow inside" for white flesh). Name the real thing
+        ("white inside, black seeds") and the real benefit.
+
+# Patterns code uses to flag personal-attribute copy (second person + a condition or identity).
+# Case-insensitive regular expressions.
+personal_attribute:
+  source: "Copy, CTA and compliance › Compliance (non-negotiable)"
+  patterns:
+    - "\\bare you (?:a |an )?(?:diabetic|overweight|obese|pregnant|depressed|anxious|sick|ill|tired all the time|struggling with|suffering from|dealing with|living with)\\b"
+    - "\\b(?:your|you have|you've got) (?:diabetes|depression|anxiety|acne|eczema|ibs|high blood pressure|cholesterol|weight problem|belly fat|insomnia)\\b"
+    - "\\b(?:struggling|suffering|dealing|living) with (?:your )?(?:weight|diabetes|depression|anxiety|bloating|digestion|insomnia)\\b"
+    - "\\b(?:people|those|someone) like you who\\b"
+    - "\\bas a (?:diabetic|vegan|mom|mother|dad|senior|man over \\d+|woman over \\d+)\\b"
+
+# Above the playbook (house rules from the user).
+house:
+  source: "house: rules above the playbook"
+  items:
+    - key: no_origin_claims
+      text: Never claim where the fruit comes from (country, region, farm location, "imported").
+    - key: no_ai_drawn_text
+      text: Image models never draw words; all text is drawn by code from approved copy.
+    - key: hook_university_stays
+      text: Hook University's angles, archetypes and banned templates stay; the playbook adds to them.
+    - key: read_only_meta
+      text: Ad Studio reads from Meta and never writes to it.

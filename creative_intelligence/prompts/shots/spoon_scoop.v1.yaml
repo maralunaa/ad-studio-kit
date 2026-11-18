@@ -1,0 +1,32 @@
+version: 1
+name: spoon_scoop
+label: Spoon scoop (sensory)
+summary: A spoon sinks into the soft flesh of a halved fruit and lifts out a creamy spoonful.
+use: Sensory beats for soft, custardy fruit
+duration_s: 5
+energy: low
+product_types:
+- fruit
+styles:
+- sensory
+cast: true
+route: veo
+audio: none
+strict_qa: true
+still:
+  locks: One half of the fruit exactly as in the reference photos, cut face up on a plain surface, a spoon resting at
+    its edge; flesh true colour and texture.
+  freedom: Surface, spoon, background blur.
+  composition: Close, three-quarter view from above, the half filling the middle third.
+  lighting: Soft window light with a glossy highlight on the flesh.
+motion:
+  camera: a very slow push in
+  change: the spoon presses into the soft flesh and lifts out one glossy spoonful
+params:
+- name: scoops
+  value: one
+  feel: several scoops look like a cooking video
+pitfalls:
+- the flesh turns into yoghurt or ice cream
+- the spoon bends or merges with the fruit
+negative: extra fruit, extra hands, extra fingers, melting, yoghurt, ice cream, text, logos, watermarks, captions

@@ -1,0 +1,44 @@
+version: 3
+name: ripening_transition
+label: Ripening (time-lapse)
+summary: The whole fruit ripening on a counter, from firm to ready, as the approved ripening guide describes.
+use: Ripening time-lapse; answers "will it be ripe?"
+duration_s: 5
+energy: low
+product_types:
+- fruit
+styles:
+- ripening_timelapse
+cast: true
+facts_category: ripeness
+route: kling
+timelapse_stages:
+- just starting to turn, a little more colour than the first picture
+- nearly ripe, the colour deeper and the skin a touch softer-looking
+- fully ripe, with the colour and look the ripening guide gives for ready to eat
+audio: none
+strict_qa: false
+qa_note: >-
+  This is a ripening time-lapse: the skin colour and softness are meant to change from the first frame to the last
+  as the approved ripening guide says. The fruit count, shape and position must not change.
+qa_skip:
+- fruit_accuracy
+still:
+  locks: One whole fruit exactly as in the reference photos in shape and markings, at the firm stage the approved
+    ripening facts describe for delivery day, on a plain kitchen counter.
+  freedom: Counter, soft background.
+  composition: Straight-on, the fruit in the middle third, plenty of calm space above.
+  lighting: Even daylight that does not change.
+motion:
+  camera: the camera is locked off, like a time-lapse
+  change: over days the skin colour and blush deepen toward the ripe stage the approved facts describe
+params:
+- name: change
+  value: colour only
+  feel: shape or size changes look fake
+pitfalls:
+- the fruit moves or changes size
+- ripens past the stage the facts describe
+negative: text, logos, watermarks, hands, extra fruit, light changes, moving camera
+# v2 (2026-10-26): a real time-lapse from stills (the first still plus one edit per stage, blended), not a video model asked to ripen the fruit; the live test's ripening video had no ripening in it.
+# v3 (2026-10-27): normal QA bar (it scored 3.94 but strict wanted 'same fruit' 5 for a fruit that changes colour on purpose); stage edits keep the variety's own markings (the blush was lost).

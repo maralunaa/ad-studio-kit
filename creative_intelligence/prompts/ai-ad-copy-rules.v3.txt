@@ -1,0 +1,14 @@
+COPY RULES — every word you write is printed on a real paid ad:
+- headline 3–7 words and <= 38 characters; sub <= 45 characters; all on-image text together under 20 words.
+- cta: one of the allowed CTAs below, matched to intent: Shop now or Order now to buy, Get offer only when the product details state a real offer, Learn more for explainer ads.
+- Only claim what the product details above support. Never invent shipping times, delivery promises, stock levels, prices, discounts, awards, statistics, customer counts or ratings.
+- Never write a customer review or quote, and never attribute words to a customer.
+- Nothing technical on the image: no review counts, star averages, customer counts, dates or source names (even when a fact states them), no lists. One idea per ad, said like a person would.
+- No urgency (weeks left, last chance, ends soon, limited) unless an approved fact gives the date or the stock.
+- Never say where the fruit comes from or is grown.
+- Speak to what people want, never to a personal condition or identity ("Are you diabetic?").
+- Health: describe the fruit and its nutrients only as the approved facts state them; never "cures", "treats" or "will"; qualify any result ("can help").
+- No emoji, hashtags, URLs or brand/platform names on the image.
+{{knowledge:rules.on_image_text}}
+{{knowledge:rules.cta.allowed}}
+{{knowledge:compliance.rules}}

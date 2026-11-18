@@ -1,0 +1,24 @@
+.env
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+data/raw/
+data/processed/
+outputs/
+*.log
+.venv/
+venv/
+credentials/
+
+# Runtime/volume data — SQLite DBs, uploaded reference photos, generated
+# images (render_outputs, labels, adstudio, clip_outputs), DB backups.
+# Persisted on the Railway volume; never source. Ignore the whole directory.
+creative_intelligence_data/
+
+# Google service-account keys: never commit (use the GOOGLE_SERVICE_ACCOUNT_JSON secret)
+meta-ads-report-*.json
+*service-account*.json
+
+# Music: originals stay local; the levelled .m4a copies are committed
+music/*.mp4

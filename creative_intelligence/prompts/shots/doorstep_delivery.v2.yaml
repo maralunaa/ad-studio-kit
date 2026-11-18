@@ -1,0 +1,31 @@
+version: 2
+name: doorstep_delivery
+label: Box at the door
+summary: A plain cardboard box waiting on a doormat at a front door, the door opening.
+use: It arrives (Behind the farm)
+duration_s: 5
+energy: low
+product_types:
+- fruit
+route: kling
+audio: none
+from_images: []
+count_check: false
+still:
+  locks: One plain cardboard shipping box with a white shipping label on a doormat in front of a closed house door;
+    no fruit visible; no people.
+  freedom: The porch, a plant pot, morning light.
+  composition: Low angle from the porch, the box in the lower third, the door filling the frame behind it.
+  lighting: Soft morning daylight.
+motion:
+  camera: a slow push in toward the box
+  change: the box is complete and rigid from the first frame (walls, flaps and lid never build up, unfold or change shape); the door behind opens a little; the box stays exactly where it is
+params:
+- name: people
+  value: none on screen
+  feel: the viewer is the one opening the door
+pitfalls:
+- a person appears
+- text on the label becomes readable words or a brand
+negative: box assembling itself, box building up, changing box shape, people, faces, hands, readable text, brand names, logos, watermarks, captions, a second box
+# v2 (2026-11-11): "the box is being built gradually" (Blood Orange template): the box is whole from frame one.

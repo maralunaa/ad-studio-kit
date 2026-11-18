@@ -1,0 +1,41 @@
+version: 2
+name: character_scene
+label: Fruit character scene
+summary: The product's approved fruit character in a short animated beat.
+use: Fruit-character episodes; never on its own as the product
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+styles:
+- fruit_characters
+cast: true
+character: true
+route: veo
+audio: none
+strict_qa: false
+qa_note: >-
+  This is an intended 3D-animation fruit character, not a photograph. The FIRST reference image is the approved
+  character sheet: judge the character against it (colours, markings, face, proportions must stay the same from the
+  first frame to the last). Do not fail it for not being a real fruit.
+qa_skip:
+- fruit_accuracy
+- appetite
+still:
+  locks: The approved fruit character exactly as on its character sheet (the first reference image), same colours,
+    markings, face and proportions, in a simple bright animated set.
+  freedom: Set, props, pose.
+  composition: Character centred in the middle third, full body.
+  lighting: Bright, soft animated-film lighting.
+motion:
+  camera: a gentle push in
+  change: the character does one small, expressive action (a wave, a little hop, a surprised look)
+params:
+- name: action
+  value: one small action
+  feel: big actions make the character drift off-model
+pitfalls:
+- the character changes colours or face mid-clip
+- the character turns into a real fruit or a person
+negative: text, letters, logos, watermarks, people, extra characters, photorealistic fruit
+# v2 (2026-10-26): Veo, about half Kling's price and faster ("Making the scene shot takes long"); Kling is its fallback.

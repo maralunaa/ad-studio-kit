@@ -1,0 +1,32 @@
+version: 1
+name: plated_sharing
+label: Plated / sharing
+summary: Sliced fruit on a plate, shared at a table.
+use: Lifestyle and sharing beat; close of a story
+duration_s: 6
+energy: medium
+product_types:
+- fruit
+route: veo
+audio: ambient
+from_images:
+- plated
+- sharing
+strict_qa: true
+still:
+  locks: Slices of the fruit exactly as in the reference photos on a simple plate; flesh colour true.
+  freedom: Table setting, people's hands at the edge, background.
+  composition: Three-quarter view, plate in the lower two-thirds.
+  lighting: Warm daylight, relaxed.
+motion:
+  camera: a slow sideways slide past the plate
+  change: a hand reaches in and takes one slice
+params:
+- name: people
+  value: hands only
+  feel: faces raise the AI-person disclosure bar
+pitfalls:
+- 'Veo adds faces: hands only'
+- slices multiply on the plate
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

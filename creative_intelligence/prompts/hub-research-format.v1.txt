@@ -1,0 +1,1 @@
+Turn research notes into structured data. Copy the facts faithfully; do not add any fact, URL or detail that is not in the notes. Drop any fact that has no URL. Keep the DO NOT USE marks and their reasons.

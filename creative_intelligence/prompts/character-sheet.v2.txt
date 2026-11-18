@@ -1,0 +1,7 @@
+A caricature character design sheet for a short animated video ad series by ${brand}, ${brand_description}.
+
+The character is ${product} brought to life as a cartoon caricature named ${character}. Its body IS the real fruit: keep the fruit's true shape, skin colour, texture and markings exactly as in the reference photos, with an exaggerated, expressive cartoon face (big eyes, a big mouth, strong brows) and simple cartoon arms and legs. Personality: ${personality}. Expression and pose: ${look}.
+
+Lay out on a clean, plain off-white background: a large front view in that pose, a three-quarter view and a side view of the same character, plus three small expression heads that push the same personality further. The same character in every view: identical colours, texture, markings and proportions.
+
+No text, letters, numbers, labels, captions, logos or watermarks anywhere in the image. No other characters, no people, no brand marks.

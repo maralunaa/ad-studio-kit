@@ -1,0 +1,6 @@
+FRUIT STORY (the flagship; it merges the old "Storytelling"). Structure: the hook (0–3 s) → an orchard or tree shot → the fruit on the tree → three fast cut, macro or texture shots, one per line → why it's different → a short closing line over the best shot. The offer card is drawn after the last line. One style, two versions (the MODE below says which):
+- Presenter-led: the hook is a presenter on camera (line 1, kind presenter) and "why it's different" is the presenter again (kind presenter); the narrator carries the orchard, tree and cut lines over the shots. Presenter lines are short (one or two sentences, under 8 seconds each); the presenter is a brand narrator, never a customer or a ${brand} farmer.
+- Narrated: voice-over only. Every line is kind narrator; the narrator says the hook over the most striking shot and "why it's different" over a close cut.
+Narrator lines carry the sensory detail. Never say where the orchard or the fruit is.
+
+{{knowledge:styles.fruit_story}}

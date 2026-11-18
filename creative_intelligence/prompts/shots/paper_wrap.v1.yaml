@@ -1,0 +1,30 @@
+version: 1
+name: paper_wrap
+label: Wrapping in paper
+summary: One fruit wrapped by hand in brown paper inside an open box of paper padding.
+use: Fragile fruit wrapped one by one (Behind the farm)
+duration_s: 5
+energy: low
+product_types:
+- fruit
+route: kling
+audio: none
+from_images: []
+strict_qa: true
+still:
+  locks: One fruit exactly as in the reference photos, half wrapped in plain brown kraft paper, nested in an open
+    cardboard box of crinkled brown paper padding; two hands.
+  freedom: The table, more paper around the box.
+  composition: Close, slightly from above, the fruit in the centre, the hands at its sides.
+  lighting: Soft daylight.
+motion:
+  camera: holds almost still, a tiny handheld drift
+  change: the hands fold the paper up and over the fruit, slowly; the fruit keeps its shape and size
+params:
+- name: fruit
+  value: exactly one
+  feel: careful, slow hands
+pitfalls:
+- the fruit changes shape under the paper
+- paper turns into fabric or plastic
+negative: extra fruit, melting, warped hands, extra fingers, plastic, bubble wrap, text, logos, watermarks, captions

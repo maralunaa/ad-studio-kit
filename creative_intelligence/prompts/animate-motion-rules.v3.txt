@@ -1,0 +1,4 @@
+Animate this photograph as one continuous shot, from its first frame to its last, with no cuts, transitions or split screen.
+The product: ${product}
+Everything in the frame stays as it is in the photo, with the same items in the same places, except what the motion below changes. If the motion opens or cuts the product, its inside is the real inside described above. The motion is slow, natural and physically believable, and the picture stays clean, with no text, captions or logos.
+Motion: ${motion}

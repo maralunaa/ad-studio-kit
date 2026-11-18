@@ -1,0 +1,42 @@
+# What each variation tests and whether Meta treats it as a new concept, derived from the Meta Creative
+# Playbook (§What each variation tests, §Concepts vs variations).
+#   new_concept  yes | no | usually | per_product | partly | unless_angle_changes
+
+version: 1
+
+changes:
+  source: "What each variation tests"
+  items:
+    - {key: angle, tests: "Why people buy (taste, discovery, gift, freshness, value)", when: "Account is tired; looking for new winners", new_concept: "yes"}
+    - {key: format, tests: "Static vs video vs carousel; talking head vs Fruit Story vs ASMR", when: "Same angle, new audience pocket", new_concept: "yes"}
+    - {key: imagery_type, tests: "Cut-open vs whole vs box vs lifestyle vs hand-held", when: "First variable to test inside a concept", new_concept: usually}
+    - {key: hook, tests: "The opening line or first 3 seconds", when: "Hook rate low, or a winner is fading", new_concept: "no"}
+    - {key: product, tests: "Mango vs variety box vs gift basket", when: "A concept won on one product", new_concept: per_product}
+    - {key: offer, tests: "Free gift, free shipping, membership, bundle", when: "Concept gets attention but low conversion", new_concept: unless_angle_changes}
+    - {key: proof, tests: "Review quote, rating, guarantee, ripening promise", when: "Clicks without purchases", new_concept: "no"}
+    - {key: copy, tests: "Wording of the same idea", when: "Polishing a proven winner", new_concept: "no"}
+    - {key: length, tests: "6 / 15 / 30 s cuts", when: "Hold rate drops mid-video", new_concept: "no"}
+    - {key: size, tests: "9:16, 4:5, 1:1", when: "Always: ship all native sizes", new_concept: "no"}
+    - {key: presenter, tests: "Who delivers the message", when: "Talking-head winner fading", new_concept: partly}
+    - {key: minor_visual, tests: "Colour, crop, CTA button", when: "Last; rarely worth a test", new_concept: "no"}
+
+testing_order:
+  source: "What each variation tests › Order of testing for a new product"
+  order: [offer, angle, imagery_type, format, hook, proof, copy]
+  note: Settle the offer first if it's in question; a weak offer can't be rescued by good creative.
+
+concepts:
+  source: "Concepts vs variations › Working rules"
+  concepts_per_batch: {min: 6, max: 10}
+  variations_per_concept: {min: 3, max: 5}
+  testing_budget_share: {min: 0.10, max: 0.20}
+  judge_after_spend_x_target_cpa: [1, 2]
+  judge_after_days: 7
+  iterate_one_variable: [hook, visual, offer]
+  tired_account_needs: new angle, not new hooks
+
+layers:
+  source: "Concepts vs variations › The three layers of an ad"
+  angle: {is: Why someone buys, changing_it: new concept}
+  format: {is: "How it's packaged", changing_it: new concept}
+  hook: {is: The first line or first second, changing_it: "a variation, unless the angle changes too"}

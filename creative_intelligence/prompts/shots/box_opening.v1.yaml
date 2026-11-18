@@ -1,0 +1,33 @@
+version: 1
+name: box_opening
+label: Box opening
+summary: Our ${brand_packaging} opens to the fruit inside.
+use: Unboxing and gift beat; end of a story
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+route: kling
+audio: none
+from_images:
+- unboxing
+- gift
+strict_qa: true
+still:
+  locks: Our ${brand_packaging}, lid just lifted; fruit exactly as in the reference photos nestled in tissue; at most
+    three fruits.
+  freedom: Table, light, hands' sleeves.
+  composition: Three-quarter view from above, box in the lower two-thirds.
+  lighting: Warm, bright home light.
+motion:
+  camera: the camera holds still
+  change: the lid lifts away and the tissue opens to reveal the fruit
+params:
+- name: lid speed
+  value: slow
+  feel: fast lids flicker
+pitfalls:
+- the box grows a print or logo
+- fruit appear or vanish when the tissue opens
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

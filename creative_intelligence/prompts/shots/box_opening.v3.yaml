@@ -1,0 +1,38 @@
+version: 3
+name: box_opening
+label: Box opening
+summary: Our ${brand_packaging} opens to the fruit inside.
+use: Unboxing and gift beat; end of a story
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+route: veo
+audio: none
+from_images:
+- unboxing
+- gift
+strict_qa: true
+still:
+  locks: Our ${brand_packaging} with its lid half open; the fruit exactly as in the reference photos sitting in the box,
+    every fruit fully visible from the first frame, nothing covering them (no tissue or paper on top); at most three
+    fruits.
+  freedom: Table, light, hands' sleeves.
+  composition: Three-quarter view from above, box in the lower two-thirds.
+  lighting: Warm, bright home light.
+motion:
+  camera: the camera holds still
+  change: only the lid moves, swinging slowly fully open; the fruit inside stay exactly where they are, none appear or
+    disappear
+params:
+- name: lid speed
+  value: slow
+  feel: fast lids flicker
+pitfalls:
+- the box grows a print or logo
+- fruit appear or vanish when the tissue opens
+- 'v2: model comparison 2026-10-26 (same still, one take each): Veo 3.1 Fast passed at 4.29 (Kling 4.29, Seedance 4.50), at half Kling''s cost and fastest; v2 routes to Veo'
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions
+# v3 (2026-11-04 model test): box opening failed on every model: paper lifted off the fruit and the count went 6 to 4,
+# fruit appeared from under tissue. Now every fruit is visible from the first frame and only the lid moves.

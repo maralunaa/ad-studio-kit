@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product shots · Ad Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='studio.css') }}"><link rel="stylesheet" href="/brand.css">
+</head>
+<body>
+{% set chip = true %}{% include "_top.html" %}
+
+<div class="layout">
+  <div class="main">
+    <div class="pane active" id="pCore"><div id="coreBody"><div class="empty"><b>Pick a product</b>Product shots are made for the product in the top bar. <a class="accent-text" href="/products">Pick one in Products</a>.</div></div></div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let PID=null, DETAIL=null;
+
+async function boot(){
+  const want=+new URLSearchParams(location.search).get('product_id');
+  if(want)selectProduct(want);
+}
+/* The product comes from the top bar (picked in Products); Product shots are its product-page set, in its type's house
+   style (fruit, candle or other: 2026-11-13). */
+async function selectProduct(id){
+  PID=id;
+  const r=await fetch('/api/adstudio/product/'+id); if(!r.ok){PID=null;return;}
+  DETAIL=await r.json();
+  $('ctxName').textContent=DETAIL.product.name;
+  const ph=DETAIL.photos.find(x=>x.is_hero)||DETAIL.photos.find(x=>x.is_primary)||DETAIL.photos[0];
+  $('pickerThumb').innerHTML=ph?`<img src="/api/adstudio/photo/${ph.id}" alt="">`:'';
+  history.replaceState(null,'','/images/shots?product_id='+id); carryProduct(id);
+  renderCore();
+}
+async function uploadPhoto(e){const f=e.target.files[0];if(!f)return;const fd=new FormData();fd.append('file',f);await fetch('/api/adstudio/product/'+PID+'/photo',{method:'POST',body:fd});await selectProduct(PID);}
+
+/* ---------- CORE PHOTOS + INFOGRAPHICS ---------- */
+const KINDS_BY_TYPE={
+  fruit:{core1:'Core 1 · White box + cut & uncut on board',core2:'Core 2 · Close-up focus, box blurred behind',core3:'Core 3 · Lifestyle / hand'},
+  candle:{core1:'Core 1 · Hero, lit, label sharp',core2:'Core 2 · Flame and melt pool close-up',core3:'Core 3 · Lifestyle'},
+  other:{core1:'Core 1 · Clean hero on a studio sweep',core2:'Core 2 · Detail close-up',core3:'Core 3 · In use'}};
+const NOUN={fruit:'fruit',candle:'candle',other:'product'};
+let CORE_KINDS=KINDS_BY_TYPE.fruit, PTYPE='fruit';
+let INFO=null, CORE_ITEMS=[];
+function parseInfo(){
+  let i={};try{i=JSON.parse(DETAIL.product.info_json||'{}')}catch(e){}
+  i.name=i.name||DETAIL.product.name;
+  i.estimate=i.estimate||'pieces';
+  i.rows=i.rows&&i.rows.length?i.rows:[{on:true,size:'SAMPLE',weight:'2 LBS',pieces:''},{on:true,size:'MEDIUM',weight:'5 LBS',pieces:''},{on:true,size:'LARGE',weight:'8 LBS',pieces:''}];
+  i.bab=i.bab||{size:'SMALL',weight:'2 LBS',pieces:''};
+  return i;
+}
+async function renderCore(){
+  if(!PID||!DETAIL){$('coreBody').innerHTML='<div class="empty">Select a product.</div>';return;}
+  const p=DETAIL.product; INFO=parseInfo();
+  PTYPE=KINDS_BY_TYPE[p.product_type||'fruit']?(p.product_type||'fruit'):'other'; CORE_KINDS=KINDS_BY_TYPE[PTYPE];
+  const noun=NOUN[PTYPE], fruit=PTYPE==='fruit';
+  $('coreBody').innerHTML=`
+    <div class="card"><div class="row jc-between"><strong>The ${noun}</strong>
+      <a class="btn sm" href="/products?product_id=${PID}">Edit in Products · Look &amp; facts</a></div>
+      <label class="fl">What it looks like (goes into every product-shot prompt)</label>
+      <p class="prose">${p.physical_desc?esc(p.physical_desc):'<span class="muted">Not written yet. Write it, or let Claude draft it, in Products · Look &amp; facts.</span>'}</p>
+      ${p.varieties?`<label class="fl">Varieties</label><p class="prose">${esc(p.varieties)}</p>`:''}
+      <div class="row mt-3 jc-between"><label class="fl m-0">Reference photos — the role tells the generator what each one is for</label><button class="btn sm" id="btnTag">Auto-tag with Claude</button></div>
+      <div class="muted">Core 1 / Core 2 layout = the real shot whose framing gets copied. A ${noun} with no layout photo of its own borrows another ${noun}'s (never another type's). Infographics and other products are never sent to the image model.</div>
+      <div class="refs" id="refs"></div><input class="mt-2" type="file" id="photoInput" accept="image/*"></div>
+
+    <div class="card"><div class="row"><strong>Core photos</strong>
+      ${Object.keys(CORE_KINDS).map(k=>`<label class="arch-toggle"><input type="checkbox" class="ck" value="${k}" checked> ${k}</label>`).join('')}
+      <select class="f w-num" id="coreN"><option>1</option><option selected>2</option><option>3</option><option>4</option></select><span class="muted">each</span>
+      <button class="btn btn-p" id="btnCoreGen">Generate</button>
+      <a class="btn" href="/api/adstudio/export-core?product_id=${PID}">Download set (zip)</a>
+      <span class="muted" id="coreStatus"></span></div>
+      <div class="muted mt-1">Locked house style — only the ${noun} changes. ★ your picks; the zip takes favorites if any are starred.</div>
+      <div id="coreGrid"></div></div>
+
+    <div class="card" ${fruit?'':'hidden'}><div class="row jc-between"><strong>Box-size infographics</strong><span class="muted">drawn exactly — no AI</span></div>
+      <div class="row mt-2">
+        <div class="field-sm"><label class="fl">Fruit name on graphic</label><input class="f" id="iName" value="${esc(INFO.name)}"></div>
+        <div class="w-200"><label class="fl">Asterisk / footnote</label><select class="f" id="iEst"><option value="pieces" ${INFO.estimate!=='weight'?'selected':''}>Pieces* — count varies</option><option value="weight" ${INFO.estimate==='weight'?'selected':''}>Weight* — weight varies</option></select></div>
+        <div class="w-220"><label class="fl">Thumbnail</label><select class="f" id="iThumb"></select></div></div>
+      <div class="row top mt-2">
+        <div class="field-wide"><label class="fl">PDP variants (tick the ones to show)</label>
+          <table class="vt"><thead><tr><th></th><th>Size</th><th>Weight</th><th>Pieces</th><th></th></tr></thead><tbody id="iRows"></tbody></table>
+          <div class="row mt-2"><button class="btn sm" id="btnAddRow">+ Row</button><button class="btn btn-p" id="btnPdp">Render PDP infographic</button></div></div>
+        <div class="w-300"><label class="fl">Build-a-Box sample variant</label>
+          <table class="vt"><thead><tr><th>Box</th><th>Weight</th><th>Pieces</th></tr></thead><tbody><tr>
+            <td><input class="f" id="bSize" value="${esc(INFO.bab.size)}"></td><td><input class="f" id="bWeight" value="${esc(INFO.bab.weight)}"></td><td><input class="f" id="bPieces" value="${esc(INFO.bab.pieces)}"></td></tr></tbody></table>
+          <button class="btn btn-p mt-2" id="btnBab">Render BaB infographic</button></div></div>
+      <div id="infoGrid"></div></div>`;
+  renderRows(); renderRefs(); $('photoInput').onchange=uploadPhoto;
+  $('btnTag').onclick=tagPhotos;
+  $('btnCoreGen').onclick=genCore; $('btnAddRow').onclick=()=>{readInfo();INFO.rows.push({on:true,size:'',weight:'',pieces:''});renderRows();};
+  $('btnPdp').onclick=()=>renderInfo('pdp'); $('btnBab').onclick=()=>renderInfo('bab');
+  await watchCore();                         // shots still being made keep updating
+}
+const ROLES={'':'(untagged)',core1:'Core 1 layout',core2:'Core 2 layout',core3:'Lifestyle',infographic:'Infographic — not sent',other:'Other product — not sent'};
+function renderRefs(){
+  $('refs').innerHTML=DETAIL.photos.map(ph=>`<div class="ref ${['infographic','other'].includes(ph.role)?'off':''}"><img src="/api/adstudio/photo/${ph.id}"><select data-role="${ph.id}">${Object.entries(ROLES).map(([k,l])=>`<option value="${k}" ${(ph.role||'')===k?'selected':''}>${l}</option>`).join('')}</select></div>`).join('')||'<div class="muted">No reference photos yet — upload below or import from Shopify.</div>';
+  document.querySelectorAll('[data-role]').forEach(sel=>sel.onchange=async()=>{
+    await fetch('/api/adstudio/photo/'+sel.dataset.role+'/role',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role:sel.value})});
+    DETAIL.photos.find(p=>p.id===+sel.dataset.role).role=sel.value; renderRefs();
+  });
+}
+async function tagPhotos(){
+  const b=$('btnTag');b.disabled=true;b.innerHTML='<span class="spinner"></span> tagging…';
+  try{const d=await (await fetch('/api/adstudio/product/'+PID+'/tag-photos',{method:'POST'})).json();
+    if(d.error){alert(d.error);return;}
+    DETAIL=await (await fetch('/api/adstudio/product/'+PID)).json(); renderRefs();
+  }finally{b.disabled=false;b.textContent='Auto-tag with Claude';}
+}
+function renderRows(){
+  $('iRows').innerHTML=INFO.rows.map((r,i)=>`<tr><td><input type="checkbox" data-on="${i}" ${r.on!==false?'checked':''}></td>
+    <td><input class="f" data-k="size" data-i="${i}" value="${esc(r.size||'')}"></td><td><input class="f" data-k="weight" data-i="${i}" value="${esc(r.weight||'')}"></td>
+    <td><input class="f" data-k="pieces" data-i="${i}" value="${esc(r.pieces||'')}"></td><td><button class="btn sm" data-rm="${i}">✕</button></td></tr>`).join('');
+  document.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{readInfo();INFO.rows.splice(+b.dataset.rm,1);renderRows();});
+}
+function readInfo(){
+  INFO.name=$('iName').value.trim(); INFO.estimate=$('iEst').value;
+  document.querySelectorAll('#iRows [data-k]').forEach(el=>INFO.rows[+el.dataset.i][el.dataset.k]=el.value);
+  document.querySelectorAll('#iRows [data-on]').forEach(el=>INFO.rows[+el.dataset.on].on=el.checked);
+  INFO.bab={size:$('bSize').value,weight:$('bWeight').value,pieces:$('bPieces').value};
+  return INFO;
+}
+async function genCore(){
+  const kinds=[...document.querySelectorAll('.ck:checked')].map(x=>x.value); if(!kinds.length)return;
+  if(!DETAIL.photos.length&&!confirm('No reference photos — the model will invent the '+NOUN[PTYPE]+'. Continue?'))return;
+  const btn=$('btnCoreGen'),st=$('coreStatus');btn.disabled=true;
+  st.innerHTML='<span class="spinner"></span> Claude is studying the references and writing shot briefs…';
+  const q=await (await fetch('/api/adstudio/product/'+PID+'/core/queue',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kinds,n:+$('coreN').value})})).json();
+  if(q.error){st.textContent=''+q.error;btn.disabled=false;return;}
+  btn.disabled=false; watchCore();
+}
+// Shots are made in the background worker (2026-10-23: a page left mid-way left them queued for good), so the
+// page only follows them; leaving it changes nothing.
+let CORE_POLL=null;
+async function runCoreIds(ids,fixes){
+  for(const id of ids)await fetch('/api/adstudio/core/'+id+'/regenerate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fix:fixes||''})});
+  watchCore();
+}
+async function watchCore(){
+  clearTimeout(CORE_POLL); await loadCore();
+  const open=CORE_ITEMS.filter(x=>['queued','generating'].includes(x.status)).length, st=$('coreStatus');
+  if(!st)return;
+  if(open){st.innerHTML=`<span class="spinner"></span> ${open} shot${open>1?'s':''} being made in the background: you can leave this page`;CORE_POLL=setTimeout(watchCore,5000);}
+  else st.textContent='';
+}
+function coreCard(it){
+  const img=`/api/adstudio/core/${it.id}/image`;
+  return `<div class="ad core"><div class="imgwrap">${it.has_image?`<img src="${img}?t=${Date.now()}">${qaBadge(it.qa)}`:`<span class="ph">${it.status==='failed'?'✕ '+esc((it.error_message||'failed').slice(0,60)):it.status}</span>`}</div>
+    <div class="meta"><span class="ttl">#${it.id}</span> <span class="muted">${esc((it.created_at||'').slice(5,16))}</span></div>
+    <div class="acts">${it.has_image?`<a href="${img}" download="${it.kind}_${it.id}.png">Download</a>`:''}<button data-cfav="${it.id}">${it.is_favorite?'★':'☆'}</button>
+    ${it.kind.startsWith('info_')?'':`<button data-cregen="${it.id}">Retry</button>`}${it.has_image&&!it.kind.startsWith('info_')?`<a href="/images/compose?product_id=${PID}&compose_core=${it.id}" title="Put ad copy on this shot">compose</a>`:''}<button data-cdel="${it.id}">Delete</button></div>
+    ${it.brief?`<details class="brief"><summary>shot brief${it.fix?' + fix':''}</summary>${esc(it.brief)}${it.fix?'\n\nFIX: '+esc(it.fix):''}</details>`:''}</div>`;
+}
+async function loadCore(){
+  if(!$('coreGrid'))return;
+  CORE_ITEMS=(await (await fetch('/api/adstudio/core?product_id='+PID)).json()).items;
+  $('coreGrid').innerHTML=Object.entries(CORE_KINDS).map(([k,label])=>{const xs=CORE_ITEMS.filter(x=>x.kind===k);
+    return `<div class="core-sec"><h4>${label}</h4>${xs.length?`<div class="gal">${xs.map(coreCard).join('')}</div>`:'<div class="muted">None yet.</div>'}</div>`;}).join('');
+  const infos=CORE_ITEMS.filter(x=>x.kind.startsWith('info_'));
+  $('infoGrid').innerHTML=[['info_pdp','PDP'],['info_bab','Build-a-Box']].map(([k,l])=>{const xs=infos.filter(x=>x.kind===k);
+    return xs.length?`<div class="core-sec"><h4>${l}</h4><div class="gal">${xs.map(coreCard).join('')}</div></div>`:'';}).join('');
+  // thumbnail options: done core1 (favorites first), then other core shots, then reference photos
+  const keep=$('iThumb').value;
+  const shots=CORE_ITEMS.filter(x=>x.has_image&&!x.kind.startsWith('info_')).sort((a,b)=>(a.kind!=='core1')-(b.kind!=='core1')||b.is_favorite-a.is_favorite);
+  $('iThumb').innerHTML=shots.map(x=>`<option value="core:${x.id}">${x.kind} #${x.id}${x.is_favorite?' ★':''}</option>`).join('')
+    +DETAIL.photos.map(ph=>`<option value="photo:${ph.id}">reference photo #${ph.id}</option>`).join('')+'<option value="">(no thumbnail)</option>';
+  if(keep&&[...$('iThumb').options].some(o=>o.value===keep))$('iThumb').value=keep;
+  document.querySelectorAll('[data-cfav]').forEach(b=>b.onclick=async()=>{await fetch('/api/adstudio/core/'+b.dataset.cfav+'/favorite',{method:'POST'});loadCore();});
+  document.querySelectorAll('[data-cdel]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this image?'))return;await fetch('/api/adstudio/core/'+b.dataset.cdel+'/delete',{method:'POST'});loadCore();});
+  document.querySelectorAll('[data-cregen]').forEach(b=>b.onclick=async()=>{
+    const it=CORE_ITEMS.find(x=>x.id===+b.dataset.cregen)||{};
+    const fix=prompt('What should change? (kept for future retries; clear it to remove)\ne.g. "flesh should be deeper pink; show the seeds"',it.fix||'');
+    if(fix===null)return; await runCoreIds([+b.dataset.cregen],fix);
+  });
+}
+async function renderInfo(kind){
+  readInfo(); const b=kind==='pdp'?$('btnPdp'):$('btnBab'); const t=b.textContent; b.disabled=true; b.innerHTML='<span class="spinner"></span>';
+  try{const d=await (await fetch('/api/adstudio/product/'+PID+'/infographic',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,info:INFO,thumb:$('iThumb').value})})).json();
+    if(d.error){alert(d.error);return;}
+    DETAIL.product.info_json=JSON.stringify(INFO); await loadCore();
+  }finally{b.disabled=false;b.textContent=t;}
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function qaBadge(q){
+  if(!q)return '';
+  if(q.total==null)return `<span class="qa-badge pending" title="${esc(q.error||'Not scored yet')}">No score</span>`;
+  const tip=[q.reasoning,(q.failures||[]).join('\n'),Object.entries(q.scores||{}).map(([k,v])=>`${k.replace(/_/g,' ')}: ${v}`).join('\n')].filter(Boolean).join('\n\n');
+  return `<span class="qa-badge ${q.passed?'pass':'fail'}" title="${esc(tip)}">QA ${q.total.toFixed(1)}</span>`;
+}
+function esc(s){return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+boot();
+</script>
+</body>
+</html>

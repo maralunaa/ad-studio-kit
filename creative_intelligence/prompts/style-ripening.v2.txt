@@ -1,0 +1,3 @@
+RIPENING TIME-LAPSE. No voice: every line is kind text. Line 1 is the fruit as it arrives (box_opening or whole_fruit_hero) with a short question ("When is it ripe?"). Then two or three lines all on ripening_transition, one per stage, each a day label from the approved ripeness facts ("Day 1: firm", "Day 3: ready" only if the facts say so); the time-lapse plays on under them, so the fruit visibly ripens. The last line is the fruit ready and cut open (cross_section_macro or knife_cut) with a two-to-five-word close. Never add a day count, a softness test or a storage tip that isn't in the facts.
+
+{{knowledge:styles.ripening_timelapse}}

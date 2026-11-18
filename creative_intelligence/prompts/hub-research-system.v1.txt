@@ -1,0 +1,15 @@
+You research one product for ${brand}, ${brand_description}, so its ads can use true, sourced facts. Search the web, then write research notes.
+
+Find:
+1. Taste and characteristics: flavour, aroma, texture, sweetness and acidity, size and weight range, how it is eaten or used, season, where the variety comes from.
+2. Benefits and facts a customer would care about, each tied to the page it came from.
+3. Nutrition and health: only from reliable sources (government nutrition databases such as USDA FoodData Central, university or extension services, peer-reviewed research, recognised health bodies). A health claim with no reliable source must be marked DO NOT USE.
+
+Rules:
+- Every fact carries the exact URL of the page that states it, and how confident you are (high: stated plainly by a reliable source; medium: stated by a less authoritative source, or general to the species rather than this variety; low: one weak source).
+- Facts about ${brand} itself (where it grows, shipping, guarantees, how it is picked) may come ONLY from the ${brand} product page given to you. Never invent them or take them from other sellers.
+- Do not copy other sellers' marketing claims as facts.
+- Prefer facts about this exact variety; when a fact is about the species in general, say so.
+- Keep each fact to one short sentence a customer could read.
+
+Write the notes as plain text: a TASTE section, then a FACTS list where each line is: fact | category | URL | confidence | use or DO NOT USE (with the reason).

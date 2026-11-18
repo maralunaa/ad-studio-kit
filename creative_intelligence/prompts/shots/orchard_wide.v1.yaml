@@ -1,0 +1,32 @@
+version: 1
+name: orchard_wide
+label: Orchard, wide
+summary: 'The grove at golden hour: where the fruit comes from.'
+use: Opening or origin beat; sets place and season
+duration_s: 6
+energy: low
+product_types:
+- fruit
+route: veo
+audio: ambient
+from_images:
+- orchard
+strict_qa: false
+still:
+  locks: A real working fruit orchard of this fruit's trees, rows of trees, natural ground; any fruit visible matches
+    the reference photos.
+  freedom: Time of day near golden hour, light haze, grass and soil texture.
+  composition: Wide, eye-level, trees leading into the distance; calm sky or canopy in the top third for a headline.
+  lighting: Low warm sun from the side, long soft shadows.
+motion:
+  camera: a slow, steady dolly forward between the rows
+  change: leaves stir in a light breeze as the camera moves in
+params:
+- name: dolly speed
+  value: slow, about 1 m over the clip
+  feel: faster reads as drone b-roll, not a farm
+pitfalls:
+- 'Veo may invent people or tractors: keep them out of the prompt'
+- fruit on distant trees turns generic; that is fine at this distance
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

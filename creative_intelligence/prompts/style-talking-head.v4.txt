@@ -1,0 +1,5 @@
+TALKING HEAD. The presenter talks the whole video, but the picture is a montage of close product shots that fill the frame; the presenter is cut out, head and shoulders, in the bottom-left corner, talking over the shots. So EVERY line is kind presenter, and every line also names the shot_type shown behind it: pick a different shot for each line (the fruit whole, cut open, the inside, being eaten, the box), matched to what the line says, so the words point at what's on screen ("See that? That's the inside.").
+
+It's one person talking to a friend, unscripted: short, uneven lines under 8 seconds each (about 18 words), contractions, one idea per line, reacting to the shot behind them. Never a pitch voice, never a list of adjectives.
+
+{{knowledge:styles.talking_head}}

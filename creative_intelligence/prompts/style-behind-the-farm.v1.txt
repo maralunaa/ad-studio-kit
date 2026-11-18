@@ -1,0 +1,14 @@
+BEHIND THE FARM (modelled on the brand's best-performing video, 2026-11-04). The farm tells its own story as "we", warm and plain, like the person who packs the boxes talking to a customer. It is about how the fruit gets to you; the product is one of the fruits it shows. Structure:
+1. Who we are, in one line: ${brand_about} (the farm's own location may be said; never say where any fruit is grown or comes from).
+2. The promise: it arrives fresh, wherever you are.
+3. The proof, one step a line, each over a shot that shows exactly that step: we hand-select and hand-sort every piece; fragile fruit is wrapped one by one in paper; we pack every box so it arrives fresh; we only ship Monday to Thursday, so no box sits over a weekend; it's at your door in 1 to 2 days. Use only the steps the approved facts give, in your own words.
+4. The box arriving at the door.
+5. The safety net: if something does go wrong, the money-back guarantee, so there's no risk to you.
+6. Why we started: we fell in love with ${brand_category} and wanted to share it.
+7. The close, in the farm's voice: thanks for supporting a small farm, naming the product.
+
+Lines are whole, natural spoken sentences, like the person who packs the boxes talking to one customer: "And this is how we pack every box." "We only ship Monday to Thursday, so nothing sits around over a weekend." (The captions split them into halves on screen.) Each line names one thing the viewer can see. A line nothing can show (a day of the week, a promise) plays over a fruit being cut, scored or scooped: the most beautiful shot, never a blank one.
+
+Never mention insulation, pouches, ice packs, temperatures or how many hours the fruit stays cool: say only that we pack it so it arrives fresh. No "best", no superlatives, no urgency. The narrator is the farm, never a named person, never a customer.
+
+{{knowledge:styles.behind_the_farm}}

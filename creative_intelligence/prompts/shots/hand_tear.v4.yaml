@@ -1,0 +1,63 @@
+version: 4
+name: hand_tear
+label: Hands pull it apart (sensory)
+summary: Two hands pull the ripe fruit apart, showing the wet flesh inside.
+use: Sensory openers and payoffs; the most visceral beat
+duration_s: 5
+energy: high
+not_for:
+- mango
+- papaya
+- orange
+- satsuma
+- mandarin
+- tangerine
+- clementine
+- lemon
+- lime
+- grapefruit
+- pomelo
+- kumquat
+product_types:
+- fruit
+styles:
+- sensory
+cast: true
+route: veo
+audio: none
+strict_qa: false
+count_check: false
+qa_note: >-
+  Two hands pull one fruit into two halves: that change is the point of the shot, so judge that it is the same fruit
+  (skin, flesh colour, seeds) before and after, not that the count stays the same. The inside must match the real
+  cut photos.
+still:
+  locks: One ripe fruit exactly as in the reference photos, already cut most of the way through so the halves can be
+    pulled apart, held in two hands over a plain surface; skin colour and markings true.
+  freedom: Surface, background blur, hand position.
+  composition: Extreme close-up, the fruit and fingertips filling the middle of the frame.
+  lighting: Hard side light that makes the flesh glisten.
+motion:
+  camera: the camera holds still, very close
+  change: the hands slowly pull the two halves apart, the flesh stretching and glistening as it opens to show the inside
+params:
+- name: pace
+  value: slow, about two seconds to open
+  feel: a fast pull reads as violent and blurs the flesh
+pitfalls:
+- the inside does not match the real flesh colour or seeds
+- extra fingers or hands merging with the fruit
+- the fruit splits into more than two pieces
+end_from_images:
+- cut_reveal
+end_edit: true
+end_edit_prompt: >-
+  Edit the first image. Keep the hands, the background, the light and the camera angle exactly the same. Only change
+  the fruit: the hands have now pulled it open into two halves, the open faces turned toward the camera, and its
+  inside (flesh colour, texture, seed or stone) looks exactly like the fruit in the second image. One fruit, two
+  hands. No text.
+negative: extra fruit, extra hands, extra fingers, melting, gore, knife, text, logos, watermarks, captions
+# v2 (2026-10-26): normal QA bar; hands in motion failed the strict warping minimum at 3.93 overall.
+# v3 (2026-10-27): ends on an edit of the start still with the real cut photo's inside (Veo invented an impossible seed).
+# v4 (2026-11-11): not for mango (one large flat stone: it came out whole with the cut cubes on top), papaya or
+#   citrus ("not really how you open an orange": two cut halves pressed together and pulled apart).

@@ -1,0 +1,125 @@
+# Ad Studio QA rubric — how every new image is scored (1 = bad, 5 = excellent).
+# Edit this file to change scoring: no code change needed. Bump `version` when you do,
+# so scores made under the old rubric can be told apart.
+#
+#   weight      how much the criterion counts in the total (weighted average, 1–5)
+#   min         optional hard floor: below it the image fails whatever the total
+#   applies_to  images | textads | core | composites | videos (default: all except composites)
+#   measured    true = scored by code, not by Claude (from what the renderer reports; limits in knowledge/rules.yaml)
+#
+# Every "(auto)" item of the playbook's pre-launch checklists (knowledge/rules.yaml › checklists) maps to a
+# criterion here or to a pre-export check in adstudio/prelaunch.py; a test keeps that true.
+
+version: 5               # 2: video criteria (Video Studio V1); 3: product-neutral wording; 4: playbook checks; 5: impossible scenes
+threshold: 3.6          # weighted total needed to pass
+high_score: 4.3         # rejecting an image at or above this counts as an overrule
+
+criteria:
+  - key: fruit_accuracy
+    name: Fruit accuracy
+    question: >-
+      Does the fruit match the reference photos exactly — skin colour and texture, flesh
+      colour, seed/stone, shape and size? Score 1 if it looks like a different variety.
+    weight: 3
+    min: 3
+
+  - key: artefacts
+    name: No artefacts
+    question: >-
+      Is it free of AI artefacts: warped hands or fingers, melted or duplicated objects,
+      impossible cuts, smeared textures, broken packaging, or a physically impossible scene
+      (cut, sliced or peeled fruit hanging on a tree; fruit floating; the same fruit twice)?
+      Score 1 for an impossible scene.
+    weight: 2
+    min: 3
+
+  - key: box_label
+    name: Box and label
+    question: >-
+      If our white box or any label appears, is it correct and clean (no invented logos,
+      garbled print, wrong shape)? Score 5 if no box or label appears.
+    weight: 1
+
+  - key: prominence
+    name: Product prominence
+    question: Is the fruit clearly the hero, large enough and in focus?
+    weight: 1.5
+
+  - key: appetite
+    name: Appetite appeal
+    question: Does it make you want to eat it — juicy, ripe, fresh, well lit?
+    weight: 2
+
+  - key: focal_point
+    name: One clear focal point
+    question: Is there a single clear focal point, without clutter competing for attention?
+    weight: 1
+
+  - key: brand_fit
+    name: Brand fit
+    question: >-
+      Does it fit the brand (brand.yaml › description) — premium, natural, honest —
+      rather than generic stock or cheap supermarket advertising?
+    weight: 1
+
+  - key: never_include
+    name: Never-include rules
+    question: >-
+      Does it respect the product type's never-include list (given below)? Score 1 if it
+      clearly breaks a rule, 5 if it breaks none.
+    weight: 2
+    min: 3
+
+  - key: legibility
+    name: Legibility at phone size
+    question: Text contrast against what is behind it, measured at phone size. 4 = at least 4.5:1 (playbook, WCAG AA).
+    weight: 1.5
+    min: 4
+    measured: true
+    applies_to: [composites, textads]
+
+  - key: word_count
+    name: Few words
+    question: Headline 3–7 words; all on-image copy under 20 words (a real review quote is not counted).
+    weight: 1
+    min: 3
+    measured: true
+    applies_to: [composites, textads]
+
+  - key: safe_zone
+    name: Inside the safe zone
+    question: All copy inside the safe zone for its size (9:16 clear of the top 14%, bottom 35%, sides 6%; 4:5 and 1:1 outer 5%).
+    weight: 1
+    min: 4
+    measured: true
+    applies_to: [composites, textads]
+
+  - key: cta_match
+    name: One allowed CTA
+    question: The on-image CTA is one of Shop now, Order now, Get offer or Learn more, so the Meta button says the same thing.
+    weight: 0.5
+    min: 3
+    measured: true
+    applies_to: [composites, textads]
+
+  # ── video clips only (Video Studio) ─────────────────────────────────────
+  - key: motion_artefacts
+    name: Warping or morphing
+    question: Does anything warp, melt, morph, flicker, jump or change identity during the clip? 5 = perfectly stable, 1 = obvious morphing.
+    weight: 3
+    min: 3
+    applies_to: [videos]
+
+  - key: hands
+    name: Hands
+    question: If hands appear, are they anatomically correct in every frame (five fingers, natural grip and motion)? Score 5 if no hands appear.
+    weight: 1.5
+    min: 3
+    applies_to: [videos]
+
+  - key: consistency
+    name: Same fruit first to last
+    question: Compare the first and last frames. Are there the same number of product items (fruits, jars, pieces), with the same shapes and sizes (allowing only a change the motion intends, such as a cut)? 5 = identical, 1 = an item added, lost or reshaped.
+    weight: 3
+    min: 4
+    applies_to: [videos]

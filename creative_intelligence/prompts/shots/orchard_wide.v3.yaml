@@ -1,0 +1,40 @@
+version: 3
+name: orchard_wide
+label: Orchard, wide
+summary: 'The grove at golden hour: where the fruit comes from.'
+use: Opening or origin beat; sets place and season
+duration_s: 6
+energy: low
+product_types:
+- fruit
+route: veo
+audio: ambient
+from_images:
+- orchard
+strict_qa: false
+still:
+  locks: Only whole, uncut fruit grows on the tree, never a cut, scored, sliced or peeled fruit on a branch
+    (2026-11-02, a cut mango cheek hung on the tree in a Kinetic video). A real working orchard of this fruit's trees; only a few fruits visible, on the nearest tree, matching
+    the reference photos. No crates, baskets, cut fruit or people.
+  freedom: Time of day near golden hour, light haze, grass and soil texture.
+  composition: Wide, eye-level, rows of trees leading into the distance; one nearby branch with two or three fruits
+    in the lower third; calm sky or canopy in the top third for a headline.
+  lighting: Low warm sun from the side, long soft shadows.
+motion:
+  camera: a slow, steady dolly forward between the rows
+  change: leaves stir in a light breeze as the camera moves in
+params:
+- name: dolly speed
+  value: slow, about 1 m over the clip
+  feel: faster reads as drone b-roll, not a farm
+- name: visible fruit
+  value: 2 to 3, near camera
+  feel: more fruit = more drift
+pitfalls:
+- 'Veo may invent people or tractors: keep them out of the prompt'
+- fruit on distant trees turns generic; that is fine at this distance
+- 'v1: with dozens of small fruits and crates in frame, Veo shifted and multiplied them; keep few fruits, no props'
+- 'fruit counts are unreliable in wide shots, so this card skips the count rule (count_check: false)'
+negative: cut fruit on the tree, sliced fruit, scored fruit, peeled fruit, extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions
+count_check: false

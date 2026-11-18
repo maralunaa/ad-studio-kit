@@ -1,0 +1,25 @@
+name: Ad Studio tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: System libraries for WeasyPrint (reporting code imports it)
+        run: sudo apt-get update && sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libfontconfig1
+      - name: Install
+        run: pip install -r requirements.txt pytest pytest-xdist==3.6.1
+      - name: End-to-end smoke (mocked; product → run → gallery → compose → launch kit)
+        run: python -m pytest tests/test_e2e_smoke.py -q
+      - name: Test (no live APIs; a root fixture blocks them; one worker per core)
+        run: python -m pytest tests -q -n auto

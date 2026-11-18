@@ -1,0 +1,3 @@
+COMMENT REPLY. A presenter answers one real comment from a customer, which is shown on screen as a sticker (the words exactly as written, the name hidden). Line 1 is the presenter on camera reacting to the comment and naming the question in their own words (kind presenter); then the answer in two or three lines, with proof on library shots (kind narrator or presenter), using ONLY the approved facts; then a short close. Answer what the comment actually asks; never put words in the commenter's mouth, never quote them beyond the sticker, and never claim anything the facts don't support (prices only if an approved fact states one). Friendly, direct, a brand voice: the presenter is a brand narrator, never a customer or a farmer.
+
+{{knowledge:styles.comment_reply}}

@@ -1,0 +1,63 @@
+{#- The top bar on every page: the product, the four sections, the user menu (Admin, Sign out); under it
+    the stage strip of the current section (routes/pages.py: SECTIONS, STAGES). Set `picker` for the full
+    product menu (Ad Studio pages); other pages show the product as a chip. Styles: studio.css. -#}
+<header class="top">
+  <a class="brand" href="/products"><img src="/brand/logo.png" alt="{{ BRAND.name }}"><b>Ad Studio</b></a>
+  {%- if picker %}
+  <div class="picker" id="picker">
+    <button class="picker-btn" id="pickerBtn" aria-haspopup="true" aria-expanded="false" aria-controls="pickerMenu">
+      <span class="picker-thumb" id="pickerThumb"></span><span class="ctx" id="ctxName">Pick a product</span><span class="caret" aria-hidden="true"></span>
+    </button>
+    <div class="picker-menu" id="pickerMenu" hidden>
+      <div class="chips" id="typeFilter"></div>
+      <div class="picker-list" id="prodList"></div>
+      <button class="btn block" id="btnNewProd">+ Add product</button>
+    </div>
+  </div>
+  {%- elif chip %}
+  <a class="picker-btn" id="prodChip" href="/products" title="Change product in Products"><span class="picker-thumb" id="pickerThumb"></span><span class="ctx" id="ctxName">Pick a product</span></a>
+  {%- endif %}
+  <nav class="secs" aria-label="Sections">
+    {%- for key, label in SECTIONS %}
+    <a href="/{{ key }}" data-sec="{{ key }}"{% if section == key %} class="on" aria-current="page"{% endif %}>{{ label }}</a>
+    {%- endfor %}
+  </nav>
+  <div class="umenu" id="umenu">
+    <button class="umenu-btn" id="umenuBtn" aria-haspopup="true" aria-expanded="false" aria-controls="umenuList">Account<span class="caret" aria-hidden="true"></span></button>
+    <div class="umenu-list" id="umenuList" hidden>
+      <a href="/admin"{% if request.path == '/admin' %} aria-current="page"{% endif %}>Admin</a>
+      {%- if session.get("auth") %}<a href="/logout">Sign out</a>{% endif %}
+    </div>
+  </div>
+</header>
+<nav class="stages" id="stagesBar" aria-label="Stages"{% if section not in STAGES %} hidden{% endif %}>
+  {%- if section in STAGES %}{% for key, label in STAGES[section] %}
+  <a href="/{{ section }}/{{ key }}" data-stage="{{ key }}" class="stage{% if stage == key %} on{% endif %}"{% if stage == key %} aria-current="step"{% endif %}><em>{{ loop.index }}</em>{{ label }}<i class="count" data-count="{{ section }}.{{ key }}" hidden></i>{% if (section, key) in SOON %}<span class="soon">soon</span>{% endif %}</a>
+  {%- if not loop.last %}<span class="arw" aria-hidden="true">→</span>{% endif %}
+  {%- endfor %}{% endif %}
+</nav>
+<script>
+/* User menu; the product travels with every section and stage link (?product_id=). */
+(()=>{
+  const b=document.getElementById('umenuBtn'), m=document.getElementById('umenuList');
+  b.onclick=e=>{e.stopPropagation();m.hidden=!m.hidden;b.setAttribute('aria-expanded',!m.hidden);};
+  document.addEventListener('click',e=>{if(!m.hidden&&!e.target.closest('#umenu')){m.hidden=true;b.setAttribute('aria-expanded','false');}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!m.hidden){m.hidden=true;b.focus();}});
+  window.carryProduct=pid=>document.querySelectorAll('.secs a,.stages a,#prodChip').forEach(a=>{
+    const u=new URL(a.getAttribute('href'),location.origin); if(pid)u.searchParams.set('product_id',pid); else u.searchParams.delete('product_id');
+    a.setAttribute('href',u.pathname+u.search);});
+  const pid=new URLSearchParams(location.search).get('product_id'); if(pid)carryProduct(pid);
+})();
+</script>
+{%- if request.path != "/admin" %}
+<script>
+/* Open alerts (failed deploy, backup or job; volume filling up): one line under the top bar, linking to Admin. */
+(async()=>{try{
+  const r=await fetch('/api/ops/alerts'); if(!r.ok)return;
+  const a=(await r.json()).alerts; if(!a.length)return;
+  const el=document.createElement('a'); el.className='alert-strip'+(a.some(x=>x.level==='error')?'':' warn'); el.href='/admin';
+  el.textContent=a.length===1?`${a[0].message} — see Admin`:`${a.length} alerts need a look — see Admin`;
+  document.getElementById('stagesBar').insertAdjacentElement('afterend',el);
+}catch(e){}})();
+</script>
+{%- endif %}

@@ -1,0 +1,1 @@
+Turn the notes into structured data. Copy each quote exactly as written in the notes, with its kind and URL. Do not add, reword or merge quotes. Drop any quote without a URL.

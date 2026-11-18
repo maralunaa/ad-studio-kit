@@ -1,0 +1,36 @@
+version: 2
+name: plated_sharing
+label: Plated / sharing
+summary: Sliced fruit on a plate, shared at a table.
+use: Lifestyle and sharing beat; close of a story
+duration_s: 6
+energy: medium
+product_types:
+- fruit
+route: veo
+audio: ambient
+from_images:
+- plated
+- sharing
+strict_qa: true
+count_check: false
+qa_note: >-
+  A hand takes one slice from the plate: that change is the point of the shot, so judge that the slices are the same fruit (flesh colour, shape) throughout, not that their number stays the same.
+still:
+  locks: Slices of the fruit exactly as in the reference photos on a simple plate; flesh colour true.
+  freedom: Table setting, people's hands at the edge, background.
+  composition: Three-quarter view, plate in the lower two-thirds.
+  lighting: Warm daylight, relaxed.
+motion:
+  camera: a slow sideways slide past the plate
+  change: a hand reaches in and takes one slice
+params:
+- name: people
+  value: hands only
+  feel: faces raise the AI-person disclosure bar
+pitfalls:
+- 'Veo adds faces: hands only'
+- slices multiply on the plate
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions
+# v2 (2026-10-26): every take failed 'Same fruit first to last' because QA forces it to 1 when the fruit count changes, and this shot changes it on purpose (comparison takes 34-36, 43-45, 65-68).

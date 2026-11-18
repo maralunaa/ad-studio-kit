@@ -1,0 +1,9 @@
+A still image taken mid-smartphone recording, vertical 9:16: a brand narrator for ${brand}, ${brand_description}, presenting to the camera for a short video ad. It must look like a frame from a real phone video, never a professional photo.
+
+Presenter: ${look}
+
+${framing} Background: ${setting}.
+
+Realism (feedback 2026-11-04: the video follows the picture, so the picture must look like phone footage): ultra-realistic iPhone camera quality, 26mm equivalent, f/1.9. Natural phone camera noise, slightly soft detail, computational photography look. Realistic skin texture with visible pores, no airbrushing, natural asymmetry in the face, slight overexposure on the forehead, soft natural light from one side. Not studio lighting, not a DSLR, not shallow cinematic bokeh, no retouched or glossy AI look.
+
+Plain clothes and caps with no logos, brand marks, name tags or text. Nothing in the frame that suggests a uniform, a job title or a farm worker. No text, captions, watermarks or logos anywhere in the image. One person only.

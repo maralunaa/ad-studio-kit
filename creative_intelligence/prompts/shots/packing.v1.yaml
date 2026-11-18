@@ -1,0 +1,31 @@
+version: 1
+name: packing
+label: Packing
+summary: Hands lay fruit into our ${brand_packaging} with tissue.
+use: Care and shipping beat
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+route: kling
+audio: none
+from_images: []
+strict_qa: true
+still:
+  locks: Our plain white shipping box with tissue paper; fruit exactly as in the reference photos; at most three
+    fruits.
+  freedom: Table surface, packing area props.
+  composition: Top-down three-quarter view, box in the lower two-thirds.
+  lighting: Clean, bright daylight.
+motion:
+  camera: the camera holds still
+  change: a hand places one more fruit into the box beside the others
+params:
+- name: fruit in box
+  value: 2 to 3
+  feel: more fruit means more drift
+pitfalls:
+- fruit multiply in the box
+- 'box print invented: the box is plain white'
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

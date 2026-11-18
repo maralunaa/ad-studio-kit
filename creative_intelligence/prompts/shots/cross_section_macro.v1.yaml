@@ -1,0 +1,32 @@
+version: 1
+name: cross_section_macro
+label: Cross-section macro
+summary: 'The cut face, macro: flesh, fibre, seed.'
+use: Texture and 'what's inside' beat
+duration_s: 5
+energy: low
+product_types:
+- fruit
+route: kling
+audio: none
+from_images:
+- cut_reveal
+strict_qa: false
+still:
+  locks: 'The cut fruit''s real internal anatomy as in the reference photos: flesh colour, fibre, the stone or seeds
+    at their true size.'
+  freedom: Background, droplets.
+  composition: Macro, the cut face filling the lower two-thirds.
+  lighting: Backlight that makes the flesh glow.
+motion:
+  camera: a slow macro slide across the cut face
+  change: light catches the moist flesh
+params:
+- name: slide
+  value: a few millimetres
+  feel: more and the anatomy smears
+pitfalls:
+- seed or stone changes shape
+- flesh colour drifts
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

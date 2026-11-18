@@ -1,0 +1,452 @@
+# Every static and video style Ad Studio knows, derived from the Meta Creative Playbook
+# (knowledge/meta-creative-playbook.md). Each entry's `source` names the playbook section it comes from
+# ("<H2> › <bold sub-heading>"); "house: …" marks a style the playbook doesn't list but the user kept.
+#
+#   family     product_real | animation | native_lofi | education
+#   medium     static | video
+#   status     live = Ad Studio makes it today; planned = listed for testing, not built yet
+#   route      how Ad Studio makes it: compose (Compose templates), video_style (styles.py + style prompt),
+#              winners (decoded winning ads), animate (Video › Animate, V1), or none yet
+#   inputs     what must exist first: shots, facts, real_reviews, real_comments, presenter, character,
+#              offer, season, licensed_music
+#   priority   1 = test first (playbook order for "Styles to test next"; formats ranked by default use)
+#   requires_facts  fact categories that must have approved facts before a script can be written
+#   shot_types      shot cards made only for this style (e.g. the supermarket fruit for Us vs supermarket)
+
+version: 1
+
+styles:
+  # ── Statics: Static ads › Formats that work ───────────────────────────
+  - key: appetite_closeup
+    name: Appetite close-up
+    family: product_real
+    medium: static
+    layout: Macro cross-section of the fruit + one taste line
+    when: Always the default; close-ups last longest of all food formats (about 12 days)
+    route: {kind: compose, templates: [craving_macro, minimal, premium]}
+    inputs: []
+    restrictions: [Text never covers the fruit]
+    priority: 1
+    status: live
+    source: "Static ads › Formats that work, and when to use them"
+
+  - key: review_card
+    name: Review / testimonial card
+    family: product_real
+    medium: static
+    layout: Verified Google review quote over the fruit it praises
+    when: Trust is the barrier; real, specific praise exists
+    route: {kind: compose, templates: [social_proof]}
+    inputs: [real_reviews]
+    restrictions: ["Only real reviews, attributed, meaning kept; never invented or AI-written"]
+    priority: 2
+    status: live
+    source: "Static ads › Formats that work, and when to use them"
+
+  - key: us_vs_them
+    name: Us vs them
+    family: product_real
+    medium: static
+    layout: Pale supermarket fruit vs tree-ripened fruit, cut side by side
+    when: Buyers already have an alternative
+    route: {kind: compose, templates: [supermarket_contrast]}
+    inputs: []
+    restrictions: [No origin claims for either fruit]
+    priority: 3
+    status: live
+    source: "Static ads › Formats that work, and when to use them"
+
+  - key: offer_stack
+    name: Offer stack
+    family: product_real
+    medium: static
+    layout: Box contents + price per fruit + free shipping + guarantee
+    when: Launches, bundles, gifting peaks; works best on warm audiences
+    route: {kind: compose, templates: [direct_response]}
+    inputs: [offer]
+    restrictions: [Prices only from Shopify, "No \"free\" with hidden charges"]
+    priority: 4
+    status: live
+    source: "Static ads › Formats that work, and when to use them"
+
+  - key: problem_solution
+    name: Problem–solution
+    family: product_real
+    medium: static
+    layout: Problem line → the box → ripening guarantee
+    when: Cold traffic
+    route: {kind: compose, templates: [bold_type, scroll_stopping]}
+    inputs: [facts]
+    restrictions: [No personal-attribute copy]
+    priority: 5
+    status: live
+    source: "Static ads › Formats that work, and when to use them"
+
+  - key: explainer_card
+    name: Advertorial / explainer card
+    family: education
+    medium: static
+    layout: A short list with one line each
+    when: The product needs a little education
+    route: {kind: compose, templates: [benefit_stack]}
+    inputs: [facts]
+    restrictions: [Facts from the library only]
+    priority: 6
+    status: live
+    source: "Static ads › Formats that work, and when to use them"
+
+  - key: gift_reveal
+    name: Gift reveal / flat lay
+    family: product_real
+    medium: static
+    layout: Open box from above, labelled fruits, gift message
+    when: Gifting season, gift buyers
+    route: {kind: compose, templates: [lifestyle_tagline, scene]}
+    inputs: []
+    restrictions: []
+    priority: 7
+    status: live
+    source: "Static ads › Formats that work, and when to use them"
+
+  - key: carousel
+    name: Carousel
+    family: product_real
+    medium: static
+    layout: One card per fruit in the box, or harvest → pack → doorstep
+    when: Several products or a story in steps; multi-image formats hold up well
+    route: {kind: none}
+    inputs: []
+    restrictions: []
+    priority: 8
+    status: planned
+    source: "Static ads › Formats that work, and when to use them"
+
+  # Compose's Origin Story template stays reachable only as a house layout: it shows the orchard, never names a place.
+  - key: orchard_scene
+    name: Orchard scene
+    family: product_real
+    medium: static
+    layout: The fruit in its orchard, natural light; copy in the calm lower band
+    when: A sense of place without naming one
+    route: {kind: compose, templates: [origin_story]}
+    inputs: []
+    restrictions: ["Never name a country, region or farm location"]
+    priority: 9
+    status: live
+    source: "house: Compose template kept; no-origin rule applies"
+
+  # ── Videos: Video ads › Brand video structures ─────────────────────────
+  - key: fruit_story
+    name: Fruit Story
+    family: product_real
+    medium: video
+    length_s: [20, 45]
+    shot_order: [hook (0–3 s), orchard, fruit on the tree, 3 fast cuts and textures, why it's different, offer card]
+    modes: [presenter, narrated]
+    default_mode: presenter
+    when: The flagship story; merges the old "Storytelling" (now its narrated version)
+    route: {kind: video_style, prompt: style-fruit-story}
+    inputs: [shots, facts]
+    mode_inputs: {presenter: [presenter]}
+    restrictions: ["Presenters are brand narrators, never customers or the brand's staff"]
+    priority: 1
+    status: live
+    source: "Video ads › Brand video structures"
+
+  - key: behind_the_farm
+    name: Behind the farm
+    family: product_real
+    medium: video
+    length_s: [35, 60]
+    shot_order: [who we are, the promise (it arrives fresh), proof steps each shown as it is said (hand-sorting,
+                 packing, wrapping, the box sent off), the box at the door, the money-back guarantee, why we started,
+                 thanks for supporting a small business]
+    look: Quick hard cuts, real hands at work, small white captions half a sentence at a time; cutting shots of the
+      fruit cover the lines nothing can show (days, promises)
+    when: Trust and retargeting. Modelled on the brand's best video (2026-11-04), told by the farm as "we"
+    route: {kind: video_style, prompt: style-behind-the-farm}
+    inputs: [shots, facts]
+    restrictions: ["Only the approved shipping, guarantee and farm facts; never insulation, ice packs or hours"]
+    priority: 2
+    status: live
+    source: "Video ads › Brand video structures"
+
+  - key: talking_head
+    name: Talking head / explainer
+    family: education
+    medium: video
+    length_s: [15, 30]
+    shot_order: [presenter states the surprising fact, explains one idea, proof, CTA]
+    look: Product shots fill the frame; the presenter's head talks in a circle in the bottom corner the whole video
+    when: One idea needs explaining (how to eat it, why it tastes different)
+    route: {kind: video_style, prompt: style-talking-head}
+    inputs: [shots, facts, presenter]
+    restrictions: ["Presenters are brand narrators, never customers or the brand's staff"]
+    priority: 2
+    status: live
+    source: "Video ads › Brand video structures"
+
+  - key: presenter_table
+    name: Presenter at the table
+    family: education
+    medium: video
+    length_s: [15, 30]
+    shot_order: [presenter at the counter says the hook over the fruit, shows it whole, shows it cut open, one fact, CTA]
+    when: A person talking to camera with the fruit in front of them, showing it (feedback 2026-10-26)
+    route: {kind: video_style, prompt: style-presenter-table}
+    inputs: [facts, presenter]
+    restrictions: ["Presenters are brand narrators, never customers or the brand's staff", "The presenter is on camera the whole video"]
+    priority: 2
+    status: live
+    source: "Video ads › Brand video structures"
+
+  - key: sensory
+    name: Sensory / ASMR
+    family: product_real
+    medium: video
+    length_s: [8, 15]
+    shot_order: [hands pull the fruit apart (or a knife cuts it), a spoon in the flesh, end card]
+    voice: false
+    when: Appetite first; no dialogue
+    route: {kind: video_style, prompt: style-sensory}
+    inputs: [shots]
+    shot_types: [hand_tear, spoon_scoop, knife_cut]   # 2026-11-11: no juice shots ("syrup"); a card a fruit can't do drops out
+    restrictions: [No voice]
+    priority: 3
+    status: live
+    source: "Video ads › Brand video structures"
+
+  - key: pov
+    name: POV unboxing / gift reveal
+    family: product_real
+    medium: video
+    length_s: [10, 20]
+    shot_order: [doorstep, lid off, fruit reveal, cut, shared at the table, CTA]
+    when: Highest click-through in food, but tires in about 9 days; refresh the first 3 s first
+    route: {kind: video_style, prompt: style-pov}
+    inputs: [shots]
+    restrictions: []
+    priority: 4
+    status: live
+    source: "Video ads › Brand video structures"
+
+  - key: us_vs_supermarket
+    name: Us vs supermarket
+    family: product_real
+    medium: video
+    length_s: [10, 20]
+    shot_order: [split screen, both fruits cut, colour and texture compared, "\"picked when ripe\"", CTA]
+    when: Buyers already have an alternative
+    route: {kind: video_style, prompt: style-us-vs-supermarket}
+    inputs: [shots]
+    shot_types: [supermarket_fruit]
+    restrictions:
+      - No origin claims for either fruit
+      - The picture compares; words about other fruit only when an approved fact says so
+    priority: 5
+    status: retired   # removed 2026-10-30 (user)
+    source: "Video ads › Brand video structures"
+
+  - key: animated_still
+    name: Animated still
+    family: product_real
+    medium: video
+    length_s: [5, 8]
+    shot_order: [one approved image with gentle motion, headline]
+    when: Ideal for Stories
+    route: {kind: animate}
+    inputs: []
+    restrictions: []
+    priority: 6
+    status: live
+    source: "Video ads › Brand video structures"
+
+  - key: kinetic
+    name: Kinetic type
+    family: native_lofi
+    medium: video
+    length_s: [6, 20]
+    shot_order: [hook words on screen, library shots under moving type, end card]
+    voice: false            # words on screen and music only: one narrator line was a voice out of nowhere (2026-10-26)
+    when: Text-led video; sound-off by design
+    route: {kind: video_style, prompt: style-kinetic}
+    inputs: [shots]
+    restrictions: []
+    priority: 7
+    status: live
+    source: "house: decision g (kept)"
+
+  - key: template
+    name: From a winning ad
+    family: product_real
+    medium: video
+    shot_order: [the decoded winner's structure]
+    when: Rebuild the structure of a proven ad with our shots
+    route: {kind: winners, prompt: style-template}
+    inputs: [shots]
+    restrictions: [Structure only; never copy another brand's words]
+    priority: 8
+    status: live
+    source: "house: decision g (kept); decoded templates keep working"
+
+  # ── Styles to test next (playbook priority order) ────────────────────
+  - key: fruit_characters
+    name: Fruit characters (cartoon / 3D)
+    family: animation
+    medium: video
+    length_s: [10, 20]
+    shot_order: [the character's hook, one or two character beats, the character's last beat naming the product, offer card]
+    when: Hook and top-of-funnel; a brand-owned character is a strong pattern interrupt
+    route: {kind: video_style, prompt: style-fruit-characters, models: [Nano Banana Pro, Kling, Seedance]}
+    inputs: [character, shots]
+    shot_types: [character_scene]
+    restrictions: ["Animated start to finish: never cut to the real fruit", "Keep it witty, brand-owned and labelled as AI",
+                   "the owner approves each character (look, voice, personality) before use"]
+    priority: 1
+    status: live
+    source: "Styles to test next"
+
+  - key: claymation
+    name: Claymation / stop-motion
+    family: animation
+    medium: video
+    length_s: [10, 20]
+    shot_order: [clay fruit on its set, clay beats (the clay box reveal, the clay cut), the clay payoff, end card]
+    when: Nothing else in the feed looks like it; cheap to test (about 3–6 US dollars an ad)
+    route: {kind: video_style, prompt: style-claymation}
+    inputs: [shots]
+    shot_types: [clay_hero, clay_cut, clay_reveal]
+    restrictions: ["Clay start to finish: never cut to the real fruit", "AI-made: flagged like every AI asset"]
+    priority: 2
+    status: live
+    source: "Styles to test next"
+
+  - key: ripening_timelapse
+    name: Ripening time-lapse
+    family: education
+    medium: video
+    length_s: [6, 15]
+    shot_order: [the fruit as it arrives, the ripening time-lapse with day labels, ready to eat (cut), end card]
+    voice: false
+    when: Answers the ripeness objection visually
+    route: {kind: video_style, prompt: style-ripening}
+    inputs: [facts, shots]
+    requires_facts: [ripeness]
+    shot_types: [ripening_transition]
+    restrictions: [Must match the real ripening guide and approved facts; day labels only as the facts state them]
+    priority: 3
+    status: live
+    source: "Styles to test next"
+
+  - key: native_lofi_static
+    name: Native lo-fi statics
+    family: native_lofi
+    medium: static
+    layout: Notes-app list, text thread, post-it, handwritten letter, real comments, review mashup
+    when: Low effort, high volume; looks like a friend's post
+    route: {kind: compose, templates: [notes_list, text_thread, post_it, handwritten_letter, comments_screenshot,
+                                       review_mashup]}
+    inputs: [real_reviews]
+    restrictions:
+      - Only real reviews and comments from the library, with source and date; no invented conversations
+      - Notes and text formats carry our own voice, never presented as a customer conversation
+    priority: 4
+    status: live
+    source: "Styles to test next"
+
+  - key: harvest_drop
+    name: Harvest drop / offer-first banner
+    family: product_real
+    medium: static
+    layout: Season announcement banner and countdown
+    when: Newness and announcement hooks had the highest hit rates
+    route: {kind: compose, templates: [seasonal_drop, offer_banner]}
+    inputs: [season]
+    restrictions: [Urgency must be real (actual season dates and stock)]
+    priority: 5
+    status: live
+    source: "Styles to test next"
+
+  - key: how_to_eat
+    name: How to eat it / FAQ
+    family: education
+    medium: video
+    length_s: [15, 30]
+    shot_order: [the question, step-by-step on cut and plated shots, the payoff, CTA]
+    modes: [presenter, hands]
+    default_mode: hands
+    when: Exotic fruit has a real learning barrier
+    route: {kind: video_style, prompt: style-how-to-eat}
+    inputs: [facts]
+    requires_facts: [how_to_eat]
+    restrictions: [Steps only from the approved how-to-eat facts; the carousel version is a set of listicle cards]
+    priority: 6
+    status: live
+    source: "Styles to test next"
+
+  - key: comment_reply
+    name: Comment reply
+    family: native_lofi
+    medium: video
+    length_s: [10, 20]
+    shot_order: [the real comment as a sticker, the presenter answers it, proof on library shots, CTA]
+    when: Answers objections in public
+    route: {kind: video_style, prompt: style-comment-reply}
+    inputs: [real_comments, presenter]
+    restrictions:
+      - "Only real comments from the library, with the commenter's name hidden; never invented or edited"
+      - "Comments are added by hand for now; the automatic Page import waits for the Page token (decision j)"
+    priority: 7
+    status: retired   # removed 2026-10-30 (user)
+    source: "Styles to test next"
+
+  - key: listicle_quiz
+    name: Listicle / quiz
+    family: education
+    medium: static
+    layout: One card per fruit (number, name, one line); the carousel is assembled from the cards in Meta
+    when: Drives discovery
+    route: {kind: compose, templates: [listicle_card]}
+    inputs: [facts]
+    restrictions: [Keep each card to one line]
+    priority: 8
+    status: live
+    source: "Styles to test next"
+
+  - key: fast_cut_montage
+    name: Fast-cut montage
+    family: product_real
+    medium: video
+    length_s: [6, 10]
+    shot_order: [5 to 8 library shots of about a second each, cut to the music, a few words, end card]
+    voice: false
+    when: Shows the whole range in seconds; good for variety boxes
+    route: {kind: video_style, prompt: style-fast-cut}
+    inputs: [shots, licensed_music]
+    restrictions: [Needs licensed music (the Meta Sound Collection tracks, Facebook and Instagram ads only)]
+    priority: 9
+    status: live
+    source: "Styles to test next"
+
+  - key: meme_trend
+    name: Meme / trend formats
+    family: native_lofi
+    medium: static
+    when: Cheap reach when a format is hot
+    route: {kind: none}
+    inputs: []
+    restrictions: [Ages fast; use only current formats]
+    priority: 10
+    status: planned
+    source: "Styles to test next"
+
+# Need real people or footage, so never AI-made; the brand uploads its own footage to the shot library (Video › Shots ›
+# Real footage), tagged real and never mixed with AI people.
+real_footage_only:
+  source: "Styles to test next › Need real people or footage, so not AI-made"
+  items:
+    - {key: customer_reaction, name: Customer reaction}
+    - {key: street_interview, name: Street interview}
+    - {key: testimonial, name: Testimonial on camera}
+    - {key: founder_story, name: Farmer or founder story}
+    - {key: other, name: Other real footage}

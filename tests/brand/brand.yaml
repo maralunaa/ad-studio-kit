@@ -1,0 +1,214 @@
+# The brand pack the test suite runs under (conftest.py sets BRAND_DIR to this folder).
+# Made-up brand and competitors; values match what the tests were written against.
+name: Test Fruit Co
+short: EXB
+website: testfruit.example
+category: rare and exotic fruit
+description: a farm-direct shop for rare and exotic fruit
+about: a small fruit farm
+packaging: plain white box
+packaging_detail: 'OUR BOX: a plain white corrugated shipping box, open, its inside lined and cushioned with natural tan kraft
+  honeycomb paper wrap that frames each fruit. The fruit sits neatly in orderly rows/grid inside, filling it. No printing,
+  logos or labels on the box.'
+timezone: Europe/London
+store:
+  public_url: https://shop.testfruit.example
+  hidden_tags:
+  - hidden
+  - exclude-cart
+  - buildabox
+  season_in_tags:
+  - c.abundant
+  season_out_tags:
+  - c.seasonal
+  - preorder
+  type_map:
+    fruit: fruit
+    mix box: gift_box
+    candle: candle
+rules:
+  no_origin_claims: true
+voices:
+- name: Wade
+  gender: man
+  tone: calm, proud farmer
+  model: gemini
+  voice: Algenib
+  style: calm, proud, unhurried American farmer in his fifties, a little gravelly
+- name: Jack
+  gender: man
+  tone: deep, quick
+  model: kokoro
+  voice: am_onyx
+- name: Luis
+  gender: man
+  tone: mid, quick
+  model: elevenlabs
+  voice: Mark
+- name: June
+  gender: woman
+  tone: curious, high energy
+  model: elevenlabs
+  voice: Sarah
+- name: Ivy
+  gender: woman
+  tone: warm grandmother
+  model: gemini
+  voice: Sulafat
+  style: warm elderly grandmother, nostalgic and gentle, a slight accent
+- name: Tess
+  gender: woman
+  tone: relaxed home cook
+  model: gemini
+  voice: Aoede
+  style: relaxed, warm home cook chatting in her kitchen
+default_voice: Wade
+persona_only_voices:
+  Ivy: Tess
+presenters:
+- name: Wade
+  role: Straight talker
+  voice: Wade
+  framing: portrait
+  look: a weathered, friendly man in his mid 50s, white, sun-tanned skin with deep laugh lines, short greying stubble beard,
+    a worn faded olive baseball cap with no logo, a faded light-blue denim work shirt with the sleeves rolled, both hands
+    around a stoneware mug of black coffee, seated and leaning slightly toward the camera
+  setting: a sunny farmhouse porch with grey wooden siding and a white railing, potted orange trees beside him and a green
+    orchard in the distance, morning light
+- name: Jack
+  role: Fruit guide
+  voice: Jack
+  framing: selfie
+  look: a relaxed, sun-tanned man in his late 30s, white, short brown hair under a plain faded cream-and-green trucker cap
+    with no logo, light stubble, an easy friendly smile, a sage-green short-sleeve button shirt
+  setting: a shaded back porch on a sunny afternoon, fruit trees and a woven hammock behind
+- name: Luis
+  role: Fruit fan
+  voice: Luis
+  framing: portrait
+  look: a warm, easy-going man in his early 40s, Latino, short dark hair with a little grey, a short trimmed beard, an olive-green
+    linen shirt with the sleeves rolled up
+  setting: a sunlit kitchen with a wooden table and a bowl of colourful fruit
+- name: June
+  role: Calm host
+  voice: June
+  framing: selfie
+  look: a gentle, sunny woman in her late 20s, white, long wavy light-brown hair loose over the shoulders, freckles, no make-up
+    look, a loose white cotton shirt
+  setting: a sunny garden in late afternoon with leafy trees and soft light
+- name: Ivy
+  role: Taste expert
+  voice: Ivy
+  framing: portrait
+  look: a calm, thoughtful woman in her mid 40s, East Asian, shoulder-length straight black hair, a soft blue denim shirt
+  setting: a garden patio at golden hour with fruit trees behind
+- name: Tess
+  role: Friendly host
+  voice: Tess
+  framing: portrait
+  look: a bright, friendly woman in her early 30s, white, shoulder-length golden blonde hair with soft waves, small gold hoop
+    earrings, a cream knit top
+  setting: a light, airy kitchen with plants and a cutting board with sliced fruit
+reviews:
+  fera_public_key: pk_test
+  trustpilot: https://www.trustpilot.com/review/testfruit.example
+  testimonials: testfruit.example testimonials
+  bbb: true
+market:
+  tiers:
+    A: 'Direct: exotic and tropical fruit DTC'
+    B: Premium fruit and gifting
+    C: Same audience, other food (borrow winning formats)
+  brands:
+  - name: Coastal Fruit Co
+    tier: A
+    website: coastalfruitco.example
+    page_name: Coastal Fruit Co
+    why: test
+  - name: Island Fruit Box
+    tier: A
+    website: islandfruitbox.example
+    page_name: Island Fruit Box
+    why: test
+  - name: Meadow Produce
+    tier: A
+    website: meadowproduce.example
+    page_name: Meadow Produce
+    why: test
+  - name: Fruit Folks
+    tier: A
+    website: fruitfolks.example
+    page_name: Fruit Folks
+    why: test
+  - name: Rare Fruits Direct
+    tier: A
+    website: rarefruitsdirect.example
+    page_name: Rare Fruits Direct
+    why: test
+  - name: Hill & Dale
+    tier: B
+    website: hilldale.example
+    page_name: Hill & Dale
+    why: test
+  - name: Orchard Gift Co
+    tier: B
+    website: orchardgiftco.example
+    page_name: Orchard Gift Co
+    why: test
+  - name: Sunny Groves
+    tier: B
+    website: sunnygroves.example
+    page_name: Sunny Groves
+    why: test
+  - name: Brook Hollow Farm
+    tier: B
+    website: brookhollowfarm.example
+    page_name: Brook Hollow Farm
+    why: test
+  - name: Kumo Berry
+    tier: B
+    website: kumoberry.example
+    page_name: Kumo Berry
+    why: test
+  - name: Parker & Dean
+    tier: B
+    website: parkerdean.example
+    page_name: Parker & Dean
+    why: test
+  - name: Odd Crate
+    tier: C
+    website: oddcrate.example
+    page_name: Odd Crate
+    why: test
+  - name: Gift Plate
+    tier: C
+    website: giftplate.example
+    page_name: Gift Plate
+    why: test
+  - name: Ranch Box
+    tier: C
+    website: ranchbox.example
+    page_name: Ranch Box
+    why: test
+  - name: North Sea Fish Co
+    tier: C
+    website: northseafishco.example
+    page_name: North Sea Fish Co
+    why: test
+  - name: Golden Hive
+    tier: C
+    website: goldenhive.example
+    page_name: Golden Hive
+    why: test
+  - name: Pantry Club
+    tier: C
+    website: pantryclub.example
+    page_name: Pantry Club
+    why: test
+  keywords:
+  - exotic fruit
+  - tropical fruit box
+  - mango delivery
+  - fruit gift box
+  - dragon fruit
+  - cherimoya

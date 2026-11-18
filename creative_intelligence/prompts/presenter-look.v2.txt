@@ -1,0 +1,7 @@
+Photoreal vertical 9:16 portrait of a brand narrator for ${brand}, ${brand_description}, for use as a talking-head presenter in short video ads.
+
+Presenter: ${look}
+
+${framing} Background softly out of focus: ${setting}.
+
+Look real: natural skin texture and pores, real hair strands, no retouched or glossy AI look, no make-up excess. Plain clothes and caps with no logos, brand marks, name tags or text. Nothing in the frame that suggests a uniform, a job title or a farm worker. No text, captions, watermarks or logos anywhere in the image. One person only.

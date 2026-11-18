@@ -1,0 +1,42 @@
+version: 4
+name: knife_cut
+label: Knife cut
+summary: A knife slices cleanly through the fruit.
+use: Reveal beat; the turn from outside to inside. Needs an approved cross-section image to end on, so the inside
+  is the real fruit
+duration_s: 5
+energy: high
+product_types:
+- fruit
+route: kling
+audio: none
+from_images:
+- kitchen_prep
+strict_qa: true
+still:
+  locks: One whole fruit exactly as in the reference photos on a wooden board; a chef's knife lying flat on the
+    board beside it, handle towards the camera; no hands in the still.
+  freedom: Board, kitchen background.
+  composition: Close, three-quarter view, board in the lower two-thirds.
+  lighting: Bright kitchen window light.
+motion:
+  camera: the camera holds still
+  change: a hand picks up the knife and slices down through the fruit, and the half falls open to show the flesh
+params:
+- name: cut
+  value: one clean stroke
+  feel: sawing motion looks fake
+pitfalls:
+- the inside does not match the real flesh colour or stone
+- the knife bends
+- the fruit regrows after the cut
+- 'v1: a knife held by a hand in the still made the image model return nothing (safety filter); the still shows
+  the knife resting, the cut happens in the motion'
+- 'v2: with no real cut photo to aim for, Kling invented an avocado-like inside; v3 ends on an approved cut_reveal
+  image (end frame)'
+- 'v3: cut_reveal was both a start and an end source, so the knife ''cut'' an already cut fruit; v4 starts from
+  a whole fruit (kitchen_prep or a card still) and ends on the cut photo'
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions
+end_from_images:
+- cut_reveal

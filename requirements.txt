@@ -1,0 +1,28 @@
+requests==2.32.3
+python-dotenv==1.0.1
+weasyprint>=60.0
+markdown>=3.5
+google-auth>=2.0.0
+google-auth-httplib2>=0.2.0
+google-api-python-client>=2.0.0
+
+# Creative Intelligence — Test UI
+flask>=3.0.0
+gunicorn>=22.0.0
+honcho>=2.0.0
+
+# Ad Studio — editable QA rubric (config/qa_rubric.yaml)
+pyyaml>=6.0
+
+# Creative Intelligence — LLM providers
+anthropic>=0.20.0
+# openai>=1.0.0
+
+# Creative Intelligence — Image generation
+replicate>=0.34.0
+
+# Creative Intelligence — Video assembly
+moviepy>=1.0.3,<2.0.0
+Pillow>=10.0.0
+numpy>=1.24.0
+tzdata>=2024.1

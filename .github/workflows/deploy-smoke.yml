@@ -1,0 +1,44 @@
+name: Ad Studio v2 deploy smoke
+
+# Railway (GitHub-linked to main, "Wait for CI" on) reports each deploy to GitHub as a
+# deployment status. After a v2 deploy this checks the live app; if the deploy or the check failed
+# it rolls back to the last good deployment and posts an alert to the Admin page.
+# Deploys of other Railway projects are ignored (vars.RAILWAY_DEPLOY_ENVIRONMENT, e.g. 'my-app / production').
+on: deployment_status
+
+concurrency:
+  group: deploy-smoke
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    if: >-
+      github.event.deployment.environment == vars.RAILWAY_DEPLOY_ENVIRONMENT &&
+      contains(fromJSON('["success", "failure", "error"]'), github.event.deployment_status.state)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Newest commit on main (only it is ever rolled back)
+        id: head
+        run: echo "sha=$(gh api repos/${{ github.repository }}/commits/main --jq .sha)" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Smoke, and roll back + alert on failure
+        run: >-
+          python scripts/deploy_smoke.py --no-dry-run
+          --url ${{ vars.APP_URL }}
+          --sha ${{ github.event.deployment.sha }}
+          --state ${{ github.event.deployment_status.state }}
+          --head-sha ${{ steps.head.outputs.sha }}
+        env:
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}       # a Railway PROJECT token for this app's project / environment
+          RAILWAY_PROJECT_ID: ${{ vars.RAILWAY_PROJECT_ID }}
+          RAILWAY_ENVIRONMENT_ID: ${{ vars.RAILWAY_ENVIRONMENT_ID }}
+          RAILWAY_SERVICE_ID: ${{ vars.RAILWAY_SERVICE_ID }}

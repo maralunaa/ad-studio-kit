@@ -1,0 +1,3 @@
+FRUIT ACCURACY: the fruit's true appearance comes from the reference photos and the appearance notes — describe it concretely (skin, flesh colour, seeds) in each scene so the render never drifts to a generic version. Show the fruit CUT in most concepts; the flesh is what sells it. The fruit must look perfectly ripe and irresistibly fresh.
+PACKAGING: if a scene shows packaging, it is our box — ${box}
+HANDS & PEOPLE are welcome (a hand in frame reaches new audiences) but must be anatomically perfect; keep faces out of frame or softly blurred.

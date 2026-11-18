@@ -1,0 +1,32 @@
+version: 1
+name: hand_picking
+label: Hand picking
+summary: A hand picks one ripe fruit from the tree.
+use: Human, harvest moment; 'picked when ripe'
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+route: kling
+audio: none
+from_images: []
+strict_qa: true
+still:
+  locks: One fruit exactly as in the reference photos on its branch; one adult hand with five natural fingers about
+    to cup it.
+  freedom: Sleeve, background foliage.
+  composition: Close-up, fruit and hand in the lower two-thirds, leaves above.
+  lighting: Soft morning light.
+motion:
+  camera: the camera holds still
+  change: the hand gently cups the fruit and lifts it off the branch
+params:
+- name: hand speed
+  value: slow and deliberate
+  feel: fast motion breaks fingers
+pitfalls:
+- fingers multiply or merge
+- the fruit changes size as it is lifted
+- a second fruit appears in the hand
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

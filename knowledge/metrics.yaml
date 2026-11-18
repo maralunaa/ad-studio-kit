@@ -1,0 +1,75 @@
+# Metric definitions, benchmarks and diagnosis rules, derived from the Meta Creative Playbook
+# (§Metrics and diagnosis, §What works in food and specialty fruit). Rates are fractions (0.30 = 30%).
+# Benchmarks are third-party modelled estimates: rough guides, to be replaced by our own data.
+
+version: 1
+
+minimum_read:
+  source: "Metrics and diagnosis"
+  days: 7
+  impressions: 5000
+
+metrics:
+  source: "Metrics and diagnosis › The metrics"
+  hook_rate:
+    formula: 3-second views ÷ impressions
+    bands: {rebuild_below: 0.15, solid: [0.25, 0.35], strong_above: 0.35}
+  hold_rate:
+    formula: 15-second views ÷ 3-second views
+    bands: {weak_below: 0.10, healthy: [0.15, 0.25], best_above: 0.30}
+    # The Meta sync has ThruPlays; ThruPlay = 15 s or the whole video if shorter, so for videos under
+    # 15 s a ThruPlay-based hold reads high. Hints label it and skip hold for those videos.
+  thruplay_rate:
+    formula: ThruPlays ÷ plays
+    bands: {median_15_to_30s: 0.20}
+  ctr:
+    formula: Link clicks ÷ impressions
+    bands: {food: 0.011, specialty_gifting: 0.0085}
+  cpa_roas:
+    formula: Spend ÷ purchases; revenue ÷ spend
+    note: "Judge against our own targets, new customers separately"
+
+# Diagnosis: the first rule whose conditions all hold gives the hint. "high" = at or above the level below,
+# "low" = under it. Hook and hold use the bands above (hook: solid's lower edge; hold: healthy's lower edge);
+# CTR the food baseline; conversion and ROAS the specialty & gifting benchmarks (CPA above $34 = low
+# conversion, ROAS under 3.5 = weak), until our own targets replace them.
+diagnosis:
+  source: "Metrics and diagnosis › Diagnosis"
+  levels: {hook: 0.25, hold: 0.15, ctr: 0.011, cpa_max: 34, roas: 3.5}
+  rules:
+    - key: low_hook_low_hold
+      when: {hook: low, hold: low}
+      problem: "Opening doesn't stop anyone"
+      hint: "Low hook, low hold: rewrite the first 1–3 s; don't touch the body yet"
+    - key: high_hook_low_hold
+      when: {hook: high, hold: low}
+      problem: "Body doesn't pay off the hook"
+      hint: "High hook, low hold: tighten seconds 3–15, proof by second 5, cut dead air"
+    - key: good_hold_low_ctr
+      when: {hold: high, ctr: low}
+      problem: No reason to act
+      hint: "Good hold, low CTR: stronger CTA, offer or urgency"
+    - key: good_ctr_low_conversion
+      when: {ctr: high, conversion: low}
+      problem: "Promise and page don't match, or the offer is weak"
+      hint: "Good CTR, low conversion: align ad and landing page; test the offer"
+    - key: all_strong_weak_roas
+      when: {hook: high, ctr: high, roas: low}
+      problem: "Engagement isn't purchase intent"
+      hint: "All strong, weak ROAS: check conversion tracking and audience; test the offer"
+
+fatigue:
+  source: "Metrics and diagnosis › Fatigue: refresh when two of these trip"
+  trips_needed: 2
+  frequency_7d: {feed: 3.5, reels_stories: 3.0}
+  engagement_drop_from_week_one: 0.25
+  cost_per_result_rise_from_first_two_weeks: 0.30
+  refresh_order: [hooks, imagery, retire]
+
+benchmarks:
+  source: "What works in food and specialty fruit › Category benchmarks (modelled estimates, use as rough guides)"
+  food_baseline:      {ctr: 0.011,  cpa: 22, roas: 4.5, life_days: 11}
+  specialty_gifting:  {ctr: 0.0085, cpa: 34, roas: 3.5, life_days: 14}
+  appetite_closeup:   {ctr: 0.013,  cpa: 20, roas: 4.6, life_days: 12}
+  packaging_on_white: {ctr: 0.007,  cpa: 31, roas: 3.6, life_days: 15}
+  new_ads_per_month_min: 10

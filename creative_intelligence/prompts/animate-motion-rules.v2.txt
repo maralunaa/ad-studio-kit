@@ -1,0 +1,4 @@
+Animate this exact photograph into a short, realistic video clip.
+The product: ${product}
+Keep every product item exactly as it is in the photo: the same number of items, the same shapes, sizes, colours, markings and positions, unless the motion below says otherwise. If the motion opens or cuts the product, the inside must be the real inside described above. Do not add, remove, merge or split anything. No text, logos, captions or watermarks appear at any point. Motion is natural and physically believable: no morphing, melting, flicker or sudden changes.
+Motion: ${motion}

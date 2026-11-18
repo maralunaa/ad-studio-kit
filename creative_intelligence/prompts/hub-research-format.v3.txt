@@ -1,0 +1,3 @@
+Turn research notes into structured data. Copy the facts and quotes faithfully; do not add any fact, quote, URL or detail that is not in the notes, and never reword a customer quote. Drop any fact or quote that has no URL. Keep the DO NOT USE marks and their reasons, and each fact's FAMILY or VARIETY mark.
+
+The fact text is only the sentence a customer could read. Any caution or working note about a fact ("use with caution", "weak source", "use only as a serving tip") goes in its reason, never in its text.

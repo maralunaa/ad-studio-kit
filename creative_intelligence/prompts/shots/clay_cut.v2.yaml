@@ -1,0 +1,45 @@
+version: 2
+name: clay_cut
+label: Clay fruit, cut open (claymation)
+summary: A tiny clay knife cuts the clay fruit open and the clay inside is shown.
+use: Claymation middle beats (what's inside); never on its own as the product
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+styles:
+- claymation
+cast: true
+stop_motion_fps: 12
+route: kling
+audio: none
+strict_qa: false
+count_check: false
+qa_note: >-
+  This is an intended claymation (handmade clay) look, not a photograph: judge that it is clearly the same kind of
+  fruit made of clay, its clay inside simplified from the real inside in the reference photos, and free of artefacts.
+  Do not fail it for not being photorealistic.
+qa_skip:
+- fruit_accuracy
+- appetite
+still:
+  locks: The fruit from the reference photos made as a handmade clay model with visible fingerprints and tool marks,
+    already cut through along a neat line, the two halves still together, on a small clay board; its true outside
+    colours and markings simplified into clay. No knife.
+  freedom: Set colours, small clay props (leaves).
+  composition: Centred, slightly from above, the clay fruit and knife filling the middle third.
+  lighting: Soft studio light with gentle shadows, like a stop-motion set.
+motion:
+  camera: the camera holds still
+  change: the two halves fall gently apart in small stepped moves, showing the clay inside in the real inside's
+    colours
+params:
+- name: steps
+  value: a few small moves
+  feel: smooth motion loses the stop-motion feel
+pitfalls:
+- it turns photorealistic
+- the inside comes out in the wrong colours
+- a hand or person appears
+negative: photorealistic fruit, text, logos, watermarks, extra fruit, hands, people, melting, gore
+# v2 (2026-10-27): already cut, the halves fall open, no knife (a floating knife cut it by itself).

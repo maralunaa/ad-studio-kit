@@ -1,0 +1,3 @@
+The same person as in the reference photo: keep the face, hair, skin, build and clothes exactly the same, in the same light and setting. Photoreal, vertical 9:16, one person only, no text, logos or watermarks.
+
+Change only this: ${change}

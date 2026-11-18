@@ -1,0 +1,54 @@
+version: 8
+name: knife_cut
+label: Knife cut
+summary: The fruit lying cut open in two halves on the board, the knife beside it, the camera moving in on the inside.
+use: Reveal beat; the turn from outside to inside. Needs an approved cross-section image to end on, so the inside
+  is the real fruit
+duration_s: 5
+energy: high
+product_types:
+- fruit
+route: kling
+audio: none
+from_images:
+- cut_reveal
+- kitchen_prep
+strict_qa: true
+count_check: false
+qa_note: >-
+  One fruit already cut in two halves: count the halves as one fruit. Nothing is cut on camera; judge that the halves and their inside stay exactly the same from first frame to last.
+still:
+  locks: One fruit exactly as in the reference photos, already cut in two halves lying open flesh-up on a wooden
+    board, the inside exactly as in the real cut photo; a chef's knife lying flat on the board beside them, handle
+    towards the camera; no hands.
+  freedom: Board, kitchen background.
+  composition: Close, three-quarter view, board in the lower two-thirds.
+  lighting: Bright kitchen window light.
+motion:
+  camera: the camera holds still
+  change: a slow push in toward the cut faces; the halves are rigid and keep their exact shape and inside, a little
+    juice glistens, the knife never moves, no hands
+params:
+- name: opening
+  value: one slow fall apart
+  feel: a hand or a moving knife warps (v6 QA found soft hands and halves reorganising)
+pitfalls:
+- the inside does not match the real flesh colour or stone
+- the knife bends
+- the fruit regrows after the cut
+- 'v1: a knife held by a hand in the still made the image model return nothing (safety filter); the still shows
+  the knife resting, the cut happens in the motion'
+- 'v2: with no real cut photo to aim for, Kling invented an avocado-like inside; v3 ends on an approved cut_reveal
+  image (end frame)'
+- 'v3: cut_reveal was both a start and an end source, so the knife ''cut'' an already cut fruit; v4 starts from
+  a whole fruit (kitchen_prep or a card still) and ends on the cut photo'
+- 'v4: the end photo came from another shoot, and a start and end that differ make Kling switch shots (its guide):
+  split panels and a second knife. v5 ends on an edit of the start still, cut open with the inside of the cut photo'
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions
+# v6 (2026-10-26): every take failed 'Same fruit first to last' because QA forces it to 1 when the fruit count changes, and this shot changes it on purpose (comparison takes 34-36, 43-45, 65-68).
+# v7 (2026-11-03): no hand and no slicing on camera (Cherimoya: warping 3, hands 3, halves reorganising); already
+# cut, the halves fall open like the clay cut that passes. Lines that say "slice" are fitted to it (styles.fit_shots).
+# v8 (2026-11-04 model test): knife cut failed on Kling, Seedance 2.5 and Wan 3.0 alike: the end frame is the real cut
+# photo (for Cherry Mango a scored hedgehog), so every model morphed a whole fruit into cubes. v8 starts already open,
+# from the real cut photo where there is one, and only the camera moves: no end frame, nothing to morph.

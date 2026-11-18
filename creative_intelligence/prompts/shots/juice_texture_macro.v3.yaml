@@ -1,0 +1,40 @@
+version: 3
+name: juice_texture_macro
+label: Juice / texture macro
+summary: A drop of juice running down the flesh.
+use: Appetite beat; ASMR and sensory videos
+duration_s: 5
+energy: low
+retired: true
+product_types:
+- fruit
+route: veo
+audio: none
+from_images:
+- juice_macro
+strict_qa: false
+qa_note: >-
+  The juice must look like real fruit juice: thin, clear, watery beads or a thin wet sheen. Juice that looks like
+  gel, jelly, slime, syrup or a glossy blob sliding off the flesh is a fail on fruit accuracy and realism
+  (feedback 2026-11-11, Honey Mango: a gel blob on the cubes).
+still:
+  locks: Cut flesh exactly as in the reference photos, glistening with a thin wet sheen; small clear beads of juice, never a gel.
+  freedom: Drop size, background blur.
+  composition: Extreme close-up, the flesh in the lower two-thirds.
+  lighting: Hard backlight that makes juice sparkle.
+motion:
+  camera: the camera holds still
+  change: a single small, thin, clear, watery drop of juice slowly runs down the flesh
+params:
+- name: drops
+  value: one
+  feel: several drops become a liquid mess
+pitfalls:
+- the juice is a thick glossy gel or blob that slides off the flesh (v3, 2026-11-11)
+- juice turns into jelly or foam
+- flesh texture melts
+- 'v2: model comparison 2026-10-26 (same still, one take each): Veo 3.1 Fast passed at 3.95 (Kling 4.33, Seedance 4.19), at half Kling''s cost and fastest; v2 routes to Veo'
+negative: gel, jelly, slime, glob, blob, syrup, extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions
+# Retired 2026-11-11: "the juice clips are always some syrup being put on top of the fruit and doesn't look like
+#   fruit juice" (Honey Mango, Blood Orange); no script or library fill uses it until a method looks real.

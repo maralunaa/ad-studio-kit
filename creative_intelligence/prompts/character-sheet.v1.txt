@@ -1,0 +1,7 @@
+A character design sheet for a short animated video ad series by ${brand}, ${brand_description}.
+
+The character is ${product} brought to life as a friendly cartoon / 3D animated character named ${character}. Its body IS the fruit: keep the fruit's true shape, skin colour, markings and proportions from the reference photos, simplified into a clean, appealing 3D-animation style with small expressive eyes and a mouth, and simple limbs. Personality: ${personality}.
+
+Lay out on a plain warm off-white background: a front view, a three-quarter view and a side view of the same character, plus three small expression heads (happy, surprised, curious). The same character in every view: identical colours, markings and proportions.
+
+No text, letters, numbers, labels, captions, logos or watermarks anywhere in the image. No other characters, no people, no brand marks.

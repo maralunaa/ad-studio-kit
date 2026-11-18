@@ -1,0 +1,34 @@
+version: 1
+name: whole_fruit_hero
+label: Whole-fruit hero
+summary: One perfect whole fruit, hero lighting.
+use: Product beat; under a headline or offer
+duration_s: 5
+energy: low
+product_types:
+- fruit
+route: kling
+audio: none
+from_images:
+- minimal_studio
+- color_pop
+- editorial
+- in_hand
+strict_qa: false
+still:
+  locks: 'One whole fruit exactly as in the reference photos: true size, skin colour and markings.'
+  freedom: Surface, background colour, a single prop.
+  composition: The fruit in the lower two-thirds, clean background above for a headline.
+  lighting: Soft key light with a gentle rim.
+motion:
+  camera: a very slight, slow push-in, no more than 10% closer
+  change: a soft highlight slides across the skin
+params:
+- name: push-in
+  value: at most 10%
+  feel: more pushes the fruit into the text area
+pitfalls:
+- the fruit swells during a push-in
+- skin turns generic and glossy
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

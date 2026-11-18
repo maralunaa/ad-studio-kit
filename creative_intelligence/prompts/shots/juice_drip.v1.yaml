@@ -1,0 +1,32 @@
+version: 1
+name: juice_drip
+label: Juice dripping (sensory)
+summary: A halved fruit held up, juice gathering and dripping off it in slow motion.
+use: Sensory beats; appetite
+duration_s: 5
+energy: low
+product_types:
+- fruit
+styles:
+- sensory
+cast: true
+route: veo
+audio: none
+strict_qa: true
+still:
+  locks: One half of the fruit exactly as in the reference photos, cut face down-angled towards the camera, held
+    between fingertips; the flesh glistening, true colour.
+  freedom: Background colour and blur.
+  composition: Close, the half in the upper middle of the frame, empty space below for the drops.
+  lighting: Hard backlight that makes every drop sparkle.
+motion:
+  camera: the camera holds still
+  change: juice gathers on the edge of the flesh and drips down in slow motion, two or three drops
+params:
+- name: drops
+  value: two or three
+  feel: a stream of juice looks like a tap and stops reading as fruit
+pitfalls:
+- juice turns into jelly, foam or syrup
+- the flesh melts
+negative: extra fruit, extra fingers, melting, syrup, foam, text, logos, watermarks, captions

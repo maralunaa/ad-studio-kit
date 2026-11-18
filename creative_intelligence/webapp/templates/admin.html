@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Studio · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='studio.css') }}"><link rel="stylesheet" href="/brand.css">
+</head>
+<body>
+{% include "_top.html" %}
+<main class="admin">
+  <div class="alerts" id="alerts" aria-live="polite"></div>
+  <section class="card" id="secOverview"><strong>Overview</strong><div id="overviewBody" class="muted">Loading…</div></section>
+  <section class="card" id="secSync"><strong>Meta sync</strong><div id="syncBody" class="muted">Loading…</div></section>
+  <section class="card" id="secJobs"><strong>Jobs</strong><div id="jobsBody" class="muted">Loading…</div></section>
+  <section class="card" id="secBackup"><strong>Storage and backups</strong><div id="backupBody" class="muted">Loading…</div></section>
+  <section class="card" id="secCost"><strong>Spending</strong><div id="costBody" class="muted">Loading…</div></section>
+  <section class="card" id="secVideo"><strong>Video</strong><p class="muted">Cost per finished video by style, the first version against each extra one, and how often library shots are reused instead of made again.</p><div id="videoBody" class="muted">Loading…</div></section>
+  <section class="card" id="secQa"><strong>Quality</strong><div id="qaBody" class="muted">Loading…</div></section>
+  <section class="card" id="secKnowledge"><strong>Knowledge</strong>
+    <p class="muted">The Meta Creative Playbook and the files derived from it. Prompts, QA, the style pickers and Results read these values. A new playbook export is compared section by section, Claude proposes the updates, and nothing changes until you approve each one.</p>
+    <div id="knowledgeBody" class="muted">Loading…</div></section>
+  <section class="card" id="secReviews"><strong>Real reviews and comments</strong>
+    <p class="muted">Review cards, review mashups and comment screenshots only show what is here: the exact words, where and when they were posted. Never write, edit or invent one. Comments show a first initial only; reviews a first name and last initial.</p>
+    <div id="reviewsBody" class="muted">Loading…</div></section>
+  <section class="card" id="secResearch"><strong>Research: brands and keywords</strong>
+    <p class="muted">The brands Ideas › Market watches (A direct, B premium fruit and gifting, C same audience, other food) and the US searches. Add the Facebook Page id when you know it: the monthly refresh then reads that Page's ads exactly. Tier A and B offers are refreshed monthly from each brand's site.</p>
+    <div id="researchBody" class="muted">Loading…</div></section>
+  <section class="card" id="secFacts"><strong>Facts and claims library</strong>
+    <p class="muted">Hooks, headlines and briefs may only state these facts; every piece of copy is checked against them. Banned words or claims are never allowed.</p>
+    <div id="factsBody" class="muted">Loading…</div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const money=v=>v==null?'—':'$'+Number(v).toFixed(2);
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}).then(r=>r.json());
+
+async function loadVideo(){
+  const d=await (await fetch('/api/ops/video')).json(), m=v=>v==null?'—':'$'+(+v).toFixed(2), S=d.shots;
+  $('videoBody').innerHTML=`<div class="stats mt-2"><div class="stat"><b class="tnum">${S.passing} of ${S.made}</b><span>library shots passing QA</span></div>
+    <div class="stat"><b class="tnum">${S.reuses}</b><span>times a library shot was reused</span></div>
+    <div class="stat"><b class="tnum">${S.reuse_rate==null?'—':S.reuse_rate+'x'}</b><span>reuses per passing shot</span></div>
+    <div class="stat"><b class="tnum">${m(S.per_use_usd)}</b><span>shot cost per use (${m(S.spend_usd)} spent)</span></div></div>
+    <div class="table-wrap mt-3"><table class="data"><thead><tr><th>Style</th><th>Videos</th><th>Versions</th><th>Spent</th><th>Per video</th><th>Per version</th></tr></thead>
+    <tbody>${d.by_style.map(r=>`<tr><td>${esc(r.style)}</td><td>${r.videos}</td><td>${r.renders}</td><td>${m(r.spend_usd)}</td><td>${m(r.per_video_usd)}</td><td>${m(r.per_render_usd)}</td></tr>`).join('')||'<tr><td colspan="6" class="dim">No finished videos yet.</td></tr>'}</tbody></table></div>`;
+}
+async function loadCosts(){
+  const d=await (await fetch('/api/ops/costs')).json();
+  $('syncBody').innerHTML=`<div class="row mt-2"><button class="btn btn-p sm" id="syncNow">Sync from Meta now</button><span class="muted" id="syncMsg"></span></div>
+    <div class="table-wrap mt-3"><table class="data"><thead><tr><th>Started (UTC)</th><th>How</th><th>Status</th><th>Ads</th><th>Patterns</th></tr></thead><tbody>
+    ${d.syncs.map(r=>`<tr><td>${esc((r.started_at||'').replace('T',' ').slice(0,16))}</td><td>${esc(r.trigger)}</td><td class="${r.status==='failed'?'err':''}" title="${esc(r.message||'')}">${esc(r.status)}</td><td>${r.n_ads??'—'}</td><td>${r.n_patterns??'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="dim">No syncs yet.</td></tr>'}</tbody></table></div>`;
+  $('syncNow').onclick=async()=>{const r=await post('/api/meta/sync');$('syncMsg').textContent=r.error||'Started. It takes about 10 minutes.';};
+  const B=d.budget, T=B.today, C=B.caps;
+  const tile=(spent,cap,label)=>`<div class="stat"><b class="tnum ${cap!=null&&spent>=cap?'err':''}">${money(spent)}${cap!=null?` <span class="muted">of ${money(cap)}</span>`:''}</b><span>${label}</span></div>`;
+  $('costBody').innerHTML=`<div class="stats mt-2">${tile(T.generation,C.generation_day,'images today')}${tile(T.video,C.video_day,'video today')}${tile(T.text,C.text_day,'Claude text calls today')}${tile(T.tagging,null,`Meta sync tagging today (alert above ${money(C.tagging_alert_day)})`)}</div>
+    <p class="muted mt-2">Days run from 00:00 London. Every paid call is checked first; over a cap it stops with “${esc(B.message)}” Tagging is never stopped.</p>
+    <div class="label-strong mt-4">Caps</div>
+    <div class="table-wrap"><table class="data"><tbody>${Object.entries(B.labels).map(([k,l])=>`<tr><td>${esc(l)}</td><td><input class="f w-num" data-cap="${k}" value="${C[k]}"></td><td><button class="btn sm" data-capsave="${k}">Save</button></td></tr>`).join('')}</tbody></table></div>
+    <div class="label-strong mt-4">Models</div>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Role</th><th>Model</th><th>Budget</th><th>Price</th><th>Setting</th></tr></thead><tbody>
+    ${d.models.map(m=>`<tr><td>${esc(m.role)}<div class="muted tiny">${esc(m.use)}</div></td><td>${esc(m.model)}</td><td>${esc(m.bucket)}</td><td>${m.price_usd==null?'—':'$'+m.price_usd+' / '+esc(m.unit)}${m.price_checked_at?'':' <span class="warn tiny">unverified</span>'}</td><td><code>${esc(m.setting)}</code></td></tr>`).join('')}</tbody></table></div>
+    <div class="label-strong mt-4">Last 7 days</div>
+    <div class="table-wrap"><table class="data"><thead><tr><th>What</th><th>Model</th><th>Calls</th><th>Cost</th></tr></thead><tbody>
+    ${d.by_kind.map(r=>`<tr><td>${esc(r.kind)}</td><td>${esc(r.model)}</td><td>${r.calls}</td><td>${money(r.usd)}</td></tr>`).join('')||'<tr><td colspan="4" class="dim">Nothing yet.</td></tr>'}</tbody></table></div>
+    <div class="label-strong mt-4">Model prices</div><p class="muted">Check these against your Replicate and Anthropic bills; saving marks the price as checked today.</p>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Model</th><th>Unit</th><th>Price</th><th>Last checked</th><th></th></tr></thead><tbody>
+    ${d.prices.map(p=>`<tr><td>${esc(p.model)}<div class="muted tiny">${esc(p.source)}</div></td><td>${esc(p.unit)}</td><td><input class="f w-num" data-price="${esc(p.model)}" value="${p.usd}"></td><td>${esc(p.checked_at||'never')}</td><td><button class="btn sm" data-save="${esc(p.model)}">Save</button></td></tr>`).join('')}</tbody></table></div>
+    <div class="label-strong mt-4">Recent image runs</div>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Run</th><th>Product</th><th>Size</th><th>Status</th><th>Delivered</th><th>Spent</th></tr></thead><tbody>
+    ${d.runs.map(r=>`<tr><td title="${esc(r.message||'')}">#${r.id}</td><td>${esc(r.product)}</td><td>${r.size}</td><td>${esc(r.status)}</td><td>${r.delivered||0}</td><td>${money(r.spent_usd)}</td></tr>`).join('')||'<tr><td colspan="6" class="dim">No runs yet.</td></tr>'}</tbody></table></div>`;
+  document.querySelectorAll('[data-capsave]').forEach(b=>b.onclick=async()=>{const k=b.dataset.capsave;const r=await post('/api/ops/caps',{key:k,usd:document.querySelector(`[data-cap="${k}"]`).value});if(r.error)alert(r.error);loadCosts();});
+  document.querySelectorAll('[data-save]').forEach(b=>b.onclick=async()=>{const m=b.dataset.save;const v=document.querySelector(`[data-price="${CSS.escape(m)}"]`).value;const r=await post('/api/ops/prices',{model:m,usd:v});if(r.error)alert(r.error);loadCosts();});
+}
+
+async function loadQa(){
+  const d=await (await fetch('/api/ops/qa')).json(), o=d.overrules, r=d.rubric;
+  $('qaBody').innerHTML=`<div class="stats mt-2"><div class="stat"><b class="tnum">${d.scored.scored||0}</b><span>images scored</span></div><div class="stat"><b class="tnum">${d.scored.scored?Math.round((d.scored.passed||0)/d.scored.scored*100)+'%':'—'}</b><span>passed QA</span></div><div class="stat"><b class="tnum">${o.rate==null?'—':o.rate+'%'}</b><span>overrule rate (${o.overrules} of ${o.reviews} reviews)</span></div></div>
+    <p class="muted mt-3">Overrules: ${o.approved_qa_reject} approved after QA rejected them · ${o.rejected_high_score} rejected despite a score of ${r.high_score}+. A high rate means the rubric needs tuning.</p>
+    ${o.recent.length?`<div class="table-wrap"><table class="data"><thead><tr><th>Item</th><th>Action</th><th>QA score</th><th>Overrule</th><th>When</th></tr></thead><tbody>${o.recent.map(x=>`<tr><td>${esc(x.source)} #${x.source_id}</td><td>${esc(x.action)}</td><td>${x.qa_total}</td><td>${esc(x.overrule.replace(/_/g,' '))}</td><td>${esc((x.at||'').slice(0,16).replace('T',' '))}</td></tr>`).join('')}</tbody></table></div>`:''}
+    <div class="label-strong mt-4">Rubric v${r.version} · pass mark ${r.threshold}</div><p class="muted">Edit <code>config/qa_rubric.yaml</code> to change it; no code change needed.</p>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Criterion</th><th>Weight</th><th>Minimum</th><th>Scored by</th></tr></thead><tbody>
+    ${r.criteria.map(c=>`<tr><td>${esc(c.name)}</td><td>${c.weight}</td><td>${c.min??'—'}</td><td>${c.measured?'code':'Claude'}</td></tr>`).join('')}</tbody></table></div>`;
+}
+
+let F=null;
+async function loadFacts(data){
+  F=data||await (await fetch('/api/ops/facts')).json();
+  const prodName=id=>id?((F.products.find(p=>p.id===id)||{}).name||'#'+id):'All products';
+  const prodOpts=sel=>`<option value="">All products</option>${F.products.map(p=>`<option value="${p.id}" ${sel===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}`;
+  $('factsBody').innerHTML=`<div class="table-wrap mt-2"><table class="data"><thead><tr><th>Fact</th><th>Category</th><th>Product</th><th>Source</th><th></th></tr></thead><tbody>
+    ${F.facts.map(f=>`<tr><td>${esc(f.text)}</td><td>${esc(F.categories[f.category]||f.category)}</td><td>${esc(prodName(f.product_id))}</td><td>${esc(f.source||'—')}</td><td><button class="btn sm" data-del-fact="${f.id}">Delete</button></td></tr>`).join('')||'<tr><td colspan="5" class="dim">No approved facts yet. Until you add some, hooks and briefs can only use your product setup, and other factual claims get flagged.</td></tr>'}</tbody></table></div>
+    <div class="label-strong mt-3">Add a fact</div>
+    <div class="row mt-1"><input class="f field-grow-2" id="nf_text" placeholder="e.g. Grown in Homestead, Florida"><select class="f w-mid" id="nf_cat">${Object.entries(F.categories).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join('')}</select><select class="f w-mid" id="nf_prod">${prodOpts(null)}</select><input class="f w-mid" id="nf_src" placeholder="Source (needed for nutrition)"><button class="btn btn-p" id="nf_add">Add fact</button></div>
+    <div class="label-strong mt-4">Banned words and claims</div>
+    <div class="row mt-1">${F.banned.map(b=>`<span class="tagb">${esc(b.term)}${b.product_id?' · '+esc(prodName(b.product_id)):''} <button class="btn ghost sm" data-del-ban="${b.id}" aria-label="Remove ${esc(b.term)}">✕</button></span>`).join('')||'<span class="muted">None yet.</span>'}</div>
+    <div class="row mt-2"><input class="f field-grow" id="nb_term" placeholder="e.g. organic, cures, #1 in America"><select class="f w-mid" id="nb_prod">${prodOpts(null)}</select><input class="f w-mid" id="nb_reason" placeholder="Why (optional)"><button class="btn" id="nb_add">Ban it</button></div>
+    <p class="err mt-2" id="factsErr"></p>`;
+  const save=async b=>{const r=await post('/api/ops/facts',b);if(r.error){$('factsErr').textContent=r.error;return;}loadFacts(r);};
+  $('nf_add').onclick=()=>save({kind:'fact',text:$('nf_text').value,category:$('nf_cat').value,product_id:$('nf_prod').value,source:$('nf_src').value});
+  $('nb_add').onclick=()=>save({kind:'banned',term:$('nb_term').value,product_id:$('nb_prod').value,reason:$('nb_reason').value});
+  document.querySelectorAll('[data-del-fact]').forEach(b=>b.onclick=()=>save({kind:'fact',id:+b.dataset.delFact,delete:true}));
+  document.querySelectorAll('[data-del-ban]').forEach(b=>b.onclick=()=>save({kind:'banned',id:+b.dataset.delBan,delete:true}));
+}
+async function loadAlerts(){
+  const d=await (await fetch('/api/ops/alerts')).json();
+  $('alerts').innerHTML=d.alerts.map(a=>`<div class="alert-bar ${esc(a.level)}"><div><b>${esc(a.source==='deploy'?'Deploy':a.source)}</b> · <span class="tnum">${esc(a.at.replace('T',' '))} UTC</span><div>${esc(a.message)}</div></div><button class="btn sm ml-auto" data-dismiss="${a.id}">Dismiss</button></div>`).join('');
+  document.querySelectorAll('[data-dismiss]').forEach(b=>b.onclick=async()=>{await post('/api/ops/alerts/'+b.dataset.dismiss+'/dismiss');loadAlerts();});
+}
+async function loadBackups(){
+  const [d,u]=await Promise.all([fetch('/api/ops/backups').then(r=>r.json()),fetch('/api/ops/storage').then(r=>r.json())]);
+  const mb=n=>n==null?'':n>=1e9?(n/1e9).toFixed(1)+' GB':(n/1048576).toFixed(1)+' MB';
+  const day=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][d.images_weekday];
+  const line=(kind,label)=>{const b=d.backups.find(x=>x.kind===kind);
+    return b?`<p class="mt-1">${label}: <b class="${b.status==='failed'?'err':b.status==='done'?'tc':''}">${esc(b.status)}</b> · ${esc((b.finished_at||b.started_at).replace('T',' '))} UTC${b.size_bytes?' · '+mb(b.size_bytes):''} · <span class="muted">${esc(b.message||'')}</span></p>`:`<p class="mt-1">${label}: none yet.</p>`;};
+  const areas=Object.entries(u.by_area||{}).filter(([,v])=>v).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${esc(k.replace('_',' '))} ${mb(v)}`).join(' · ');
+  $('backupBody').innerHTML=`<div class="stats mt-2"><div class="stat"><b class="tnum ${u.warn?'err':''}">${Math.round(u.used_share*100)}%</b><span>volume used${u.warn?' (over 80%)':''}</span></div><div class="stat"><b class="tnum">${mb(u.free_bytes)}</b><span>free of ${mb(u.total_bytes)}</span></div></div>
+    <p class="muted mt-2">${areas}</p>
+    <p class="mt-2">${d.folder_set?`Database to Google Drive every night after ${String(d.hour_utc).padStart(2,'0')}:00 UTC (newest ${d.keep} kept); new images every ${day}.`:'Backups to Drive are off until <code>BACKUP_DRIVE_FOLDER_ID</code> is set.'} Railway also keeps volume backups (database and images): ${esc(d.railway_volume_backups)}.</p>
+    ${line('database','Last database backup')}${line('images','Last image backup')}
+    <div class="row mt-2"><button class="btn sm" id="backupNow" ${d.folder_set?'':'disabled'}>Back up database now</button><button class="btn sm" id="backupImgs" ${d.folder_set?'':'disabled'}>Back up new images now</button><span class="muted" id="backupMsg"></span></div>`;
+  const run=async kind=>{const r=await post('/api/ops/backups/run',{kind});$('backupMsg').textContent=r.error||'Backing up… refresh in a minute.';};
+  $('backupNow').onclick=()=>run('database'); $('backupImgs').onclick=()=>run('images');
+}
+async function loadJobs(){
+  const d=await (await fetch('/api/ops/jobs')).json();
+  const c=d.counts||{}, w=d.worker;
+  const dur=j=>j.started_at&&j.finished_at?Math.max(1,Math.round((new Date(j.finished_at+'Z')-new Date(j.started_at+'Z'))/1000))+' s':'';
+  $('jobsBody').innerHTML=`<p class="mt-1">${d.alive?`Worker running, last check-in ${Math.round(d.heartbeat_age_s)} s ago`:`<span class="err">The worker hasn't checked in${w?` since ${esc(w.heartbeat_at.replace('T',' '))} UTC`:''}</span>`} · ${c.queued||0} queued · ${c.running||0} running · ${c.done||0} done and <span class="${c.failed?'err':''}">${c.failed||0} failed</span> in the last day</p>
+    <div class="table-wrap mt-2"><table class="data"><thead><tr><th>Job</th><th>Status</th><th>Queued (UTC)</th><th>Took</th><th>Tries</th><th></th></tr></thead><tbody>
+    ${d.jobs.map(j=>`<tr><td>${esc(j.label)} <span class="muted">#${j.id}</span>${j.error?`<div class="err tiny">${esc(j.error)}</div>`:''}</td><td class="${j.status==='failed'?'err':j.status==='done'?'tc':''}">${esc(j.status)}</td><td>${esc((j.created_at||'').replace('T',' '))}</td><td>${dur(j)}</td><td>${j.attempts}/${j.max_attempts}</td><td>${j.status==='failed'&&j.kind!=='image_run'?`<button class="btn sm" data-retry="${j.id}">Retry</button>`:''}</td></tr>`).join('')||'<tr><td colspan="6" class="dim">No jobs yet.</td></tr>'}</tbody></table></div>`;
+  document.querySelectorAll('[data-retry]').forEach(b=>b.onclick=async()=>{const r=await post('/api/ops/jobs/'+b.dataset.retry+'/retry');if(r.error)alert(r.error);loadJobs();});
+}
+document.addEventListener('click',async e=>{if(e.target.id!=='retryFailed')return;   // every failed job, last 24 h
+  e.target.disabled=true;const r=await post('/api/ops/jobs/retry-failed');
+  e.target.textContent=r.error?r.error:`${r.queued} job${r.queued===1?'':'s'} back in the queue`;loadJobs();});
+async function loadOverview(){
+  const d=await (await fetch('/api/ops/dashboard')).json();
+  const B=d.budget, T=B.today, C=B.caps, V=d.volume;
+  const when=t=>t?esc(t.replace('T',' ').slice(0,16))+' UTC':'never';
+  const st=(s)=>`<b class="${s==='failed'?'err':s==='done'?'tc':''}">${esc(s||'—')}</b>`;
+  const db=d.last_backup.database, im=d.last_backup.images, sy=d.last_sync;
+  $('overviewBody').innerHTML=`<div class="stats mt-2">
+      <div class="stat"><b class="tnum ${T.generation>=C.generation_day?'err':''}">${money(T.generation)} <span class="muted">of ${money(C.generation_day)}</span></b><span>images today</span></div>
+      <div class="stat"><b class="tnum ${T.video>=C.video_day?'err':''}">${money(T.video)} <span class="muted">of ${money(C.video_day)}</span></b><span>video today</span></div>
+      <div class="stat"><b class="tnum ${T.text>=C.text_day?'err':''}">${money(T.text)} <span class="muted">of ${money(C.text_day)}</span></b><span>Claude text today</span></div>
+      <div class="stat"><b class="tnum">${d.per_image_7d==null?'—':'$'+d.per_image_7d.toFixed(2)}</b><span>per delivered image, 7-day average (${d.runs_7d} run${d.runs_7d===1?'':'s'})</span></div>
+      <div class="stat"><b class="tnum ${V.warn?'err':''}">${Math.round(V.used_share*100)}%</b><span>volume used</span></div>
+      <div class="stat"><b class="tnum ${d.failed_jobs.length?'err':''}">${d.failed_jobs.length}</b><span>failed jobs, last 24 h</span></div>
+      <div class="stat"><b class="tnum ${d.worker.alive?'':'err'}">${d.worker.alive?'Running':'Down'}</b><span>worker</span></div></div>
+    <p class="mt-3">Last Meta sync: ${sy?st(sy.status)+' · '+when(sy.finished_at||sy.started_at)+' · '+esc(sy.trigger):'never'}
+      · Last database backup: ${db?st(db.status)+' · '+when(db.finished_at||db.started_at):'never'}
+      · Last image backup: ${im?st(im.status)+' · '+when(im.finished_at||im.started_at):'never'}</p>
+    ${d.failed_jobs.length?`<div class="err tiny mt-1">${d.failed_jobs.map(f=>`${esc(f.label)} #${f.id}: ${esc(f.error)}`).join('<br>')}</div>
+      <button class="btn sm mt-1" id="retryFailed">Retry failed jobs</button>`:''}
+    <div class="label-strong mt-4">Spend by provider</div>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Provider</th>${d.periods.map(p=>`<th>${esc(p==='today'?'Today':'Last '+p)}</th>`).join('')}</tr></thead><tbody>
+    ${Object.entries(d.spend).map(([k,v])=>`<tr><td>${esc(k)}</td>${d.periods.map(p=>`<td>${money(v[p])}</td>`).join('')}</tr>`).join('')}
+    <tr><td><b>Total</b></td>${d.periods.map(p=>`<td><b>${money(d.spend_total[p])}</b></td>`).join('')}</tr></tbody></table></div>
+    <div class="label-strong mt-4">Runs</div>
+    <div class="table-wrap"><table class="data"><thead><tr><th>Run</th><th>Product</th><th>Status</th><th>Delivered</th><th>Spent</th><th>Per delivered image</th></tr></thead><tbody>
+    ${d.runs.map(r=>`<tr><td>#${r.id} <span class="muted">${esc((r.created_at||'').slice(0,10))}</span></td><td>${esc(r.product)}</td><td>${esc(r.status)}</td><td>${r.delivered||0} of ${r.size}</td><td>${money(r.spent_usd)}</td><td>${r.per_image==null?'—':'$'+r.per_image.toFixed(2)}</td></tr>`).join('')||'<tr><td colspan="6" class="dim">No runs yet.</td></tr>'}</tbody></table></div>`;
+}
+async function loadReviews(data){
+  const R=data||await (await fetch('/api/ops/reviews')).json();
+  const prod=id=>id?((R.products.find(p=>p.id===id)||{}).name||'#'+id):'All products';
+  $('reviewsBody').innerHTML=`<div class="table-wrap mt-2"><table class="data text"><thead><tr><th>Words</th><th>Shown as</th><th>Where, when</th><th>Product</th><th></th></tr></thead><tbody>
+    ${R.reviews.map(r=>`<tr><td>${r.rating?esc('★'.repeat(r.rating))+' ':''}${esc(r.text)}</td><td>${esc(r.shown_as)} <span class="muted">(${esc(r.kind)})</span>${r.usable?'':' <span class="badge">not used in ads</span>'}</td><td>${r.source_url?`<a class="accent-text" href="${esc(r.source_url)}" target="_blank" rel="noopener">${esc(r.source_name)}</a>`:esc(r.source_name)} · ${esc(r.posted_on)}</td><td>${esc(prod(r.product_id))}</td><td><button class="btn sm" data-rv-arch="${r.id}">Remove</button></td></tr>`).join('')||'<tr><td colspan="5" class="dim">None yet. Add real ones from Google, Shopify or your Meta comments.</td></tr>'}</tbody></table></div>
+    <div class="label-strong mt-3">Add one (copy the exact words)</div>
+    <textarea class="f mt-1" id="rv_text" placeholder="The exact words, as posted"></textarea>
+    <div class="row mt-2"><select class="f w-mid" id="rv_kind"><option value="review">Review</option><option value="comment">Comment</option></select>
+      <input class="f w-mid" id="rv_author" placeholder="Name as posted"><select class="f w-mid" id="rv_rating"><option value="">No stars</option>${[5,4,3,2,1].map(n=>`<option>${n}</option>`).join('')}</select>
+      <select class="f w-mid" id="rv_source">${Object.entries(R.sources).map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join('')}</select>
+      <input class="f w-mid" id="rv_date" type="date" aria-label="Posted on"><select class="f w-mid" id="rv_prod"><option value="">All products</option>${R.products.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></div>
+    <div class="row mt-2"><input class="f field-grow" id="rv_url" placeholder="Link to it (optional)"><button class="btn btn-p" id="rv_add">Add</button></div>
+    <p class="err mt-2" id="rvErr"></p>`;
+  const save=async b=>{const r=await post('/api/ops/reviews',b);if(r.error){$('rvErr').textContent=r.error;return;}loadReviews(r);};
+  $('rv_add').onclick=()=>save({kind:$('rv_kind').value,text:$('rv_text').value,author:$('rv_author').value,rating:$('rv_rating').value,
+    source:$('rv_source').value,posted_on:$('rv_date').value,product_id:$('rv_prod').value,source_url:$('rv_url').value});
+  document.querySelectorAll('[data-rv-arch]').forEach(b=>b.onclick=()=>save({id:+b.dataset.rvArch,archive:true}));
+}
+let KP=null;
+async function loadKnowledge(){
+  const K=await (await fetch('/api/ops/knowledge')).json(), pb=K.playbook;
+  const st={pending:'Waiting',live:'Live',approved:'Approved for the PR',rejected:'Rejected'};
+  const upd=u=>{
+    const open=u.proposals.filter(p=>p.status==='pending');
+    return `<details class="mt-3" ${u.id===KP?'open':''} data-upd="${u.id}"><summary><b>Export ${u.revision?'revision '+u.revision:'(no revision)'}</b> <span class="muted">· uploaded ${esc(u.created_at.replace('T',' '))} · ${u.diff.length} section${u.diff.length===1?'':'s'} changed · ${esc(u.status==='ready'?open.length+' to decide':u.status)}</span></summary>
+      ${u.error?`<p class="err mt-1">${esc(u.error)}</p>`:''}
+      ${u.diff.map(c=>`<div class="label-strong mt-3">${esc(c.section)} <span class="muted">(${esc(c.change)})</span></div>${c.diff?`<pre class="diff">${esc(c.diff)}</pre>`:''}`).join('')||'<p class="muted mt-2">No section changed.</p>'}
+      ${u.affected.length?`<p class="muted mt-2">${u.affected.length} derived value${u.affected.length===1?'':'s'} come from these sections.</p>`:''}
+      ${u.proposals.length?`<div class="table-wrap mt-2"><table class="data text"><thead><tr><th></th><th>Change</th><th>Before</th><th>After</th><th>Why</th><th>Status</th></tr></thead><tbody>
+        ${u.proposals.map((p,i)=>`<tr><td>${p.status==='pending'?`<input type="checkbox" data-pick="${u.id}:${i}" aria-label="Pick item ${i+1}">`:''}</td><td><b>${esc(p.target)}</b><br><code>${esc(p.key)}</code></td><td><pre class="diff">${esc(p.before||'')}</pre></td><td><pre class="diff">${esc(p.after)}</pre></td><td>${esc(p.reason)}<br><span class="muted">${esc(p.section)}</span></td><td>${esc(st[p.status]||p.status)}</td></tr>`).join('')}</tbody></table></div>
+        ${open.length?`<div class="row mt-2"><button class="btn btn-p sm" data-dec="${u.id}:1">Approve selected</button><button class="btn sm" data-dec="${u.id}:0">Reject selected</button><span class="muted">Playbook and knowledge items go live together once checked; rubric and prompt wording is approved for the PR.</span></div>`:''}
+        <p class="mt-2"><a class="accent-text" href="/api/ops/knowledge/${u.id}/export">Download what's approved</a> <span class="muted">(for the PR that folds it into the repo)</span></p>`:
+        (u.status==='queued'||u.status==='running'?'<p class="muted mt-2"><span class="spinner"></span> Claude is reading the changes…</p>':'')}
+      <p class="err mt-1" id="kErr${u.id}"></p></details>`;};
+  $('knowledgeBody').innerHTML=`<dl class="kv mt-2"><dt>Playbook</dt><dd>Revision ${pb.revision??'—'} · exported ${esc(pb.exported||'—')}${pb.adopted?' · adopted here, not yet in the repo':''}</dd>
+      <dt>Knowledge version</dt><dd><code>${esc(K.version)}</code> (recorded on everything made with it)</dd>
+      <dt>Checks</dt><dd>${K.errors.length?`<span class="err">${esc(K.errors.join(' · '))}</span>`:'Every file loads, validates and traces to the playbook.'}</dd></dl>
+    ${K.files.map(f=>`<details class="mt-3"><summary><b>${esc(f.file)}</b> <span class="muted">· ${f.values.length} values</span></summary>
+      <div class="table-wrap mt-2"><table class="data text"><thead><tr><th>Value</th><th>From the playbook</th><th>Used by</th></tr></thead><tbody>
+      ${f.values.map(v=>`<tr><td><code>${esc(v.key)}</code></td><td>${esc(v.source)}</td><td>${[...v.prompts.map(p=>'prompt: '+p),...v.code].map(esc).join('<br>')||'<span class="dim">—</span>'}</td></tr>`).join('')}</tbody></table></div></details>`).join('')}
+    <details class="mt-3"><summary><b>Pre-launch checklists</b></summary>${['static','video'].map(k=>`<div class="label-strong mt-2">${k==='static'?'Static':'Video'}</div><ul class="mt-1">${K.checklists[k].map(i=>`<li>${esc(i.text)} <span class="muted">· ${i.auto?'Ad Studio: '+esc(i.check):'a person'}</span></li>`).join('')}</ul>`).join('')}</details>
+    ${K.overrides.length?`<div class="label-strong mt-4">Approved changes live here (not yet in the repo)</div><div class="table-wrap"><table class="data text"><thead><tr><th>Value</th><th>Now</th><th>Approved</th><th></th></tr></thead><tbody>
+      ${K.overrides.map(o=>`<tr><td><code>${esc(o.key)}</code></td><td><code>${esc(JSON.stringify(o.value))}</code></td><td>${esc((o.approved_at||'').replace('T',' '))}</td><td><button class="btn sm" data-undo="${esc(o.key)}">Undo</button></td></tr>`).join('')}</tbody></table></div>`:''}
+    <div class="label-strong mt-4">Check a new playbook export</div>
+    <p class="muted">Export the Claude Docs playbook as Markdown and paste or upload it. It is stored, not used, until you approve its changes.</p>
+    <textarea class="f tall mt-1" id="kMd" placeholder="Paste the Markdown export here" aria-label="Playbook export"></textarea>
+    <div class="row mt-2"><input type="file" id="kFile" accept=".md,text/markdown,text/plain" aria-label="Upload the export"><button class="btn btn-p" id="kUp">Check for changes</button><span class="err" id="kUpErr"></span></div>
+    ${K.updates.map(upd).join('')}`;
+  $('kUp').onclick=async()=>{const b=$('kUp');b.disabled=true;let r;
+    if($('kFile').files[0]){const fd=new FormData();fd.append('export',$('kFile').files[0]);r=await (await fetch('/api/ops/knowledge/upload',{method:'POST',body:fd})).json();}
+    else r=await post('/api/ops/knowledge/upload',{markdown:$('kMd').value});
+    b.disabled=false; if(r.error){$('kUpErr').textContent=r.error;return;} KP=r.id; loadKnowledge();};
+  document.querySelectorAll('[data-dec]').forEach(b=>b.onclick=async()=>{const [uid,ap]=b.dataset.dec.split(':');
+    const items=[...document.querySelectorAll(`[data-pick^="${uid}:"]:checked`)].map(c=>+c.dataset.pick.split(':')[1]);
+    if(!items.length){$('kErr'+uid).textContent='Tick the items first.';return;}
+    const r=await post(`/api/ops/knowledge/${uid}/decide`,{items,approve:ap==='1'});KP=+uid;
+    if(r.error){$('kErr'+uid).textContent=r.error;return;} loadKnowledge();});
+  document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=async()=>{await post('/api/ops/knowledge/override/remove',{key:b.dataset.undo});loadKnowledge();});
+  if(K.updates.some(u=>u.status==='queued'||u.status==='running'))setTimeout(loadKnowledge,8000);
+}
+async function loadResearchAdmin(){
+  const m=await (await fetch('/api/adstudio/market')).json();
+  const tier=(id,t)=>`<select class="f w-mid" data-f="tier">${Object.keys(m.tiers).map(k=>`<option ${k===t?'selected':''}>${k}</option>`).join('')}</select>`;
+  const row=b=>`<tr data-id="${b.id||''}"><td><input class="f" data-f="name" value="${esc(b.name)}"></td><td>${tier(b.id,b.tier)}</td>
+    <td><input class="f" data-f="website" value="${esc(b.website)}"></td><td><input class="f" data-f="page_name" value="${esc(b.page_name)}"></td>
+    <td><input class="f w-mid" data-f="page_id" value="${esc(b.page_id)}" placeholder="Page id"></td><td><input class="f" data-f="why" value="${esc(b.why)}"></td>
+    <td><label class="check-row"><input type="checkbox" data-f="active" ${b.active!==0?'checked':''}> on</label></td><td><button class="btn sm" data-save>Save</button></td></tr>`;
+  $('researchBody').innerHTML=`<div class="table-wrap"><table class="data text"><thead><tr><th>Brand</th><th>Tier</th><th>Website</th><th>Page name</th><th>Page id</th><th>Why</th><th>Active</th><th></th></tr></thead>
+      <tbody>${m.brands.map(row).join('')}${row({name:'',tier:'C',website:'',page_name:'',page_id:'',why:'',active:1})}</tbody></table></div>
+    <label class="fl">US keyword searches</label><div class="row">${m.keywords.map(k=>`<span class="tagb">${esc(k.term)} <button class="btn sm" data-kw="${k.id}" aria-label="Remove ${esc(k.term)}">×</button></span>`).join('')}
+      <input class="f w-mid" id="kwNew" placeholder="new search"><button class="btn sm" id="kwAdd">Add</button></div><p class="err" id="rsAdminErr"></p>`;
+  document.querySelectorAll('#researchBody [data-save]').forEach(b=>b.onclick=async()=>{const tr=b.closest('tr'), d={id:tr.dataset.id||null};
+    tr.querySelectorAll('[data-f]').forEach(i=>d[i.dataset.f]=i.type==='checkbox'?i.checked:i.value);
+    const r=await post('/api/adstudio/market/brands',d); if(r.error){$('rsAdminErr').textContent=r.error;return;} loadResearchAdmin();});
+  document.querySelectorAll('#researchBody [data-kw]').forEach(b=>b.onclick=async()=>{await post('/api/adstudio/market/keywords',{remove:+b.dataset.kw});loadResearchAdmin();});
+  $('kwAdd').onclick=async()=>{const r=await post('/api/adstudio/market/keywords',{term:$('kwNew').value});if(r.error){$('rsAdminErr').textContent=r.error;return;}loadResearchAdmin();};
+}
+loadAlerts(); loadOverview(); loadJobs(); loadBackups(); loadCosts(); loadVideo(); loadQa(); loadFacts(); loadKnowledge(); loadReviews(); loadResearchAdmin();
+</script>
+</body>
+</html>

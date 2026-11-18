@@ -1,0 +1,3 @@
+RIPENING TIME-LAPSE. No voice: every line is kind text. Show the fruit as it arrives, then the ripening_transition shot with day labels, then the fruit ready and cut open. The day labels and the words come ONLY from the approved ripeness facts (for example "Day 1: firm", "Day 3: ready" only if the facts say so); never add a day count, a softness test or a storage tip that isn't there. Three to five lines, two to five words each.
+
+{{knowledge:styles.ripening_timelapse}}

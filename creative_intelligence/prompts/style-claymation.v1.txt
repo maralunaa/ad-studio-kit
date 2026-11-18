@@ -1,0 +1,3 @@
+CLAYMATION / STOP-MOTION. A short, witty clay-animation piece that ends on the real fruit. Use the clay shots (clay_hero for the clay fruit on its set, clay_slice_reveal for the signature moment) and finish on real shots: the slice reveal always comes before the last line, and the last line plays over a real cross-section or cut shot. Lines are short narrator lines or a few words of on-screen text; playful, never silly about the product, and never a claim beyond the approved facts. The clay is the hook; the real fruit is the payoff.
+
+{{knowledge:styles.claymation}}

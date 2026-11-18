@@ -1,0 +1,40 @@
+version: 1
+name: clay_hero
+label: Clay fruit (claymation)
+summary: The fruit as a handmade clay model, turning on a little clay set.
+use: Claymation openers and beats; never on its own as the product
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+styles:
+- claymation
+cast: true
+stop_motion_fps: 12
+route: kling
+audio: none
+strict_qa: false
+count_check: true
+qa_note: >-
+  This is an intended claymation (handmade clay) look, not a photograph: judge that it is clearly the same kind of
+  fruit (shape, colours, markings) made of clay, and free of artefacts. Do not fail it for not being photorealistic.
+qa_skip:
+- fruit_accuracy
+- appetite
+still:
+  locks: The fruit from the reference photos made as a handmade clay model with visible fingerprints and tool marks,
+    its true shape, colours and markings simplified into clay; on a small clay set with a clay board.
+  freedom: Set colours, small clay props (leaves, a tiny knife).
+  composition: Centred, three-quarter view, the clay fruit filling the middle third.
+  lighting: Soft studio light with gentle shadows, like a stop-motion set.
+motion:
+  camera: the camera holds still
+  change: the clay fruit turns a quarter turn in small stepped moves, like stop-motion
+params:
+- name: steps
+  value: a few small moves
+  feel: smooth motion loses the stop-motion feel
+pitfalls:
+- it turns photorealistic
+- extra clay fruit appear
+negative: photorealistic fruit, text, logos, watermarks, extra fruit, melting, warped hands

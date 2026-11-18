@@ -1,0 +1,4 @@
+CLAYMATION / STOP-MOTION. A short, witty clay-animation piece that is clay from the first line to the last: never cut to a photo or the real fruit. Every line plays over a clay shot (clay_hero: the clay fruit on its set; clay_reveal: the clay fruit popping out of a little clay box; clay_cut: the clay fruit already cut, its halves falling open to show the clay inside); vary them, and save clay_cut for the payoff near the end. The last line names the product and leads into the offer card. Lines are short narrator lines or a few words of on-screen text; playful, never silly about the product, and never a claim beyond the approved facts.
+
+The narrator is a dry, warm storyteller, not an announcer: say it the way you'd tell a friend a funny little story, short sentences, contractions, one small joke at most, the timing in the full stops ("The box opens. Nobody's ready.").
+{{knowledge:styles.claymation}}

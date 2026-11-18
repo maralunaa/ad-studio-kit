@@ -1,0 +1,32 @@
+version: 2
+name: juice_texture_macro
+label: Juice / texture macro
+summary: A drop of juice running down the flesh.
+use: Appetite beat; ASMR and sensory videos
+duration_s: 5
+energy: low
+product_types:
+- fruit
+route: veo
+audio: none
+from_images:
+- juice_macro
+strict_qa: false
+still:
+  locks: Cut flesh exactly as in the reference photos, glistening.
+  freedom: Drop size, background blur.
+  composition: Extreme close-up, the flesh in the lower two-thirds.
+  lighting: Hard backlight that makes juice sparkle.
+motion:
+  camera: the camera holds still
+  change: a single drop of juice slowly runs down the flesh
+params:
+- name: drops
+  value: one
+  feel: several drops become a liquid mess
+pitfalls:
+- juice turns into jelly or foam
+- flesh texture melts
+- 'v2: model comparison 2026-10-26 (same still, one take each): Veo 3.1 Fast passed at 3.95 (Kling 4.33, Seedance 4.19), at half Kling''s cost and fastest; v2 routes to Veo'
+negative: extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

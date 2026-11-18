@@ -1,0 +1,3 @@
+PRESENTER AT THE TABLE. One presenter sits at a bright kitchen counter with the fruit laid out in front of them and talks to camera for the whole video: every line is kind presenter, there are no cutaways. They show the fruit as they talk: point at it, hold the whole one up, show the cut half. Lines are short and spoken, under 8 seconds each (about 18 words), one idea per line, warm and curious, like explaining it to a friend across the table. Give each line a shot_type of the closest library shot; it is only used for the hooks' openings.
+
+{{knowledge:styles.presenter_table}}

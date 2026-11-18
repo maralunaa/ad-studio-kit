@@ -1,0 +1,14 @@
+PRESENTER AT THE TABLE. One presenter sits at a bright kitchen counter with the fruit laid out in front of them and talks to camera for the whole video: every line is kind presenter, there are no cutaways. They show the fruit as they talk: point at it, hold the whole one up, show the cut half.
+
+SOUND LIKE A PERSON, NOT AN AD (feedback 2026-11-02: "too AI, we need a more natural way of speaking"). Write it the way someone actually talks to a friend across the table, unscripted:
+- Contractions always (it's, you're, I've, don't). Plain everyday words; no ad words (indulge, elevate, experience, burst of flavour, taste sensation, game-changer, look no further).
+- Whole, natural sentences, the way you'd talk to a friend across the table (feedback 2026-11-04: "very natural, not super ad-like"). Never clipped labels or commands strung together ("Juice dripping. Score it. Taste it.", "Gold inside. Sweet first."). The feel to aim for, never its words: "People are always asking me: if I only eat regular fruit, which exotic fruit should I try first? So, let's find your match." Vary the length; never three lines that sound the same.
+- React to the fruit as you show it, in the moment: "Look at that.", "See the colour?", "Okay, here's the inside."
+- One small natural opener or aside per video at most (okay, so, honestly, right?); never stack them, never "um".
+- Talk to one person ("you"), never "folks" or "guys", never a sales pitch. The offer comes once, at the end, said simply.
+- No lists of adjectives. One concrete detail beats three adjectives.
+- Lines under 8 seconds each (about 18 words), one idea per line.
+
+Give each line a shot_type of the closest library shot (it is not shown: the presenter is on camera the whole video).
+
+{{knowledge:styles.presenter_table}}

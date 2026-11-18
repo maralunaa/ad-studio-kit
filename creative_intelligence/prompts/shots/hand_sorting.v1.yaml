@@ -1,0 +1,32 @@
+version: 1
+name: hand_sorting
+label: Hand-sorting
+summary: Two hands sorting the fruit in a crate, picking one up to check it.
+use: Hand-selected beat (Behind the farm)
+duration_s: 5
+energy: medium
+product_types:
+- fruit
+route: kling
+audio: none
+from_images: []
+strict_qa: true
+still:
+  locks: The fruit exactly as in the reference photos, many of them loose in a plain crate; two real hands, the
+    near one lifting a single fruit.
+  freedom: The packing table, a second crate behind, daylight from a window.
+  composition: Top-down three-quarter view over the crate, hands entering from the bottom of the frame, like a
+    phone held by the person sorting.
+  lighting: Bright, natural daylight, soft shadows.
+motion:
+  camera: handheld, a little natural sway, as if filmed on a phone
+  change: one hand slowly lifts one fruit and turns it to look at it, then sets it down; the rest stay still
+params:
+- name: hands
+  value: two, the same two the whole shot
+  feel: real working hands, short nails, no jewellery
+pitfalls:
+- extra hands or fingers
+- fruit multiply or merge in the crate
+negative: extra hands, extra fingers, warped hands, fruit merging or splitting, melting, text, logos, watermarks,
+  captions

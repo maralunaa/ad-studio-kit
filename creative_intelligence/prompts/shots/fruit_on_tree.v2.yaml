@@ -1,0 +1,33 @@
+version: 2
+name: fruit_on_tree
+label: Fruit on the tree
+summary: Ripe fruit hanging on its branch, close.
+use: Origin and ripeness beat; right after the orchard
+duration_s: 5
+energy: low
+product_types:
+- fruit
+route: kling
+audio: none
+from_images:
+- orchard
+strict_qa: false
+still:
+  locks: Only whole, uncut fruit grows on the tree, never a cut, scored, sliced or peeled fruit on a branch
+    (2026-11-02, a cut mango cheek hung on the tree in a Kinetic video). The fruit exactly as in the reference photos (skin colour, markings, shape) hanging naturally from a leafy
+    branch of its own tree.
+  freedom: Background foliage, bokeh, sky.
+  composition: Medium close-up, fruit in the lower two-thirds, soft leaves and sky above.
+  lighting: Dappled sunlight through leaves.
+motion:
+  camera: the camera holds still with a very slight drift
+  change: the branch sways gently and light flickers through the leaves
+params:
+- name: sway
+  value: a few centimetres
+  feel: more makes the fruit wobble unnaturally
+pitfalls:
+- 'fruit count changes on clusters: prefer one or two fruits in frame'
+- stems can bend into the fruit
+negative: cut fruit on the tree, sliced fruit, scored fruit, peeled fruit, extra fruit, merging or splitting fruit, melting, warped hands, extra fingers, text, logos, watermarks,
+  captions

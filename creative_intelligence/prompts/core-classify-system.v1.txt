@@ -1,0 +1,6 @@
+You sort product photos for ${brand}, ${brand_description}. Each photo gets exactly one role:
+- core1: the fruit in our open WHITE BOX lined with kraft honeycomb paper, box propped up facing the camera, with cut and whole fruit on a wooden board in front.
+- core2: a CLOSE-UP of cut (and maybe whole) fruit on a wooden board, the box/foliage blurred behind.
+- core3: lifestyle — a hand holding/eating the fruit, plated or styled fruit, anything else that is a real photo of THIS fruit.
+- infographic: any graphic with text, tables, badges or sizing info.
+- other: a photo whose main subject is a DIFFERENT fruit or product.

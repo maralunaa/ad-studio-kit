@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ad Pack · Ad Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="{{ url_for('static', filename='studio.css') }}"><link rel="stylesheet" href="/brand.css">
+</head>
+<body data-stage="{{ stage }}">
+{#- Ad Pack (Part C): say what creatives you need (form, a sentence or a template), approve one plan with its cost,
+    download one pack ready for Meta. routes/adpack.py, adstudio/adpack.py. -#}
+{% set chip = true %}{% include "_top.html" %}
+
+<div class="layout">
+  <div class="main">
+    <div class="pane active" id="body"><div class="empty"><span class="spinner"></span></div></div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}).then(r=>r.json());
+const STAGE=document.body.dataset.stage;
+let PID=+new URLSearchParams(location.search).get('product_id')||null, O=null, R=null;
+
+async function boot(){
+  if(PID){
+    const r=await fetch('/api/adstudio/product/'+PID);
+    if(r.ok){const d=await r.json();$('ctxName').textContent=d.product.name;
+      const ph=d.photos.find(x=>x.is_hero)||d.photos.find(x=>x.is_primary)||d.photos[0];
+      $('pickerThumb').innerHTML=ph?`<img src="/api/adstudio/photo/${ph.id}" alt="">`:'';}
+    else PID=null;
+  }
+  O=await (await fetch('/api/adstudio/adpack/options')).json();
+  R={...O.default, product_ids:PID?[PID]:[]};
+  ({request:renderRequest,plan:renderPlan,packs:renderPacks})[STAGE]();
+}
+
+/* ---------- REQUEST: the form, pre-filled; a sentence or a template fills it; nothing runs from here ---------- */
+function renderRequest(msg){
+  const vs=O.video_styles, n=R.product_ids.length||1;
+  const tot=R.statics*n, vid=Object.values(R.videos).reduce((a,b)=>a+b,0)*n;
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">New ad pack</h2><span class="muted">Say what you need, check the form, then make the plan. Nothing is generated until you approve the plan.</span></div>
+    <section class="card mb-2"><label class="fl" for="aText">In one sentence</label>
+      <div class="row"><input class="f" id="aText" placeholder="15 statics and 5 videos for Honey Mango and the Variety Box: 2 talking heads, 3 that worked before"><button class="btn" id="aParse">Fill the form</button></div>
+      <div class="chips mt-1">${O.templates.map((t,i)=>`<button class="chip" data-tpl="${i}" title="${t.saved?'Saved template':'Built-in'}">${esc(t.name)}</button>`).join('')}</div>
+      <p class="muted" id="aMsg">${esc(msg||'')}</p></section>
+    <div class="two">
+      <section class="card"><div class="card-title">What to make</div>
+        <label class="fl" for="aProds">Products</label><select class="f" id="aProds" multiple size="6">${O.products.map(p=>`<option value="${p.id}" ${R.product_ids.includes(p.id)?'selected':''}>${esc(p.name)}</option>`).join('')}</select>
+        <label class="fl" for="aStatics">Statics per product</label><input class="f w-num" id="aStatics" type="number" min="0" max="${O.limits.statics}" value="${R.statics}">
+        <label class="fl">Videos per product, by format</label>
+        <div class="table-wrap"><table class="data text"><tbody>${vs.map(([k,l])=>`<tr><td>${esc(l)}</td><td><input class="f w-num" type="number" min="0" max="${O.limits.videos}" data-v="${k}" value="${R.videos[k]||0}"></td></tr>`).join('')}</tbody></table></div>
+        <p class="muted mt-1">"Proven" uses our winning ads; when there aren't enough, the plan fills with the best-evidence ideas and says so.</p></section>
+      <section class="card"><div class="card-title">How</div>
+        <label class="fl">Sizes</label><div class="chips">${O.sizes.map(s=>`<button class="chip ${R.sizes.includes(s)?'on':''}" data-size="${s}">${s}</button>`).join('')}</div>
+        <label class="fl" for="aAngles">Angles</label><select class="f" id="aAngles"><option value="auto">Picked for me: best evidence first</option><option value="ideas" ${R.angles==='ideas'?'selected':''}>From approved ideas</option></select>
+        <div id="aIdeasBox" ${R.angles==='ideas'?'':'hidden'}><select class="f mt-1" id="aIdeas" multiple size="5">${O.ideas.map(i=>`<option value="${i.id}" ${R.idea_ids.includes(i.id)?'selected':''}>${esc(i.title)}</option>`).join('')||'<option disabled>No approved ideas yet</option>'}</select></div>
+        <label class="fl" for="aMix">New ideas vs proven: <b id="aMixV">${R.mix_new}% new</b></label><input class="f" id="aMix" type="range" min="0" max="100" step="10" value="${R.mix_new}">
+        <div class="two"><div><label class="fl" for="aPT">Primary texts per ad</label><input class="f w-num" id="aPT" type="number" min="1" max="5" value="${R.primary_texts}"></div>
+          <div><label class="fl" for="aHL">Headlines per ad</label><input class="f w-num" id="aHL" type="number" min="1" max="5" value="${R.headlines}"></div></div>
+        <div class="two"><div><label class="fl" for="aVoice">Narrator voice</label><select class="f" id="aVoice"><option value="rotate">Each in turn, least used first</option>${(O.voices||[]).map(v=>`<option value="${esc(v)}" ${R.voice===v?'selected':''}>${esc(v)}</option>`).join('')}</select></div>
+          <div><label class="fl" for="aPres">Presenter</label><select class="f" id="aPres"><option value="rotate">Each in turn, least used first</option>${(O.presenters||[]).map(p=>`<option value="${p.id}" ${R.presenter_id===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select></div></div>
+        <label class="fl" for="aName">Pack name</label><input class="f" id="aName" value="${esc(R.name)}" placeholder="Defaults to today's date">
+        <label class="fl" for="aDir">Creative direction <span class="muted">· goes into every ad and script in this pack</span></label><textarea class="f tall" id="aDir" placeholder="e.g. Christmas: warm, festive table, gift-giving. Or: summer picnics, bright and outdoorsy. Or: for chefs, close-up texture, plated dishes.">${esc(R.direction)}</textarea>
+        <label class="fl" for="aNotes">Notes for the team <span class="muted">· not used in prompts</span></label><textarea class="f" id="aNotes" placeholder="Deadline, who it's for, anything to remember">${esc(R.notes)}</textarea></section>
+    </div>
+    <div class="row mt-2"><span class="muted" id="aSum">${R.product_ids.length?`${tot} statics and ${vid} videos across ${R.product_ids.length} product${R.product_ids.length===1?'':'s'}`:'Pick at least one product'}</span>
+      <button class="btn ml-auto" id="aSaveT">Save as template</button><button class="btn btn-p" id="aGo">Make the plan</button></div>`;
+  const read=()=>{R={...R,product_ids:[...$('aProds').selectedOptions].map(o=>+o.value),statics:+$('aStatics').value,
+      videos:Object.fromEntries([...document.querySelectorAll('[data-v]')].map(i=>[i.dataset.v,+i.value]).filter(([,v])=>v)),
+      angles:$('aAngles').value,idea_ids:[...$('aIdeas').selectedOptions].map(o=>+o.value),mix_new:+$('aMix').value,
+      primary_texts:+$('aPT').value,headlines:+$('aHL').value,name:$('aName').value,notes:$('aNotes').value,direction:$('aDir').value,
+      voice:$('aVoice').value,presenter_id:$('aPres').value==='rotate'?'rotate':+$('aPres').value};};
+  document.querySelectorAll('#body input,#body select,#body textarea').forEach(x=>{if(x.id!=='aText')x.onchange=()=>{read();renderRequest();};});
+  $('aMix').oninput=()=>$('aMixV').textContent=$('aMix').value+'% new';
+  document.querySelectorAll('[data-size]').forEach(b=>b.onclick=()=>{read();const s=b.dataset.size;
+    R.sizes=R.sizes.includes(s)?R.sizes.filter(x=>x!==s):[...R.sizes,s]; if(!R.sizes.length)R.sizes=[s]; renderRequest();});
+  document.querySelectorAll('[data-tpl]').forEach(b=>b.onclick=()=>{read();const t=O.templates[+b.dataset.tpl];
+    R={...t.request,product_ids:R.product_ids}; renderRequest(`Template "${t.name}" applied. Check it, then make the plan.`);});
+  $('aParse').onclick=async()=>{$('aMsg').innerHTML='<span class="spinner"></span> Reading…';
+    const d=await post('/api/adstudio/adpack/parse',{text:$('aText').value});
+    if(d.error){$('aMsg').textContent=d.error;return;}
+    R=d.request; renderRequest(d.unknown_products.length?`Filled. Not in the catalogue: ${d.unknown_products.join(', ')}. Pick them below.`:'Filled from your sentence. Check it, then make the plan.');};
+  $('aSaveT').onclick=async()=>{read();const name=prompt('Template name');if(!name)return;
+    const d=await post('/api/adstudio/adpack/templates',{name,request:R}); if(d.error){$('aMsg').textContent=d.error;return;}
+    O.templates=d.templates; renderRequest(`Saved "${name}".`);};
+  $('aGo').onclick=async()=>{read();const d=await post('/api/adstudio/adpack',{request:R});
+    if(d.error){$('aMsg').textContent=d.error;$('aMsg').scrollIntoView();return;}
+    await post('/api/adstudio/adpack/'+d.id+'/plan');
+    location.href='/adpack/plan?pack='+d.id+(PID?'&product_id='+PID:'');};
+}
+
+/* ---------- PLAN: per product, what gets made, what it costs, what isn't ready (nothing is spent here) ---------- */
+async function renderPlan(){
+  const id=+new URLSearchParams(location.search).get('pack')||(O.packs[0]||{}).id;
+  if(!id){$('body').innerHTML=`<div class="pane-head"><h2 class="page-title">Plan</h2></div><div class="empty">No pack yet. <a class="accent-text" href="/adpack/request">Make a request</a> first.</div>`;return;}
+  $('body').innerHTML='<div class="empty"><span class="spinner"></span> Working out the plan…</div>';
+  const cur=await (await fetch('/api/adstudio/adpack/'+id)).json();
+  if(['producing','review','ready'].includes(cur.status))return renderProgress(id);
+  const P=await post('/api/adstudio/adpack/'+id+'/plan');
+  if(P.error){$('body').innerHTML=`<div class="empty">${esc(P.error)}</div>`;return;}
+  const usd=v=>'$'+(+v).toFixed(2), r=P.request;
+  const prod=p=>p.error?`<section class="card mt-2"><b>${esc(p.name)}</b><div class="err">${esc(p.error)}</div></section>`:
+    `<section class="card mt-2"><div class="row"><b>${esc(p.name)}</b><span class="ml-auto ${p.ready?'muted':'err'}">${p.ready?'Ready':'Not ready'}</span></div>
+      ${p.statics?`<div class="mt-1">${p.statics} statics, all AI-designed, in ${esc(r.sizes.join(' and '))}: ${p.static_files} files · about ${usd(p.static_usd)} <span class="muted">· ${p.hooks} usable hook${p.hooks===1?'':'s'}</span></div>`:''}
+      ${(p.notes||[]).map(w=>`<div class="muted">${esc(w)}</div>`).join('')}${p.warnings.map(w=>`<div class="err">${esc(w)}</div>`).join('')}
+      ${p.videos.length?`<div class="table-wrap mt-2"><table class="data text"><thead><tr><th>Video format</th><th>How many</th><th>To the draft</th><th></th></tr></thead><tbody>
+        ${p.videos.map(v=>`<tr><td>${esc(v.label)}${v.note?`<div class="muted">${esc(v.note)}</div>`:''}</td><td>${v.count}</td><td>${v.ready?'about '+usd(v.usd):''}</td><td class="${v.ready?'muted':'err'}">${v.ready?'Ready':esc(v.why)}</td></tr>`).join('')}</tbody></table></div>`:''}</section>`;
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">${esc(P.name)}</h2><span class="muted">${r.primary_texts} primary texts and ${r.headlines} headlines per ad · voice: ${r.voice&&r.voice!=='rotate'?esc(r.voice):'each in turn'} · presenter: ${r.presenter_id&&r.presenter_id!=='rotate'?esc(((O&&O.presenters||[]).find(p=>p.id===r.presenter_id)||{}).name||'#'+r.presenter_id):'each in turn'}${r.notes?' · '+esc(r.notes):''}</span>
+      <a class="btn ml-auto" href="/adpack/request${PID?'?product_id='+PID:''}">Change the request</a></div>
+    ${r.direction?`<section class="card mb-2"><span class="muted">Creative direction</span><div>${esc(r.direction)}</div></section>`:''}
+    <section class="card"><div class="row"><b>About ${usd(P.total_usd)}</b><span class="muted">images ${usd(P.images_usd)} · video to the drafts ${usd(P.video_usd)}; finals are priced when you approve the drafts</span></div>
+      <div class="muted mt-1">Left today: images ${usd(P.left_today.images)}, video ${usd(P.left_today.video)}${P.left_today.text!=null?`, Claude ${usd(P.left_today.text)} (this pack needs about ${usd(P.text_usd||0)} for scripts and copy)`:''}.</div>
+      ${P.over_cap.length?`<div class="err">Over today's ${esc(P.over_cap.map(k=>k==='text'?'Claude':k).join(' and '))} cap: ${P.over_cap.includes('text')?'scripts and copy would stop part-way. Make a smaller pack, wait for tomorrow, or raise the Claude cap in Admin.':'it would be made over more than one day, or raise the cap in Admin.'}</div>`:''}</section>
+    ${P.products.map(prod).join('')}
+    <div class="row mt-3"><button class="btn btn-p" id="apGo" ${P.ready?'':'disabled'}>Approve and produce · about ${usd(P.total_usd)}</button><span class="muted">${P.ready?'Runs Bulk and the video batches; empty products are filled, images to animate are approved and storyboards are approved for you. The drafts come back here.':'Fix what is listed above first.'}</span><span class="err" id="apErr"></span></div>`;
+  if($('apGo'))$('apGo').onclick=async()=>{$('apGo').disabled=true;const r=await post('/api/adstudio/adpack/'+id+'/produce');
+    if(r.error){$('apErr').textContent=r.error;$('apGo').disabled=false;return;} renderProgress(id);};
+}
+
+/* ---------- PROGRESS: each product's statics batch and video batch ---------- */
+let PROG=null;
+async function renderProgress(id){
+  clearTimeout(PROG);
+  const d=await (await fetch('/api/adstudio/adpack/'+id+'/progress')).json(); if(STAGE!=='plan')return;
+  const st={producing:'Being made',review:'Ready to review',ready:'Ready'}[d.status]||d.status;
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">${esc(d.name)}</h2><span class="muted">${esc(st)}</span></div>
+    ${d.message?`<div class="err">${esc(d.message)}</div>`:''}
+    <section class="card"><div class="table-wrap"><table class="data text"><thead><tr><th>Product</th><th>Statics</th><th>Videos</th></tr></thead><tbody>
+      ${d.progress.map(r=>r.filling||r.starting?`<tr><td><b>${esc(r.name)}</b></td><td colspan="2"><span class="spinner"></span> ${r.filling?'Filling the product first (photos, look, research, hooks); its statics and videos start right after.':'Starting its statics and videos…'}</td></tr>`:`<tr><td><b>${esc(r.name)}</b></td>
+        <td>${r.statics?`${r.statics.done} of ${r.statics.total} made${r.statics.failed?` · ${r.statics.failed} failed`:''} <span class="muted">· ${esc(r.statics.status)}</span> <a class="accent-text" href="/gallery/assets?product_id=${r.product_id}&type=ai">Review in Gallery</a>`:'<span class="muted">none</span>'}</td>
+        <td>${r.videos?`${r.videos.drafts} of ${r.videos.total} drafts <span class="muted">· ${esc(r.videos.status)}</span> <a class="accent-text" href="/video/create?product_id=${r.product_id}&batch=${r.videos.id}">Open</a>${(r.videos.failed||[]).length?`<div class="err">${r.videos.failed.length} not made: ${esc([...new Set(r.videos.failed.map(f=>f.why))].join(' · '))}</div>`:''}`:'<span class="muted">none</span>'}${r.animate?`<div class="muted">Animated still: ${r.animate.id?`${esc(r.animate.status)} <a class="accent-text" href="/video/create?product_id=${r.product_id}&batch=${r.animate.id}">Open</a>`:'making images to animate, approved for you when they pass QA'}</div>`:''}</td></tr>`).join('')}
+    </tbody></table></div></section>
+    <p class="muted mt-2">Approve the drafts you want finished in Video; the pack's review grid and download come next.</p>`;
+  if(d.status==='producing')PROG=setTimeout(()=>renderProgress(id),10000);
+}
+
+/* ---------- PACKS: every request and where it is ---------- */
+function renderPacks(){
+  const name=id=>(O.products.find(p=>p.id===id)||{}).name||'#'+id;
+  $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">Packs</h2><a class="btn btn-p ml-auto" href="/adpack/request${PID?'?product_id='+PID:''}">New ad pack</a></div>
+    ${O.packs.length?`<section class="card"><div class="table-wrap"><table class="data text"><thead><tr><th>Pack</th><th>Products</th><th>Asked for</th><th>Status</th><th>Created</th></tr></thead><tbody>
+      ${O.packs.map(p=>{const r=p.request,v=Object.values(r.videos).reduce((a,b)=>a+b,0);return `<tr><td><a class="accent-text" href="/adpack/plan?pack=${p.id}${PID?'&product_id='+PID:''}"><b>${esc(p.name)}</b></a></td><td>${esc(r.product_ids.map(name).join(', '))}</td>
+        <td>${r.statics} statics · ${v} videos per product</td><td>${esc(p.status)}</td><td class="muted">${esc(p.created_at.slice(0,10))}</td></tr>`;}).join('')}</tbody></table></div></section>`
+    :'<div class="empty">No packs yet.</div>'}`;
+}
+
+boot();
+</script>
+</body>
+</html>

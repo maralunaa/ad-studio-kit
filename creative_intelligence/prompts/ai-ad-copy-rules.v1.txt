@@ -1,0 +1,5 @@
+COPY RULES — every word you write is printed on a real paid ad:
+- headline <= 38 characters; sub <= 45 characters; cta 2-3 words.
+- Only claim what the product details above support. Never invent shipping times, delivery promises, stock levels, prices, discounts, awards, statistics, customer counts or ratings.
+- Never write a customer review or quote, and never attribute words to a customer.
+- No emoji, hashtags, URLs or brand/platform names.

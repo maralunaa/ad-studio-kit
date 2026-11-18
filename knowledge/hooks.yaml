@@ -1,0 +1,113 @@
+# Hook types and hook rules, derived from the Meta Creative Playbook (§Hooks).
+# A hook gets a hook_type (the opening move, below) AND keeps its Hook University archetype (A1–A10, the
+# structure): two separate tags. Hook University's angles and banned templates stay in hook_university.py.
+#
+# Examples are patterns, not copy (decision f): the claims check and approved facts still rule, and
+# numbers, counts, ratings and deadlines in them are illustrative only.
+# tagger: the Meta tagger's hook_type (tagging/ai_tagger.py, taxonomy fruit-v1) each type maps to,
+# so Results can compare hooks we write with ads already running.
+
+version: 1
+
+types:
+  source: "Hooks › Hook types, with examples"
+  items:
+    - key: visual_sensory
+      name: Visual / sensory
+      definition: Opens on the fruit itself, texture and motion, before any words land.
+      why: Texture and motion stop the thumb before words are read.
+      examples:
+        - Knife through a pink mango, juice running
+        - Dragon fruit split open
+      best_fit: [appetite_closeup, sensory, fruit_story, pov]
+      tagger: taste_sensory
+
+    - key: curiosity
+      name: Curiosity
+      definition: Opens a question the viewer wants closed, and the ad closes it.
+      why: An open question the viewer wants closed.
+      examples:
+        - This fruit tastes like custard. Most people have never heard of it.
+      best_fit: [talking_head, explainer_card, fruit_story]
+      tagger: curiosity_question
+
+    - key: contrarian
+      name: Contrarian / negative
+      definition: Leads with a mistake, a warning or a reversal of what people assume.
+      why: Mistakes and warnings grab more attention than benefits.
+      examples:
+        - Stop buying mangoes at the supermarket.
+      best_fit: [us_vs_them, us_vs_supermarket, talking_head]
+      tagger: vs_supermarket
+
+    - key: problem
+      name: Problem
+      definition: Names a frustration the viewer already feels, about the fruit, never about the person.
+      why: Names a frustration the viewer already feels.
+      examples:
+        - Tired of fruit that never ripens?
+      best_fit: [problem_solution, talking_head]
+      tagger: other
+      requires: [no_personal_attribute]
+
+    - key: social_proof_fomo
+      name: Social proof / FOMO
+      definition: Others chose it, and it may run out.
+      why: Others chose it, and it may run out.
+      examples:
+        - 2,400+ Google reviews. Lychee season ends in 3 weeks.
+      best_fit: [review_card, harvest_drop, offer_stack]
+      tagger: social_proof
+      requires: [approved_fact_for_counts, real_deadline]
+
+    - key: discovery_list
+      name: Discovery / list
+      definition: Promises something new, fast, often as a short list.
+      why: Promises something new, fast.
+      examples:
+        - 5 fruits you've never tried (number 3 tastes like candy)
+      best_fit: [explainer_card, listicle_quiz, fruit_story]
+      tagger: discovery_new_fruit
+
+    - key: gift
+      name: Gift
+      definition: Ties the product to a moment of giving.
+      why: Ties the product to a moment.
+      examples:
+        - The gift my dad still talks about.
+      best_fit: [gift_reveal, pov]
+      tagger: gift_occasion
+
+    - key: offer
+      name: Offer
+      definition: Leads with direct value; only a real, current offer.
+      why: Direct value; best on warm audiences.
+      examples:
+        - Free mango with your first box.
+      best_fit: [offer_stack, harvest_drop]
+      tagger: offer_price
+      requires: [real_offer]
+
+rules:
+  source: "Hooks › Rules"
+  items:
+    - key: show_and_say
+      text: Show and say at once. Pair a striking fruit visual with on-screen words.
+    - key: pay_it_off
+      text: Pay it off. A strong hook with weak hold means the body didn't deliver; that's clickbait.
+    - key: be_specific
+      text: Be specific. Numbers, fruit names and real moments beat adjectives.
+    - key: break_the_pattern
+      text: Break the pattern. Familiar polished openings get scrolled past.
+    - key: one_body_many_hooks
+      text: One body, many hooks. Test 3–5 (up to 10) hooks on one winning body.
+      hooks_per_body: {min: 3, max: 5, ceiling: 10}
+    - key: refresh_hooks_first
+      text: Refresh hooks first when a winner fades.
+    - key: no_personal_condition
+      text: Never imply a personal condition ("Are you struggling with…"). Meta rejects personal-attribute copy.
+
+hook_rate:
+  source: "Hooks"
+  target: 0.30
+  rebuild_below: 0.15
