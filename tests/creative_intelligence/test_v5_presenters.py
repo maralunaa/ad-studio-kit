@@ -67,7 +67,7 @@ def _approved(env, made):
     return c, pid
 
 
-LINE = "This is the Honey mango: up to two pounds of fruit."
+LINE = "This is the Rosy Sunshine mango: up to two pounds of fruit."
 
 
 def test_talking_clips_need_an_approved_face_and_fit_the_method(env, made):
@@ -171,7 +171,7 @@ def test_a_persona_brief_steers_the_script_and_keeps_the_face(env, monkeypatch):
     monkeypatch.setattr(S, "_ask", lambda client, ask, *a, **k: seen.setdefault("ask", ask) and (_ for _ in ()).throw(RuntimeError("stop")))
     monkeypatch.setattr("creative_intelligence.adstudio.chat._client", lambda **k: object())
     try:
-        S.write(c, {"id": 1, "name": "Honey Mango", "product_type": "fruit"}, "talking_head", presenter_id=pid, plan=True)
+        S.write(c, {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}, "talking_head", presenter_id=pid, plan=True)
     except Exception as exc:
         seen["why"] = str(exc)
     assert "THE PRESENTER ON CAMERA" in seen.get("ask", ""), seen.get("why")

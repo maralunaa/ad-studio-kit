@@ -9,7 +9,7 @@ import pytest
 from creative_intelligence.adstudio import qa, reviews, styles as S, timeline, videotools
 from tests.creative_intelligence.test_s2a_video_styles import SCRIPT, _Claude, _shot, conn  # noqa: F401  (fixture)
 
-P = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+P = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
 
 
 @pytest.mark.skip(reason="Comment reply retired 2026-10-30")

@@ -21,7 +21,7 @@ def conn(tmp_path, monkeypatch):
     init_db(tmp_path / "data" / "t.db")
     c = get_connection(tmp_path / "data" / "t.db")
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
     yield c
     c.close()
 
@@ -53,7 +53,7 @@ class _Claude:
 def _fera(n, start=0):
     return [{"id": f"r{i}", "created_at": "2026-09-0%dT10:00:00Z" % (1 + i % 9), "rating": 5.0, "heading": None,
              "body": f"Review number {i}: the mango arrived perfectly ripe.", "customer": {"display_name": "Sam K."},
-             "channel_code": "google" if i % 2 else "web", "product": {"name": "Honey Mango"}}
+             "channel_code": "google" if i % 2 else "web", "product": {"name": "Rosy Sunshine Mango"}}
             for i in range(start, start + n)]
 
 
@@ -84,7 +84,7 @@ def test_web_imports_keep_exact_dated_words_and_mark_testimonials_curated(conn):
 
 def test_csv_import(conn):
     out = voice.import_csv(conn, "text,author,rating,source,posted_on,product\n"
-                                 "Gift for my mom she loved it,Ana R,5,email,2026-07-01,Honey Mango\n"
+                                 "Gift for my mom she loved it,Ana R,5,email,2026-07-01,Rosy Sunshine Mango\n"
                                  "no date here,Bo,4,email,,\n")
     assert out["added"] == 1 and out["rows"] == 2 and "row 3" in out["errors"][0]
     assert voice.import_csv(conn, "words\nhi\n")["error"].startswith("The CSV needs")
@@ -149,7 +149,7 @@ def test_routes(conn, tmp_path, monkeypatch):
     assert c.post("/api/adstudio/voice/import", json={"source": "yelp"}).status_code == 400
     voice.import_fera(conn, http=_Http([{"data": _fera(2), "meta": {"page_count": 1}}]), pause=0)
     d = c.get("/api/adstudio/voice?product_id=1").get_json()
-    assert d["groups"][0]["product"] == "Honey Mango" and d["groups"][0]["estimate"] > 0
+    assert d["groups"][0]["product"] == "Rosy Sunshine Mango" and d["groups"][0]["estimate"] > 0
     assert c.post("/api/adstudio/voice/extract", json={"product_id": 1}).get_json()["estimate"] > 0
     assert c.post("/api/adstudio/voice/extract", json={"product_id": 1, "confirm": True}).get_json() == {"job_id": 3}
     assert queued[-1] == ("voice", {"step": "extract", "product_id": 1})

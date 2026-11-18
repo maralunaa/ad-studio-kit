@@ -27,7 +27,7 @@ def test_style_only_cards_are_cast_only_by_their_style(conn, tmp_path):
 
 
 def test_claymation_needs_its_clay_shot(conn, tmp_path):
-    p = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+    p = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
     _shot(conn, 1, "cross_section_macro", tmp_path)
     with pytest.raises(ValueError, match="shot in Video › Shots first"):
         S.write(conn, p, "claymation", client=_Claude())
@@ -56,7 +56,7 @@ def test_one_voice_per_video():
 
 
 def test_ripening_follows_the_approved_guide(conn, tmp_path):
-    p = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+    p = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
     _shot(conn, 1, "ripening_transition", tmp_path)
     with pytest.raises(ValueError, match="Ripeness"):
         S.write(conn, p, "ripening_timelapse", client=_Claude())

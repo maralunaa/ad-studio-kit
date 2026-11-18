@@ -38,18 +38,18 @@ def test_house_voices_and_their_inputs():
 
 
 def test_rough_timings_cover_the_audio():
-    w = voices.spread_words("This is the Honey mango.", 3.0)
+    w = voices.spread_words("This is the Rosy Sunshine mango.", 3.0)
     assert len(w) == 6 and w[0]["start"] > 0 and w[-1]["end"] <= 3.0
     assert all(a["end"] <= b["start"] for a, b in zip(w, w[1:]))
 
 
 # ── timeline planning ───────────────────────────────────────────────────────
 WORDS = [{"word": x, "start": i * 0.4, "end": i * 0.4 + 0.3} for i, x in enumerate(
-    "This is the Honey mango. Cut it open, golden flesh. Shop now.".split())]
+    "This is the Rosy Sunshine mango. Cut it open, golden flesh. Shop now.".split())]
 
 
 def test_lines_are_timed_from_the_words_and_each_gets_its_shot():
-    lines = ["This is the Honey mango.", "Cut it open, golden flesh.", "Shop now."]
+    lines = ["This is the Rosy Sunshine mango.", "Cut it open, golden flesh.", "Shop now."]
     spans = T.line_spans(lines, WORDS, 5.0)
     assert spans == [(0.0, 2.4), (2.4, 4.4), (4.4, 5.0)]
     pic = T.picture_plan(spans, [{"src": "a"}, {"src": "b"}, {"src": "c"}])
@@ -60,7 +60,7 @@ def test_lines_are_timed_from_the_words_and_each_gets_its_shot():
 
 def test_captions_break_at_punctuation_and_a_few_words():
     chunks = T.caption_chunks(WORDS, max_words=3)
-    assert [c["text"] for c in chunks] == ["This is the", "Honey mango.", "Cut it open,", "golden flesh.", "Shop now."]
+    assert [c["text"] for c in chunks] == ["This is the", "Rosy Sunshine mango.", "Cut it open,", "golden flesh.", "Shop now."]
     assert all(a["end"] <= b["start"] + 1e-9 or a["end"] - b["start"] < 0.51 for a, b in zip(chunks, chunks[1:]))
 
 
@@ -82,7 +82,7 @@ def test_renders_every_track_in_both_sizes(tmp_path, monkeypatch):
         tl = {"aspect": aspect, "fps": 24, "transition": 0.3, "picture": pic, "voice": {"src": str(tmp_path / "vo.mp3"), "words": words},
               "text": [{"template": "bold_type", "headline": "Pink outside", "start": 0, "end": 1.5}],
               "music": {"src": str(tmp_path / "m.mp3"), "gain_db": -18},                       # looped under the voice
-              "end_card": {"dur": 1.5, "image": png(tmp_path / "hero.png"), "headline": "Honey Mango", "cta": "Shop now"}}
+              "end_card": {"dur": 1.5, "image": png(tmp_path / "hero.png"), "headline": "Rosy Sunshine Mango", "cta": "Shop now"}}
         r = T.render(tl, tmp_path / f"out{aspect[0]}.mp4")
         p = V.probe(r["path"])
         assert (p["width"], p["height"]) == size and p["duration"] == pytest.approx(T.duration(tl), abs=0.15)
@@ -98,7 +98,7 @@ SCRIPT = {"title": "PEM story", "hook_headline": "Pink outside, gold inside", "c
     {"text": "Most mangoes never look like this.", "shot_type": "whole_fruit_hero"},
     {"text": "Cut it open and the flesh is golden and soft.", "shot_type": "cross_section_macro"},
     {"text": "Grown in the hills of Vietnam, it tastes like honey.", "shot_type": "bogus_type"},
-    {"text": "Honey mango, from Test Fruit Co.", "shot_type": "knife_cut"}]}
+    {"text": "Rosy Sunshine mango, from Test Fruit Co.", "shot_type": "knife_cut"}]}
 
 
 class ScriptClaude:
@@ -189,7 +189,7 @@ def test_story_end_to_end_with_library_shots(env, monkeypatch):
     assert fake.calls[0][1]["voice"] == "Aoede"
     tl = json.loads(v["timeline_json"])
     assert len(tl["picture"]) == 4 and tl["text"] == []      # the captions say the hook (2026-11-09)
-    assert tl["end_card"]["cta"] == "Shop now" and tl["end_card"]["headline"] == "Honey Mango"
+    assert tl["end_card"]["cta"] == "Shop now" and tl["end_card"]["headline"] == "Rosy Sunshine Mango"
     renders = [dict(r) for r in c.execute("SELECT * FROM adstudio_video_renders WHERE video_id=?", (vid,))]
     assert {r["aspect"] for r in renders} == {"9:16", "4:5"}
     p = V.probe(renders[0]["output_path"])

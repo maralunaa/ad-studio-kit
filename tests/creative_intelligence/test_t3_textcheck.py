@@ -156,6 +156,6 @@ def test_a_format_is_only_checked_for_the_words_it_prints(monkeypatch):
         def __enter__(self): return self
         def __exit__(self, *a): return False
         def execute(self, *a): return self
-    r = tc.check_textad(Conn(), {"id": 1, "kind": "variant", "variant": "minimal", "headline": "Honey",
+    r = tc.check_textad(Conn(), {"id": 1, "kind": "variant", "variant": "minimal", "headline": "Rosy Sunshine",
                                  "subhead": "", "cta": "Shop now", "image_path": "x.png"})
     assert seen == {"headline": "", "subhead": "", "cta": "", "price": ""} and r["status"] == "pass"

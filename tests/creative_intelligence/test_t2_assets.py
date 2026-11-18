@@ -20,7 +20,7 @@ def conn(tmp_path, monkeypatch):
     init_db(path)
     c = get_connection(path)
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO creative_patterns (id, pattern_name, winner_count, creative_count, updated_at)"
                   " VALUES (7, 'hook_type × angle: hook_type:vs_supermarket + angle:flavor_experience', 3, 9, '2026-10-15')")
         c.execute("INSERT INTO adstudio_briefs (id, product_id, pattern_id, brief_json) VALUES (3, 1, 7, ?)",
@@ -49,9 +49,9 @@ class TestIds:
         assert assets.ensure_assets(conn) == 3
         rows = conn.execute("SELECT source_id, asset_id, concept_id FROM adstudio_assets ORDER BY source_id").fetchall()
         ids = [r["asset_id"] for r in rows]
-        assert ids[0] == "EXB_b3_flavor-experience_vs-supermarket_bold-type_honey-mango_v01"
-        assert ids[1].endswith("_bold-type_honey-mango_v02")       # same concept + format -> next version
-        assert ids[2].endswith("_minimal_honey-mango_v01")
+        assert ids[0] == "EXB_b3_flavor-experience_vs-supermarket_bold-type_rosy-sunshine-mango_v01"
+        assert ids[1].endswith("_bold-type_rosy-sunshine-mango_v02")       # same concept + format -> next version
+        assert ids[2].endswith("_minimal_rosy-sunshine-mango_v01")
         assert {r["concept_id"] for r in rows} == {"B3"}                     # variants share the concept
         assert assets.ensure_assets(conn) == 0                               # idempotent; IDs never change
 
@@ -67,7 +67,7 @@ class TestIds:
         monkeypatch.setattr(config, "ASSET_ID_TEMPLATE", "EXB-{product}-{format}-{version:03d}")
         assets.ensure_assets(conn)
         first = conn.execute("SELECT asset_id FROM adstudio_assets ORDER BY id").fetchone()[0]
-        assert first == "EXB-honey-mango-bold-type-001"
+        assert first == "EXB-rosy-sunshine-mango-bold-type-001"
 
     def test_part_strips_separators(self):
         assert assets.part("Quality / authenticity_hook") == "quality-authentici"

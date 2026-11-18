@@ -59,7 +59,7 @@ def _batch(conn, items):
 
 def _item(style="fruit_story", kinds=("narrator", "narrator"), own=("whole_fruit_hero", "knife_cut")):
     lines = [{"text": f"Line {n}", "kind": k, "shot_type": t} for n, (k, t) in enumerate(zip(kinds, own))]
-    return {"product_id": 1, "product": "Honey Mango", "style": style, "label": "Fruit Story", "keep": True,
+    return {"product_id": 1, "product": "Rosy Sunshine Mango", "style": style, "label": "Fruit Story", "keep": True,
             "script": {"style": style, "lines": lines, "own_shots": {t: "b1.0" for t in own}, "missing_shots": ["knife_cut"],
                        "hooks": ["Hook"], "hook_shots": [own[0]]}}
 
@@ -107,7 +107,7 @@ def test_behind_the_farm_is_a_batch_format_with_quiet_captions_and_its_own_shots
     cards = prompts.shot_cards()
     assert all(k in cards and shots.own_ok(k) for k in ("hand_sorting", "paper_wrap", "doorstep_delivery"))
     text = prompts.text(styles.style_prompt("behind_the_farm"))
-    assert "ice packs" in text and "arrives fresh" in text and "outside San Diego" in text
+    assert "ice packs" in text and "arrives fresh" in text and "a small fruit farm" in text   # brand.yaml › about
 
 
 def test_real_world_stills_ask_for_phone_footage_and_stylized_ones_dont():
@@ -212,7 +212,7 @@ def test_a_persona_that_tells_memories_gets_them_past_the_claims_check(conn, mon
                 def create(**k):
                     sent.append(k["messages"][0]["content"])
                     raise RuntimeError("stop")
-    prod = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+    prod = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
     facts.check_copy(conn, prod, {"line": "When I was a little girl, mango was summer."}, client=Fake(), allow=facts.MEMORIES)
     facts.check_copy(conn, prod, {"line": "When I was a little girl, mango was summer."}, client=Fake())
     assert "ALLOWED BY THE OWNER" in sent[0] and "ALLOWED BY THE OWNER" not in sent[1]

@@ -21,7 +21,7 @@ def client(tmp_path, monkeypatch):
     png.write_bytes(b"\x89PNG\r\n\x1a\n")
     c = get_connection(db)
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO adstudio_images (id, product_id, title, status, image_path, aspect_ratio)"
                   " VALUES (1, 1, 'Orchard', 'done', ?, '4:5')", (str(png),))
         c.execute("INSERT INTO adstudio_images (id, product_id, title, status, image_path, aspect_ratio)"
@@ -136,7 +136,7 @@ def test_launch_kit_goes_to_drive_with_videos_and_a_sheet(client, tmp_path, monk
     assert r == {"job_id": 7, "n": 2} and queued[0][:2] == ("drive_kit", {"product_id": 1, "date": "2026-10-22"})
     fake = _FakeDrive(monkeypatch)
     out = jobs.HANDLERS["drive_kit"](queued[0][1], lambda: get_connection(db))
-    assert out["uploaded"] == 2 and out["failed"] == [] and out["folder_name"] == "2026-10-22 · Honey Mango · 2 ready ads"
+    assert out["uploaded"] == 2 and out["failed"] == [] and out["folder_name"] == "2026-10-22 · Rosy Sunshine Mango · 2 ready ads"
     files = [v for v in fake.items.values() if v.get("mime")]
     assert {f["mime"] for f in files} == {"image/png", "video/mp4"}
     assert all(f["name"].endswith((".png", ".mp4")) for f in files)

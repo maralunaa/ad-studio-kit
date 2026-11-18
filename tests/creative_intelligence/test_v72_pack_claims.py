@@ -119,7 +119,7 @@ def test_mango_is_not_pulled_apart_by_hand_and_robotic_voices_dont_narrate():
     from creative_intelligence.adstudio import shots
     from creative_intelligence.adstudio import video_batch as VB
     c = shots.card("hand_tear")
-    assert not shots.applies(c, {"name": "Honey Mango", "product_type": "fruit"})
+    assert not shots.applies(c, {"name": "Rosy Sunshine Mango", "product_type": "fruit"})
     assert shots.applies(c, {"name": "Cherimoya", "product_type": "fruit"})
     assert "never both" in prompts.text("fruit-reference-lock") and "gel" in prompts.text("video-qa-system")
     kokoro = [v["name"] for v in config.HOUSE_VOICES if v["model"] == config.KOKORO_MODEL]

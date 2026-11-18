@@ -164,7 +164,7 @@ def screen(hooks: list[dict[str, Any]], seen: list[str], product_name: str = "")
     results = filter_hooks([t for _, t in uniq], source_hooks=seen,
                            config=QAConfig(diversity="high", duplicate_threshold=0.5))
     words = re.findall(r"[a-z]+", product_name.lower())
-    name_words = [w for w in (words[:-1] if len(words) > 1 else words) if len(w) > 2]   # "honey mango" -> "honey", not just "mango"
+    name_words = [w for w in (words[:-1] if len(words) > 1 else words) if len(w) > 2]   # "sunrise mango" -> "sunrise", not just "mango"
     passed, flagged = [], []
     archetypes: set[str] = set()
     comparisons = 0

@@ -9,7 +9,7 @@ from creative_intelligence import prompts
 from creative_intelligence.adstudio import characters, shots, styles as S
 from tests.creative_intelligence.test_s2a_video_styles import _Claude, _shot, conn  # noqa: F401  (fixture)
 
-P = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+P = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
 SCRIPT = {"title": "t", "hook_headline": "Meet Pinky", "cta": "Shop now", "hooks": ["Hi, I'm Pinky."],
           "lines": [{"text": "Hi, I'm Pinky.", "kind": "narrator", "shot_type": "character_scene", "short": True},
                     {"text": "Want to see inside?", "kind": "presenter", "shot_type": "character_scene", "short": True}]}
@@ -51,7 +51,7 @@ def test_nothing_is_usable_until_a_sheet_is_approved(conn, tmp_path, monkeypatch
 
 
 def test_sheet_prompt_and_card():
-    t = prompts.text("character-sheet", character="Pinky", personality="sunny", product="Honey Mango", look="a grin")
+    t = prompts.text("character-sheet", character="Pinky", personality="sunny", product="Rosy Sunshine Mango", look="a grin")
     assert "Pinky" in t and "No text" in t and "${" not in t and "caricature" in t
     c = prompts.shot_cards()["character_scene"]
     assert c["character"] and "FIRST reference image is the approved" in c["qa_note"] and c["styles"] == ["fruit_characters"]

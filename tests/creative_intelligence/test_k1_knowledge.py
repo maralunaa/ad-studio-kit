@@ -133,6 +133,6 @@ def test_healthz_reports_knowledge(kdir, tmp_path, monkeypatch):
 def test_grows_in_naturally_is_not_a_place():
     """Live test 2026-10-26: "that pink skin grows in naturally" was flagged as saying where the fruit comes from."""
     from creative_intelligence.adstudio.hook_university import origin_claim
-    assert not origin_claim("That pink skin grows in naturally.", "Honey Mango")
+    assert not origin_claim("That pink skin grows in naturally.", "Rosy Sunshine Mango")
     assert not origin_claim("My pink blush grows in all by itself.")
     assert origin_claim("Grown in Florida sunshine") and origin_claim("It grows in the hills of Peru")

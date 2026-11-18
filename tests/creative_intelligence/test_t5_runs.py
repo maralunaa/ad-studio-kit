@@ -31,7 +31,7 @@ def env(tmp_path, monkeypatch):
     factory = lambda: get_connection(path)
     c = factory()
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
     c.close()
     calls = {"prompts": []}
 

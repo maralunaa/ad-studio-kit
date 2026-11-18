@@ -60,7 +60,7 @@ def fake_run_deps():
         return {"total": 4.2, "passed": True}
 
     return {"plan": plan, "make_image": make_image, "score": score,
-            "refs": lambda c, pid: [], "product": lambda c, pid: {"id": pid, "name": "Honey Mango",
+            "refs": lambda c, pid: [], "product": lambda c, pid: {"id": pid, "name": "Rosy Sunshine Mango",
                                                                  "product_type": "fruit"}}
 
 
@@ -85,7 +85,7 @@ def test_main_flow_end_to_end(app, monkeypatch):
         assert client.get(page).status_code == 200, page
 
     # product, photo, hook
-    pid = client.post("/api/adstudio/products", json={"name": "Honey Mango", "product_type": "fruit"}).get_json()["id"]
+    pid = client.post("/api/adstudio/products", json={"name": "Rosy Sunshine Mango", "product_type": "fruit"}).get_json()["id"]
     r = client.post(f"/api/adstudio/product/{pid}/photo", data={"file": (io.BytesIO(png()), "mango.png")},
                     content_type="multipart/form-data")
     assert r.status_code == 200

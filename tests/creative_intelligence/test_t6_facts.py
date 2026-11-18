@@ -35,7 +35,7 @@ def conn(tmp_path, monkeypatch):
     init_db(tmp_path / "t.db")
     c = get_connection(tmp_path / "t.db")
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type, scent_notes) VALUES (1, 'Honey Mango', 'fruit', 'custardy, zero fibre')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type, scent_notes) VALUES (1, 'Rosy Sunshine Mango', 'fruit', 'custardy, zero fibre')")
         c.execute("INSERT INTO facts (product_id, category, text) VALUES (NULL, 'shipping', 'Ships within 2 days of picking')")
         c.execute("INSERT INTO facts (product_id, category, text, source) VALUES (1, 'growing_region', 'Grown in Homestead, Florida', 'farm records')")
         c.execute("INSERT INTO banned_terms (product_id, term) VALUES (NULL, 'organic')")
@@ -43,7 +43,7 @@ def conn(tmp_path, monkeypatch):
     c.close()
 
 
-PRODUCT = {"id": 1, "name": "Honey Mango", "product_type": "fruit", "scent_notes": "custardy, zero fibre"}
+PRODUCT = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit", "scent_notes": "custardy, zero fibre"}
 
 
 class TestPrompts:

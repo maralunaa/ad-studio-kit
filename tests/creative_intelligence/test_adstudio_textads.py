@@ -308,5 +308,5 @@ def test_a_box_is_framed_differently_in_each_ad():
     frames = {T.build_variant_prompt(box, {}, "premium", "Unforgettable Gift", style_seed=s).split("FRAMING")[1][:120]
               for s in range(len(T.BOX_FRAMES))}
     assert len(frames) == len(T.BOX_FRAMES)
-    assert "FRAMING" not in T.build_variant_prompt({"name": "Honey Mango", "product_type": "fruit"}, {},
-                                                   "premium", "Honey")
+    assert "FRAMING" not in T.build_variant_prompt({"name": "Rosy Sunshine Mango", "product_type": "fruit"}, {},
+                                                   "premium", "Rosy Sunshine")

@@ -38,7 +38,7 @@ def conn(tmp_path, monkeypatch):
     init_db(tmp_path / "data" / "t.db")
     c = get_connection(tmp_path / "data" / "t.db")
     with c:
-        for i, (n, notes) in enumerate([("Honey Mango", "custardy, zero fibre"), ("Lychee", "floral, juicy"),
+        for i, (n, notes) in enumerate([("Rosy Sunshine Mango", "custardy, zero fibre"), ("Lychee", "floral, juicy"),
                                         ("Mangosteen", "sweet-tart"), ("Rambutan", "")], 1):
             c.execute("INSERT INTO adstudio_products (id, name, product_type, scent_notes) VALUES (?,?, 'fruit', ?)",
                       (i, n, notes))
@@ -77,7 +77,7 @@ def test_supermarket_card_is_scored_without_fruit_accuracy():
 
 @pytest.mark.skip(reason="Us vs supermarket retired 2026-10-30")
 def test_us_vs_supermarket_needs_its_comparison_shot_and_hides_it_from_other_styles(conn, tmp_path):
-    p = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+    p = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
     _shot(conn, 1, "cross_section_macro", tmp_path)
     with pytest.raises(ValueError, match="Supermarket fruit"):
         S.write(conn, p, "us_vs_supermarket", client=_Claude())
@@ -88,7 +88,7 @@ def test_us_vs_supermarket_needs_its_comparison_shot_and_hides_it_from_other_sty
 
 
 def test_how_to_eat_only_with_approved_steps_and_hands_mode_has_no_presenter(conn, tmp_path):
-    p = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+    p = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
     _shot(conn, 1, "cross_section_macro", tmp_path)
     with pytest.raises(ValueError, match="How to eat it"):
         S.write(conn, p, "how_to_eat", client=_Claude())
@@ -159,7 +159,7 @@ def test_sensory_plays_only_on_its_tactile_shots(conn, tmp_path):
     """Feedback 2026-10-26: a sensory video looked like kinetic type; it should be fruit dripping, hands pulling the
     fruit apart. Every line lands on its own cards (or the juice macro), whatever the script asked for."""
     from creative_intelligence.adstudio import styles as S2
-    p = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+    p = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
     _shot(conn, 1, "cross_section_macro", tmp_path)
     s = S2.write(conn, p, "sensory", client=_Claude(), plan=True)
     # 2026-11-11: no juice shots ("syrup"), and hands can't pull a mango apart: the spoon and the knife instead
@@ -192,7 +192,7 @@ def test_scripts_are_told_the_openings_other_videos_already_use(conn, tmp_path):
     assert S2.used_openings(conn, 1) == ["A mango this pink?", "Pink outside, gold inside"]
     _shot(conn, 1, "cross_section_macro", tmp_path)
     fake = _Claude()
-    S2.write(conn, {"id": 1, "name": "Honey Mango", "product_type": "fruit"}, "fruit_story", client=fake)
+    S2.write(conn, {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}, "fruit_story", client=fake)
     assert "A mango this pink?" in fake.sent[0]["messages"][0]["content"]
 
 

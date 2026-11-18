@@ -103,7 +103,7 @@ def parse(conn, text: str, client: Any = None) -> dict[str, Any]:
     from creative_intelligence.adstudio.chat import _client
     text = (text or "").strip()
     if not text:
-        return {"error": "Say what you need, e.g. '10 statics and 3 videos for Honey Mango'."}
+        return {"error": "Say what you need, e.g. '10 statics and 3 videos for Sunrise Mango'."}
     products = {r[0]: r[1] for r in conn.execute("SELECT id, name FROM adstudio_products WHERE COALESCE(archived,0)=0")}
     styles = video_styles()
     ask = (f"REQUEST: {text}\n\nPRODUCTS (use these exact names): {'; '.join(products.values())}\n\n"

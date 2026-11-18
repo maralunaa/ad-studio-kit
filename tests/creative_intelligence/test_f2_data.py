@@ -19,7 +19,7 @@ def live(tmp_path, monkeypatch):
     D.init_db(path)
     c = D.get_connection(path)
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO adstudio_drive_auth (id, email, refresh_token) VALUES (1, 'ops@example.com', 'r')")
     c.close()
     return path
@@ -133,7 +133,7 @@ def test_restore_dry_run_reports_and_changes_nothing_then_restores(live, tmp_pat
     assert sqlite3.connect(live).execute("SELECT COUNT(*) FROM adstudio_products").fetchone()[0] == 2
     done = backup.restore(str(gz), live, dry_run=False)
     assert done["restored"] is True
-    assert [r[0] for r in sqlite3.connect(live).execute("SELECT name FROM adstudio_products")] == ["Honey Mango"]
+    assert [r[0] for r in sqlite3.connect(live).execute("SELECT name FROM adstudio_products")] == ["Rosy Sunshine Mango"]
 
 
 def test_restore_refuses_a_damaged_backup(live, tmp_path):

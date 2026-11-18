@@ -12,7 +12,7 @@ from creative_intelligence.adstudio.hook_university import origin_claim
 from creative_intelligence.db import get_connection
 from tests.creative_intelligence.test_s2a_video_styles import _Claude, _shot, conn  # noqa: F401  (fixture)
 
-P = {"id": 1, "name": "Honey Mango", "product_type": "fruit"}
+P = {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}
 SCRIPT = {"title": "t", "hook_headline": "Meet me", "cta": "Shop now", "hooks": ["Hi."],
           "lines": [{"text": "Hi.", "kind": "narrator", "shot_type": "character_scene", "short": True},
                     {"text": "Want to see inside?", "kind": "narrator", "shot_type": "character_scene", "short": True}]}
@@ -71,12 +71,12 @@ def test_make_characters_writes_five_distinct_caricatures_without_origin_claims(
         for field in ("name", "personality", "dos", "donts", "look"):
             assert not origin_claim(c[field], P["name"]), (c["name"], field)
         assert "where it is grown" in c["donts"] and "health" in c["donts"]
-        assert "end by naming Honey Mango and the offer" in c["dos"]
+        assert "end by naming Rosy Sunshine Mango and the offer" in c["dos"]
         assert c["status"] == "draft" and [s["status"] for s in c["sheets"]] == ["queued"]
     # one paid character_sheet job per character; each sheet asks for a caricature in its own pose
     assert [k for k, _ in queued] == ["character_sheet"] * 5
     prompts = [r[0] for r in conn.execute("SELECT prompt FROM character_sheets ORDER BY id")]
-    assert all("caricature" in p and "Honey Mango" in p and "plain off-white background" in p
+    assert all("caricature" in p and "Rosy Sunshine Mango" in p and "plain off-white background" in p
                and "true shape, skin colour, texture" in p and "${" not in p for p in prompts)
     assert "giant yawn" in prompts[3] and "scowl" in prompts[2]
     # a second click doesn't duplicate them

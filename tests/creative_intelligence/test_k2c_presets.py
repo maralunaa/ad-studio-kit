@@ -80,13 +80,13 @@ def test_write_tells_claude_the_mode(monkeypatch):
     monkeypatch.setattr(facts, "check_copy", lambda *a, **k: {"status": "ok", "unlisted": [], "banned": []})
     monkeypatch.setattr(costs, "log_tokens", lambda *a, **k: None)
     fake = _Claude()
-    s = S.write(None, {"id": 1, "name": "Honey Mango", "product_type": "fruit"}, "fruit_story", client=fake,
+    s = S.write(None, {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}, "fruit_story", client=fake,
                 mode="narrated")
     ask = fake.sent[0]["messages"][0]["content"]
     assert "MODE: narrated" in ask and "Narrated: voice-over only" in ask and "Brand video structures" in ask
     assert s["mode"] == "narrated" and all(ln["kind"] == "narrator" for ln in s["lines"])
     n = len(fake.sent)
-    s = S.write(None, {"id": 1, "name": "Honey Mango", "product_type": "fruit"}, "fruit_story", client=fake)
+    s = S.write(None, {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}, "fruit_story", client=fake)
     # the write call, not the read-aloud pass after it (v51)
     assert s["mode"] == "presenter" and "MODE: presenter" in fake.sent[n]["messages"][0]["content"]
 

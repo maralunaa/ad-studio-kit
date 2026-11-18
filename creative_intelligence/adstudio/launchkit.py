@@ -5,7 +5,7 @@ Meta ad name), with the manifest the agency uploads from. The Gallery zip and th
 Drive layout (worker job `drive_kit`, the files can be videos of tens of MB):
     Meta Ads/ (ADSTUDIO_DRIVE_FOLDER_ID: the test folder until switchover)
       <Product>/
-        '2026-10-22 · Honey Mango · 12 ready ads'/   every file + the 'Launch sheet' Google Sheet
+        '2026-10-22 · Sunrise Mango · 12 ready ads'/   every file + the 'Launch sheet' Google Sheet
 """
 from __future__ import annotations
 

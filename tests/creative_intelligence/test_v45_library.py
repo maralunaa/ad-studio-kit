@@ -31,7 +31,7 @@ def test_a_type_that_failed_twice_is_not_made_again(conn):
 
 def test_fill_plan_tops_every_type_up_and_skips_failing_ones(conn, tmp_path, monkeypatch):
     monkeypatch.setattr("creative_intelligence.webapp.common._product_dict",
-                        lambda c, pid: {"id": 1, "name": "Honey Mango", "product_type": "fruit"})
+                        lambda c, pid: {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"})
     _shot(conn, 1, T, tmp_path)
     _failed(conn, "knife_cut")
     _failed(conn, "knife_cut")
@@ -46,7 +46,7 @@ def test_fill_plan_tops_every_type_up_and_skips_failing_ones(conn, tmp_path, mon
 
 def test_fill_queues_extra_takes_from_new_stills(conn, tmp_path, monkeypatch):
     monkeypatch.setattr("creative_intelligence.webapp.common._product_dict",
-                        lambda c, pid: {"id": 1, "name": "Honey Mango", "product_type": "fruit"})
+                        lambda c, pid: {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"})
     monkeypatch.setattr("creative_intelligence.budget.check", lambda *a, **k: None)
     monkeypatch.setattr("creative_intelligence.budget.caps", lambda c: {"video_job": 1000})
     monkeypatch.setattr("creative_intelligence.jobs.enqueue", lambda *a, **k: None)
@@ -75,7 +75,7 @@ def test_fruit_character_scripts_fit_30_seconds():
 def test_claymation_gets_a_take_per_line_so_no_clip_repeats(conn, tmp_path, monkeypatch):
     """2026-11-02: 7 Claymation lines on 3 clay shots played the same clips again and again."""
     monkeypatch.setattr("creative_intelligence.webapp.common._product_dict",
-                        lambda c, pid: {"id": 1, "name": "Honey Mango", "product_type": "fruit"})
+                        lambda c, pid: {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"})
     monkeypatch.setattr("creative_intelligence.budget.check", lambda *a, **k: None)
     monkeypatch.setattr("creative_intelligence.budget.caps", lambda c: {"video_job": 1000})
     monkeypatch.setattr("creative_intelligence.jobs.enqueue", lambda *a, **k: None)
@@ -99,6 +99,6 @@ def test_a_repeated_type_plays_another_take(conn, tmp_path):
 
 def test_fill_includes_clay(conn, monkeypatch):
     monkeypatch.setattr("creative_intelligence.webapp.common._product_dict",
-                        lambda c, pid: {"id": 1, "name": "Honey Mango", "product_type": "fruit"})
+                        lambda c, pid: {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"})
     made = {x["type"] for x in shots.fill_plan(conn, 1, 3)["make"]}
     assert {"clay_hero", "clay_reveal", "clay_cut"} <= made and "character_scene" not in made

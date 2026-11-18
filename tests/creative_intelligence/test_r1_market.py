@@ -60,7 +60,7 @@ def test_the_brief_brands_and_keywords_are_seeded(conn):
     assert "Island Fruit Box" in {b["name"] for b in bs}
     assert {k["term"] for k in market.keywords(conn)} >= {"exotic fruit", "cherimoya", "mango delivery"}
     mf = next(b for b in bs if b["name"] == "Coastal Fruit Co")
-    assert "country=US" in mf["us_library_url"] and "q=Miami+Fruit" in mf["us_library_url"]
+    assert "country=US" in mf["us_library_url"] and "q=Coastal+Fruit+Co" in mf["us_library_url"]
     market.save_brand(conn, {"id": mf["id"], "name": "Coastal Fruit Co", "tier": "A", "page_id": "123-45", "website": "coastalfruitco.example"})
     mf = next(b for b in market.brands(conn) if b["name"] == "Coastal Fruit Co")
     assert mf["us_library_url"].endswith("view_all_page_id=12345")

@@ -55,7 +55,7 @@ class TestTemplates:
 
 class TestTextFreePrompt:
     def test_no_copy_in_the_image_prompt(self):
-        product = {"name": "Honey Mango", "product_type": "fruit", "physical_desc": "blush-pink skin"}
+        product = {"name": "Rosy Sunshine Mango", "product_type": "fruit", "physical_desc": "blush-pink skin"}
         brief = {"visual_direction": "warm orchard light"}
         p = T.build_textfree_prompt(product, brief, "bold_type", "9:16")
         assert "NO TEXT of any kind" in p and "COMPOSITION — BOLD TYPE" in p and "warm orchard light" in p
@@ -96,7 +96,7 @@ def client(tmp_path, monkeypatch):
 
 
 def _ad(client, monkeypatch, variant="direct_response"):
-    pid = client.post("/api/adstudio/products", json={"name": "Honey Mango", "product_type": "fruit"}).get_json()["id"]
+    pid = client.post("/api/adstudio/products", json={"name": "Rosy Sunshine Mango", "product_type": "fruit"}).get_json()["id"]
     variants = {k: {"headline": f"{k} line", "sub": f"{k} sub"} for k in T.VARIANTS}
     monkeypatch.setattr(T, "draft_brief", lambda *a, **k: T.normalize_brief(
         {"angle": "custard", "cta": "Get Yours", "primary_texts": ["p1"], "variants": variants}))
@@ -132,7 +132,7 @@ class TestAiAdsTextFree:
 
 
 class TestComposePrice:
-    def _image(self, client, pid, tmp_path, shopify_url="https://shop.testfruit.example/products/honey-mango"):
+    def _image(self, client, pid, tmp_path, shopify_url="https://shop.testfruit.example/products/rosy-sunshine-mango"):
         img = tmp_path / "base.png"
         Image.new("RGB", (1080, 1350), (90, 60, 40)).save(img)
         c = client.conn()

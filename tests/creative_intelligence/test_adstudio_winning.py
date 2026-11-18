@@ -23,7 +23,7 @@ def db(tmp_path):
 def _seed(conn, updated_at="2026-09-01T00:00:00"):
     with conn:
         conn.execute("INSERT INTO creatives (id, ad_id, ad_name, headline, primary_text)"
-                     " VALUES ('c1','a1','Mango ad','Best Fruit On Earth','REAL honey mangos')")
+                     " VALUES ('c1','a1','Mango ad','Best Fruit On Earth','REAL rosy sunshine mangos')")
         conn.execute("INSERT INTO creative_performance (creative_id, ad_id, date_range, snapshot_date,"
                      " spend, roas, cpa) VALUES ('c1','a1',?,'2026-09-01', 500, 3.1, 40)",
                      (meta_sync.DATE_RANGE,))
@@ -49,7 +49,7 @@ def test_current_patterns_dedupes_and_has_real_examples(db):
                                         "Quality / authenticity hook · Image format"]
     assert ps[0]["examples"][0]["headline"] == "Best Fruit On Earth"
     block = winning.prompt_block(ps)
-    assert f"[pattern_id {ps[0]['id']}]" in block and "REAL honey mangos" in block
+    assert f"[pattern_id {ps[0]['id']}]" in block and "REAL rosy sunshine mangos" in block
 
 
 def test_only_patterns_from_latest_sync(db):

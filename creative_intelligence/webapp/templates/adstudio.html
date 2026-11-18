@@ -731,7 +731,7 @@ async function renderCharacters(){
 }
 
 /* ---------- VIDEO · CREATE · TALKING HEAD: AI presenters (V5) ---------- */
-let PRES_POLL=null, TALK_LINE='This is the Honey mango: up to two pounds of fruit, with a pink blush that comes in naturally as it grows.';
+let PRES_POLL=null, TALK_LINE='This is the Sunrise mango: up to two pounds of fruit, with a pink blush that comes in naturally as it grows.';
 async function renderPresenters(){
   clearTimeout(PRES_POLL);
   const [d,t]=await Promise.all([fetch('/api/adstudio/presenters').then(r=>r.json()),fetch('/api/adstudio/talking').then(r=>r.json())]);
@@ -817,7 +817,7 @@ function templateCard(t){
 
 /* ---------- PRODUCT TYPES ---------- */
 const TYPES={
-  fruit:{icon:'',label:'Fruit',notes:'Flavor notes',notesPh:'sweet, floral, custardy — zero fiber',look:'What it looks like — whole & cut',lookPh:'Large oval mango, blush-pink skin… cut open shows deep-golden, fiber-free flesh',namePh:'Honey Mango',ctxPh:'e.g. peak season Jun–Aug; most people have never tried one; tastes like pineapple + honey',chatPh:'e.g. 3 angles for people who have never tried it',
+  fruit:{icon:'',label:'Fruit',notes:'Flavor notes',notesPh:'sweet, floral, custardy — zero fiber',look:'What it looks like — whole & cut',lookPh:'Large oval mango, blush-pink skin… cut open shows deep-golden, fiber-free flesh',namePh:'Sunrise Mango',ctxPh:'e.g. peak season Jun–Aug; most people have never tried one; tastes like pineapple + honey',chatPh:'e.g. 3 angles for people who have never tried it',
     hint:'<b>Fruit workflow</b> — taste &amp; discovery hooks · a fruit image menu (cross-section reveals, first bite, unboxing our white box, orchard, variety lineups…) · no jar/label rules · plus the Core product-page set.'},
   candle:{icon:'',label:'Candle',notes:'Scent / key notes',notesPh:'Pink Guava · Rainier Cherry',look:'What it looks like',lookPh:'amber jar, wood lid, periwinkle label, brand wordmark',namePh:'Guava Rosé Candle',ctxPh:"e.g. 'Rosé' = rosé wine, not the flower; ingredients are pink guava + Rainier cherry",chatPh:'e.g. 3 fall angles',
     hint:'<b>Candle workflow</b> — atmosphere &amp; memory hooks · candle image menu (flame macro, room in-situ, scent story…) · label reproduced exactly from your reference photo.'},

@@ -54,7 +54,7 @@ def env(tmp_path, monkeypatch):
     src = png(tmp_path / "approved.png")                                   # a 4:5 approved image
     c = factory()
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO adstudio_images (id, product_id, title, status, image_path, aspect_ratio, review_status,"
                   " prompt) VALUES (1, 1, 'Hero', 'done', ?, '4:5', 'approved', 'Create a premium 4:5 product photograph.')", (src,))
         c.execute("INSERT INTO adstudio_images (id, product_id, title, status, image_path, aspect_ratio)"

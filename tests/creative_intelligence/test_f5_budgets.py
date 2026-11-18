@@ -138,7 +138,7 @@ def test_caps_and_models_on_admin(conn):
 def test_video_proof_is_a_dry_run_by_default(conn, capsys):
     from creative_intelligence.providers import video_proof
     with conn:
-        conn.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        conn.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
     assert video_proof.main(["--product", "1"]) == 0
     out = capsys.readouterr().out
     assert "estimated $0.84" in out and "[dry run] nothing generated" in out

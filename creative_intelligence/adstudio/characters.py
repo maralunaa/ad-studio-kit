@@ -28,7 +28,7 @@ SHEETS_PER_RUN = 2
 PANEL = "Video › Create › Characters"
 
 # "Make characters": five caricatures with clearly different personalities. {fruit} is the fruit word of the product
-# name ("Honey Mango" -> "Mango"). Each gets its own house voice where possible (config.HOUSE_VOICES).
+# name ("Sunrise Mango" -> "Mango"). Each gets its own house voice where possible (config.HOUSE_VOICES).
 CAST = [
     {"mood": "cheerful", "name": "Sunny {fruit}", "voice": "June",
      "personality": "a sunny, bouncy {fruit} who thinks today is the best day ever and can't wait to be cut open and shared",

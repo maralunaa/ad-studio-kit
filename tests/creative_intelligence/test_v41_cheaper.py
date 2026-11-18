@@ -88,7 +88,7 @@ def test_a_long_script_is_trimmed_once(conn, tmp_path):
     long = json.loads(json.dumps(SCRIPT))
     long["lines"][1]["text"] = " ".join(["juicy"] * 120)
     fake = _Claude(long)
-    S.write(conn, {"id": 1, "name": "Honey Mango", "product_type": "fruit"}, "kinetic", client=fake)
+    S.write(conn, {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"}, "kinetic", client=fake)
     asks = [m["messages"][0]["content"] for m in fake.sent if isinstance(m["messages"][0]["content"], str)]
     assert sum("so it runs long" in a for a in asks) == 1
 

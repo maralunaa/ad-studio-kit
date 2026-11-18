@@ -73,7 +73,7 @@ def test_a_box_outside_the_zone_fails():
 def test_video_captions_and_end_card_stay_in_the_zone(tmp_path, aspect):
     W, H = SIZES[aspect]
     m: dict = {"frame": [W, H]}
-    timeline.end_card_png({"image": _photo(tmp_path, (1080, 1350), fruit=True), "headline": "Honey Mango, picked ripe",
+    timeline.end_card_png({"image": _photo(tmp_path, (1080, 1350), fruit=True), "headline": "Rosy Sunshine Mango, picked ripe",
                            "cta": "Shop now", "price": "$54"}, W, H, tmp_path / "card.png", m)
     timeline.caption_png("a caption long enough to wrap onto two lines", W, H, tmp_path / "cap.png", aspect, "boxed", m)
     timeline.kinetic_png("Custard in a skin", W, H, tmp_path / "k.png", m)
@@ -199,10 +199,10 @@ def test_assets_are_tagged_with_the_playbook_hook_type(tmp_path, monkeypatch):
     init_db(tmp_path / "t.db")
     c = get_connection(tmp_path / "t.db")
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO adstudio_hooks (id, product_id, hook_text, archetype, hook_type) VALUES (5, 1, 'h', 'A3', 'gift')")
         c.execute("INSERT INTO adstudio_images (id, product_id, image_path) VALUES (7, 1, 'x.png')")
     d = assets.describe(c, "composite", {"id": 2, "hook_id": 5, "image_id": 7,
-                                         "layout_json": json.dumps({"template": "bold_type"})}, {"name": "Honey Mango"})
+                                         "layout_json": json.dumps({"template": "bold_type"})}, {"name": "Rosy Sunshine Mango"})
     assert d["tags"]["hook_type"] == "gift" and d["tags"]["format"] == "compose-bold_type"
     c.close()

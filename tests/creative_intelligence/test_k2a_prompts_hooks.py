@@ -13,13 +13,13 @@ from creative_intelligence.adstudio import facts
 from creative_intelligence.adstudio import hook_university as HU
 from creative_intelligence.db import get_connection, init_db
 
-GOOD = ["Honey Mango weighs two pounds, yet most people walk past it at the market every week",
-        "The Honey Mango ripens in a window so short most growers never ship it at all",
-        "My kids asked for Honey Mango before dessert, and I still haven't told them why",
-        "Honey Mango cuts like butter, but the first slice is not the part people remember",
-        "One Honey Mango feeds four, though nobody at the table will want to share it",
-        "Honey Mango tastes like honey and sunset, and the seed is thinner than you'd expect",
-        "Honey Mango smells like vanilla before you even pick up a knife to open it up"]
+GOOD = ["Rosy Sunshine Mango weighs two pounds, yet most people walk past it at the market every week",
+        "The Rosy Sunshine Mango ripens in a window so short most growers never ship it at all",
+        "My kids asked for Rosy Sunshine Mango before dessert, and I still haven't told them why",
+        "Rosy Sunshine Mango cuts like butter, but the first slice is not the part people remember",
+        "One Rosy Sunshine Mango feeds four, though nobody at the table will want to share it",
+        "Rosy Sunshine Mango tastes like honey and sunset, and the seed is thinner than you'd expect",
+        "Rosy Sunshine Mango smells like vanilla before you even pick up a knife to open it up"]
 KNOWLEDGE_PROMPTS = ("hook-university-system", "ai-ad-copy-rules", "claims-check-system", "story-script-system",
                      "image-concepts-system", "run-plan-system")
 
@@ -72,10 +72,10 @@ def test_angles_stay_with_the_health_angle_rewritten():
 
 
 def test_request_asks_for_hook_types_and_places_emoji():
-    ask = HU.request("Honey Mango", 7, HU.ANGLES[0], [], emoji=[3])
+    ask = HU.request("Rosy Sunshine Mango", 7, HU.ANGLES[0], [], emoji=[3])
     assert "hook_type" in ask and "visual_sensory" in ask and "offer" in ask
     assert "only in the body of hook 3" in ask and "personal condition" in ask
-    assert "No emoji anywhere." in HU.request("Honey Mango", 7, HU.ANGLES[0], [], emoji=[])
+    assert "No emoji anywhere." in HU.request("Rosy Sunshine Mango", 7, HU.ANGLES[0], [], emoji=[])
 
 
 def test_emoji_slots_are_about_fifteen_percent():
@@ -93,7 +93,7 @@ def test_screen_checks_type_personal_attributes_and_emoji():
              _hk(4, body="Juice everywhere 🥭🥭🥭"),
              _hk(5, body="Custard in a skin 🥭"),
              _hk(6, body="Honey and vanilla 🍯")]
-    ok, bad = HU.screen(hooks, [], "Honey Mango")
+    ok, bad = HU.screen(hooks, [], "Rosy Sunshine Mango")
     flags = {h["hook_text"]: h["qa_flags"] for h in ok + bad}
     assert hooks[0]["hook_type"] == "visual_sensory" and hooks[1]["hook_type"] == ""   # unknown type cleared
     assert flags[GOOD[2]] == ["personal_attribute"]
@@ -116,7 +116,7 @@ def test_suggested_hooks_carry_type_and_versions(monkeypatch):
     from creative_intelligence.adstudio import chat
     fake = _HookClient([[_hk(i, hook_type=t) for i, t in enumerate(("curiosity", "gift", "offer", "problem", "gift"))]])
     monkeypatch.setattr(chat, "_client", lambda: fake)
-    hooks = chat.suggest_hooks({"name": "Honey Mango", "product_type": "fruit"}, 3)
+    hooks = chat.suggest_hooks({"name": "Rosy Sunshine Mango", "product_type": "fruit"}, 3)
     assert [h["hook_type"] for h in hooks] == ["curiosity", "gift", "offer"]
     assert all(h["prompt_version"].startswith("hook-university-system@v4+knowledge@pb16-") for h in hooks)
     assert "Hook types: the opening move" in fake.sent[0]["system"]
@@ -130,7 +130,7 @@ def conn(tmp_path, monkeypatch):
     init_db(tmp_path / "t.db")
     c = get_connection(tmp_path / "t.db")
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
     yield c
     c.close()
 
@@ -147,8 +147,8 @@ class _ClaimsClient:
 
 def test_copy_check_flags_personal_attributes_everywhere(conn):
     fake = _ClaimsClient()
-    r = facts.check_copy(conn, {"id": 1, "name": "Honey Mango", "product_type": "fruit"},
-                         {"script": "Struggling with your weight? Honey Mango is sweet."}, client=fake)
+    r = facts.check_copy(conn, {"id": 1, "name": "Rosy Sunshine Mango", "product_type": "fruit"},
+                         {"script": "Struggling with your weight? Rosy Sunshine Mango is sweet."}, client=fake)
     assert r["status"] == "flagged"
     assert r["banned"] == [{"field": "script", "term": "Struggling with your weight", "rule": "personal_attribute"}]
     assert "cures, treats" in fake.system and "Reviews and testimonials must be real" in fake.system

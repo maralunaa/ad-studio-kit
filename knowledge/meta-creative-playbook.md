@@ -1,8 +1,10 @@
 <!--
-The brand's playbook, exported as markdown. Replace it with your own (Admin › Knowledge takes a new export and
-proposes matching updates to the knowledge files, rubric and prompts; nothing changes until a person approves).
-The house rules in knowledge/*.yaml marked "house:" sit above it. Section names are referenced by the YAML files'
-`source:` fields, so keep them in step when you rename a section.
+Source of truth: the brand's playbook document (put its link here).
+Exported: 2026-10-20 · doc revision 16. Replace this file with your own export: Admin › Knowledge takes a new
+export and proposes matching updates to the knowledge files, rubric and prompts; nothing changes until a person
+approves. Section names are referenced by the YAML files' `source:` fields, so keep them in step.
+House rules that sit above this playbook (sample): never claim where the fruit comes from; Hook University stays
+(this playbook adds to it); invented reviews are never used.
 -->
 
 # Meta Creative Playbook

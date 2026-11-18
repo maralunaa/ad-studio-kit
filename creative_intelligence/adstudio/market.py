@@ -133,6 +133,7 @@ def library_url(term: str, page_id: str = "") -> str:
 
 def brand_for(conn, page_name: str, page_id: Any = None) -> int | None:
     """The registry brand an ad belongs to, by Page id or by name."""
+    _seed(conn)
     if page_id:
         r = conn.execute("SELECT id FROM research_brands WHERE page_id=?", (str(page_id),)).fetchone()
         if r:

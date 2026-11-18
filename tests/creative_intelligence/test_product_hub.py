@@ -18,11 +18,11 @@ def _p(handle, title, ptype="Fruit: Mango", tags=(), available=True, price="89.0
             "images": [{"src": f"https://cdn.example/{handle}.jpg"}]}
 
 
-FEED = [_p("honey-mango", "Honey Mango", tags=["c.abundant", "core active"]),
+FEED = [_p("rosy-sunshine-mango", "Rosy Sunshine Mango", tags=["c.abundant", "core active"]),
         _p("asian-pear", "Asian Pear", "Fruit: Pear", tags=["c.seasonal"], available=False),
         _p("mango-variety-box", "Mango Variety Box", "Mix Box: Mango, Variety", tags=["preorder"]),
         _p("guava-rose-candle", "Guava Rosé Candle", "Candle: Guava Rose"),
-        _p("pem-bab", "Honey Mango", tags=["buildabox", "hidden"]),
+        _p("pem-bab", "Rosy Sunshine Mango", tags=["buildabox", "hidden"]),
         _p("gift-card", "Gift Card", "Gift Card"),
         _p("snack", "Tropical Bites", "Other: Tropical Bites, Mango")]
 
@@ -47,9 +47,9 @@ class TestSync:
     def test_lists_maps_and_badges(self, conn):
         counts = catalog.sync(conn, "manual", fetch=lambda: FEED)
         assert counts["listed"] == 5 and counts["added"] == 5            # hidden twin and gift card left out
-        pem = _row(conn, shopify_handle="honey-mango")
+        pem = _row(conn, shopify_handle="rosy-sunshine-mango")
         assert (pem["product_type"], pem["origin"], pem["season"], pem["in_stock"]) == ("fruit", "shopify", "in", 1)
-        assert json.loads(pem["shop_json"])["price_min"] == 89.0 and pem["description"] == "Honey Mango copy"
+        assert json.loads(pem["shop_json"])["price_min"] == 89.0 and pem["description"] == "Rosy Sunshine Mango copy"
         pear = _row(conn, shopify_handle="asian-pear")
         assert (pear["season"], pear["in_stock"]) == ("out", 0)
         assert _row(conn, shopify_handle="mango-variety-box")["product_type"] == "gift_box"
@@ -61,14 +61,14 @@ class TestSync:
     def test_links_existing_products_and_keeps_their_type_and_work(self, conn):
         with conn:
             conn.execute("INSERT INTO adstudio_products (id, name, product_type, shopify_url, physical_desc) VALUES"
-                         " (7, 'PEM', 'candle', 'https://shop.testfruit.example/products/honey-mango', 'pink')")
+                         " (7, 'PEM', 'candle', 'https://shop.testfruit.example/products/rosy-sunshine-mango', 'pink')")
             conn.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (8, 'asian pear', 'fruit')")
             conn.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (9, 'Kiwi Test', 'fruit')")
         counts = catalog.sync(conn, fetch=lambda: FEED)
         assert counts["linked"] == 2 and counts["added"] == 3
         pem = _row(conn, id=7)
         assert (pem["shopify_handle"], pem["origin"], pem["product_type"], pem["physical_desc"]) == \
-            ("honey-mango", "shopify", "candle", "pink")
+            ("rosy-sunshine-mango", "shopify", "candle", "pink")
         assert _row(conn, id=8)["shopify_handle"] == "asian-pear"         # linked by name
         assert _row(conn, id=9)["origin"] == "local"                      # not in store
         assert facts.not_in_store(_row(conn, id=9)) and not facts.not_in_store(pem)
@@ -189,8 +189,8 @@ class FakeClient:
 
 
 RESEARCH = {"taste": "Honeyed, very low acid, buttery and fibreless.", "facts": [
-    {"text": "Honey mangoes can weigh up to 2 lb.", "category": "characteristic",
-     "source_url": "https://shop.testfruit.example/products/honey-mango", "confidence": "high", "use": True, "reason": ""},
+    {"text": "Rosy Sunshine mangoes can weigh up to 2 lb.", "category": "characteristic",
+     "source_url": "https://shop.testfruit.example/products/rosy-sunshine-mango", "confidence": "high", "use": True, "reason": ""},
     {"text": "A cup of mango has about 60 mg of vitamin C.", "category": "nutrition",
      "source_url": "https://fdc.nal.usda.gov/food/123", "confidence": "high", "use": True, "reason": ""},
     {"text": "Mango lowers blood sugar.", "category": "health", "source_url": "https://blog.example/mango",
@@ -208,8 +208,8 @@ class TestResearch:
     def pem(self, conn):
         with conn:
             conn.execute("INSERT INTO adstudio_products (id, name, product_type, origin, shopify_url, description) VALUES"
-                         " (1, 'Honey Mango', 'fruit', 'shopify',"
-                         " 'https://shop.testfruit.example/products/honey-mango', 'Up to 2 lb each')")
+                         " (1, 'Rosy Sunshine Mango', 'fruit', 'shopify',"
+                         " 'https://shop.testfruit.example/products/rosy-sunshine-mango', 'Up to 2 lb each')")
         return 1
 
     def test_estimate_is_shown_and_capped(self, conn, pem, monkeypatch):
@@ -230,7 +230,7 @@ class TestResearch:
         assert client.calls[1][1]["messages"][1]["role"] == "assistant"            # pause_turn resumed
         assert client.calls[0][1]["tools"][0]["type"] == "web_search_20260209"
         rows = {r["text"]: dict(r) for r in conn.execute("SELECT * FROM facts WHERE product_id=1")}
-        assert rows["Honey mangoes can weigh up to 2 lb."]["status"] == "pending"
+        assert rows["Rosy Sunshine mangoes can weigh up to 2 lb."]["status"] == "pending"
         assert rows["A cup of mango has about 60 mg of vitamin C."]["source"] == "fdc.nal.usda.gov"
         assert rows["Mango lowers blood sugar."]["status"] == "do_not_use"
         assert "own product page" in rows["Test Fruit Co ships within a day of picking."]["note"]
@@ -307,9 +307,9 @@ class TestRoutes:
         d = client.get("/api/adstudio/catalog").get_json()
         by = {p["name"]: p for p in d["products"]}
         assert len(d["products"]) == 6 and d["sync"]["status"] == "done"
-        assert by["Honey Mango"]["in_store"] and by["Honey Mango"]["season"] == "in"
+        assert by["Rosy Sunshine Mango"]["in_store"] and by["Rosy Sunshine Mango"]["season"] == "in"
         assert not by["Kiwi Berry"]["in_store"] and by["Mango Variety Box"]["product_type"] == "gift_box"
-        assert by["Honey Mango"]["thumb_url"].endswith("honey-mango.jpg")
+        assert by["Rosy Sunshine Mango"]["thumb_url"].endswith("rosy-sunshine-mango.jpg")
 
     def test_sync_now_queues_one_job(self, client):
         a = client.post("/api/adstudio/catalog/sync").get_json()["job_id"]
@@ -319,7 +319,7 @@ class TestRoutes:
     def test_profile_and_fact_flow(self, client, monkeypatch):
         monkeypatch.setattr("creative_intelligence.adstudio.core.shopify_prices",
                             lambda url: [{"title": "2 lbs", "price": "$89", "available": True}])
-        pid = next(p["id"] for p in client.get("/api/adstudio/catalog").get_json()["products"] if p["name"] == "Honey Mango")
+        pid = next(p["id"] for p in client.get("/api/adstudio/catalog").get_json()["products"] if p["name"] == "Rosy Sunshine Mango")
         prof = client.get(f"/api/adstudio/product/{pid}/profile").get_json()
         assert prof["in_store"] and prof["prices_live"] and prof["prices"][0]["price"] == "$89"
         assert prof["research_estimate"] > 0 and set(prof["tags"]) == set(hub.TAGS)
@@ -370,44 +370,44 @@ def _hk(text, **kw):
             "ps": "ps", **kw}
 
 
-GOOD = ["Honey Mango weighs two pounds, yet most people walk past it at the market every week",
-        "The Honey Mango ripens in a window so short most growers never ship it at all",
-        "My kids asked for Honey Mango before dessert, and I still haven't told them why",
-        "Honey Mango cuts like butter, but the first slice is not the part people remember",
-        "One Honey Mango feeds four, though nobody at the table will want to share it",
-        "Honey Mango tastes like honey and sunset, and the seed is thinner than you'd expect"]
+GOOD = ["Rosy Sunshine Mango weighs two pounds, yet most people walk past it at the market every week",
+        "The Rosy Sunshine Mango ripens in a window so short most growers never ship it at all",
+        "My kids asked for Rosy Sunshine Mango before dessert, and I still haven't told them why",
+        "Rosy Sunshine Mango cuts like butter, but the first slice is not the part people remember",
+        "One Rosy Sunshine Mango feeds four, though nobody at the table will want to share it",
+        "Rosy Sunshine Mango tastes like honey and sunset, and the seed is thinner than you'd expect"]
 
 
 class TestHookUniversity:
     def test_cliches_are_caught(self):
         from creative_intelligence.adstudio import hook_university as HU
-        assert HU.is_cliche("Honey Mango the way it should have always tasted")
+        assert HU.is_cliche("Rosy Sunshine Mango the way it should have always tasted")
         assert HU.is_cliche("You've never tasted mango like this")
         assert not HU.is_cliche(GOOD[0])
 
     def test_suggest_filters_and_retries_with_everything_seen_forbidden(self, monkeypatch):
         from creative_intelligence.adstudio import chat
-        first = [_hk(GOOD[0]), _hk("You've never tasted Honey Mango like this. We guarantee it, honestly."),
+        first = [_hk(GOOD[0]), _hk("You've never tasted Rosy Sunshine Mango like this. We guarantee it, honestly."),
                  _hk(GOOD[0]), _hk("[fruit] is great"), _hk(GOOD[1]), _hk(GOOD[2])]
         fake = _HookClient([first, [_hk(GOOD[3]), _hk(GOOD[4]), _hk(GOOD[5])]])
         monkeypatch.setattr(chat, "_client", lambda: fake)
-        hooks = chat.suggest_hooks({"name": "Honey Mango", "product_type": "fruit"}, 5,
-                                   recent=["An old hook about Honey Mango"])
+        hooks = chat.suggest_hooks({"name": "Rosy Sunshine Mango", "product_type": "fruit"}, 5,
+                                   recent=["An old hook about Rosy Sunshine Mango"])
         assert [h["hook_text"] for h in hooks] == GOOD[:5] and all(not h["qa_flags"] for h in hooks)
         assert len(fake.sent) == 3 and fake.sent[2]["model"] == chat.CRITIC_MODEL       # 2 drafts, then the critic
         assert "Hook University" in fake.sent[0]["system"] and "A12" in fake.sent[0]["system"]
         ask2 = fake.sent[1]["messages"][0]["content"][-1]["text"]
-        assert "An old hook about" in ask2 and "never tasted Honey" in ask2     # seen = exhausted
+        assert "An old hook about" in ask2 and "never tasted Rosy Sunshine" in ask2     # seen = exhausted
         assert "REQUIRED ANGLE MIX" in ask2 and "D+C+PS" in ask2
 
     def test_house_rules_code_can_check(self):
         from creative_intelligence.adstudio import hook_university as HU
         hooks = [{"hook_text": GOOD[0], "archetype": "A1 — x"},
                  {"hook_text": "Dense honeyed flesh, the mango texture grocery stores can't deliver to anyone", "archetype": "A2"},
-                 {"hook_text": "Honey Mango tastes nothing like the grocery store kind, and here is why", "archetype": "A3"},
-                 {"hook_text": "Honey Mango tastes nothing like the supermarket kind you buy each week", "archetype": "A4"},
-                 {"hook_text": "Honey Mango is the one fruit my kids fight over, every single summer", "archetype": "A1"}]
-        ok, bad = HU.screen(hooks, [], "Honey Mango")
+                 {"hook_text": "Rosy Sunshine Mango tastes nothing like the grocery store kind, and here is why", "archetype": "A3"},
+                 {"hook_text": "Rosy Sunshine Mango tastes nothing like the supermarket kind you buy each week", "archetype": "A4"},
+                 {"hook_text": "Rosy Sunshine Mango is the one fruit my kids fight over, every single summer", "archetype": "A1"}]
+        ok, bad = HU.screen(hooks, [], "Rosy Sunshine Mango")
         assert [h["hook_text"] for h in ok] == [GOOD[0], hooks[2]["hook_text"]]
         flags = {h["archetype"]: h["qa_flags"] for h in bad}
         assert flags["A2"] == ["product_not_named"] and flags["A1"] == ["archetype_repeated: A1"]
@@ -417,7 +417,7 @@ class TestHookUniversity:
         from creative_intelligence.adstudio import chat
         fake = _HookClient([[_hk(GOOD[0]), _hk("short one")], [_hk("Ever wondered why mango from the supermarket never quite delivers?")]])
         monkeypatch.setattr(chat, "_client", lambda: fake)
-        hooks = chat.suggest_hooks({"name": "Honey Mango", "product_type": "fruit"}, 3)
+        hooks = chat.suggest_hooks({"name": "Rosy Sunshine Mango", "product_type": "fruit"}, 3)
         assert hooks[0]["hook_text"] == GOOD[0] and hooks[1]["qa_flags"] and "banned_template" in hooks[2]["qa_flags"]
 
 
@@ -436,8 +436,8 @@ class TestFill:
         monkeypatch.setenv("FACTS_CHECK", "0")
         with conn:
             conn.execute("INSERT INTO adstudio_products (id, name, product_type, origin, shopify_url, shop_json) VALUES"
-                         " (1, 'Honey Mango', 'fruit', 'shopify', 'https://shop.testfruit.example/products/pem',"
-                         " '{\"type\": \"Fruit: Mango, Honey\", \"images\": [\"https://cdn.example/a.jpg\"]}')")
+                         " (1, 'Rosy Sunshine Mango', 'fruit', 'shopify', 'https://shop.testfruit.example/products/pem',"
+                         " '{\"type\": \"Fruit: Mango, Rosy Sunshine\", \"images\": [\"https://cdn.example/a.jpg\"]}')")
         from creative_intelligence.adstudio import chat
         hooks = _HookClient([[_hk(g) for g in GOOD]])
         monkeypatch.setattr(chat, "_client", lambda log=True: hooks)
@@ -502,13 +502,13 @@ class TestFill:
 class TestFamily:
     def test_family_from_the_shopify_type(self):
         f = lambda t: catalog.family({"shop_json": json.dumps({"type": t})})
-        assert f("Fruit: Mango, Honey") == "mango" and f("Mix Box: Mango, Variety") == "mango"
+        assert f("Fruit: Mango, Rosy Sunshine") == "mango" and f("Mix Box: Mango, Variety") == "mango"
         assert f("Mix Box: Peaches") == "peach" and f("Fruit: Avocados, Hass") == "avocado"
         assert f("Mix Box: Variety Box, Citrus") == "" and f("Candle: Guava Rose") == "" and f("") == ""
 
     def test_family_facts_are_researched_once_and_shared(self, conn):
         catalog.sync(conn, fetch=lambda: FEED)
-        pem = _row(conn, shopify_handle="honey-mango")
+        pem = _row(conn, shopify_handle="rosy-sunshine-mango")
         box = _row(conn, shopify_handle="mango-variety-box")
         data = {"taste": "", "quotes": [], "facts": [
             {**RESEARCH["facts"][1], "scope": "family"}, {**RESEARCH["facts"][0], "scope": "variety"}]}
@@ -526,7 +526,7 @@ class TestFamily:
 
     def test_research_is_told_what_the_family_already_knows(self, conn, tmp_path):
         catalog.sync(conn, fetch=lambda: FEED)
-        pem = _row(conn, shopify_handle="honey-mango")
+        pem = _row(conn, shopify_handle="rosy-sunshine-mango")
         hub.save_research(conn, pem, {"facts": [{**RESEARCH["facts"][1], "scope": "family"}]}, "x")
         box = _row(conn, shopify_handle="mango-variety-box")
         with conn:
@@ -540,7 +540,7 @@ class TestFamily:
 def test_nothing_fills_by_itself_the_button_does(client):
     pid = client.post("/api/adstudio/products", json={"name": "Kiwi Berry", "product_type": "fruit"}).get_json()["id"]
     conn = get_connection(client.db_path)
-    pem = conn.execute("SELECT id FROM adstudio_products WHERE shopify_handle='honey-mango'").fetchone()[0]
+    pem = conn.execute("SELECT id FROM adstudio_products WHERE shopify_handle='rosy-sunshine-mango'").fetchone()[0]
     assert _row(conn, id=pid)["fill_status"] == "" and not conn.execute("SELECT 1 FROM jobs WHERE kind='fill'").fetchone()
     conn.close()
     prof = client.get(f"/api/adstudio/product/{pem}/profile").get_json()
@@ -565,8 +565,8 @@ def test_no_origin_claims_in_facts_or_hooks():
     assert hub.judge({**f, "text": "The flesh is fibreless."}, "x")[0] == "approved"             # auto-approved
     assert hub.judge({**f, "text": "Each one weighs about 2 lb."}, "x")[0] == "pending"          # numbers wait
     assert hub.judge({**f, "text": "Arrives in 2 days.", "category": "shipping"}, "x")[0] == "pending"
-    ok, bad = HU.screen([{"hook_text": "Honey Mango came all the way from Vietnam to your kitchen table", "archetype": "A1"}],
-                        [], "Honey Mango")
+    ok, bad = HU.screen([{"hook_text": "Rosy Sunshine Mango came all the way from Vietnam to your kitchen table", "archetype": "A1"}],
+                        [], "Rosy Sunshine Mango")
     assert not ok and "origin_claim" in bad[0]["qa_flags"]
     assert "Never claim where the fruit comes from" in HU.system()
     assert "origin" not in " ".join(HU.ANGLES).lower() and "ripeness" in HU.request("PEM", 5, HU.ANGLES[0], [])
@@ -588,7 +588,7 @@ def test_hook_critic_keeps_the_best_and_says_why():
     sent = []
     fake = SimpleNamespace(messages=SimpleNamespace(create=lambda **kw: sent.append(kw) or SimpleNamespace(
         content=[SimpleNamespace(type="text", text=_json.dumps(body))])))
-    out = chat.critique_hooks({"name": "Honey Mango"}, hooks, 2, ["sweet like candy"], client=fake)
+    out = chat.critique_hooks({"name": "Rosy Sunshine Mango"}, hooks, 2, ["sweet like candy"], client=fake)
     assert [h["headline"] for h in out] == ["No fibre to floss out", "Ripe on your counter"]
     assert out[0]["critic_note"] == "named frustration" and out[1]["critic_score"] == 4.0
     assert "sweet like candy" in sent[0]["messages"][0]["content"] and sent[0]["model"] == chat.CRITIC_MODEL

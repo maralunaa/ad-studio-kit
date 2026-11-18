@@ -209,7 +209,7 @@ GENERIC_FAMILIES = {"variety", "variety box", "bundle", "gift basket", "mystery 
 
 
 def family(product: dict[str, Any]) -> str:
-    """The fruit family from the Shopify type ("Fruit: Mango, Honey" or "Mix Box: Mango, Variety"
+    """The fruit family from the Shopify type ("Fruit: Mango, Sunrise" or "Mix Box: Mango, Variety"
     → "mango"), for sharing facts across a family. '' when there is none."""
     head, _, rest = (shop(product).get("type") or "").partition(":")
     if head.strip().lower() not in ("fruit", "mix box"):

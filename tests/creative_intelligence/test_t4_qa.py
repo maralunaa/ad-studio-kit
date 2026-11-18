@@ -110,7 +110,7 @@ class TestScoring:
     def test_claude_scores_with_reference_photos_and_rubric(self, conn):
         client = FakeClient(GOOD)
         r = qa.score(conn, "image", 1, conn.img, ["data:image/png;base64,iVBORw0KGgo="],
-                     {"name": "Honey Mango", "product_type": "fruit"}, client=client)
+                     {"name": "Rosy Sunshine Mango", "product_type": "fruit"}, client=client)
         assert r["passed"] and r["reasoning"].startswith("Accurate")
         kw = client.calls[0]
         assert kw["model"] == "claude-sonnet-5-5" and kw["fallbacks"] == "default"

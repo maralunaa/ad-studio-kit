@@ -23,7 +23,7 @@ def conn(tmp_path, monkeypatch):
     init_db(tmp_path / "data" / "t.db")
     c = get_connection(tmp_path / "data" / "t.db")
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (2, 'Lychee', 'fruit')")
     yield c
     c.close()

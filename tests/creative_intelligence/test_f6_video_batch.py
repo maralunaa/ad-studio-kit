@@ -17,7 +17,7 @@ def conn(tmp_path, monkeypatch):
     init_db(db)
     c = get_connection(db)
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (2, 'Lychee', 'fruit')")
     monkeypatch.setattr("creative_intelligence.jobs.enqueue", lambda *a, **k: 1)
     monkeypatch.setattr("creative_intelligence.budget.check", lambda *a, **k: None)

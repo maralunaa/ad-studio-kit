@@ -45,7 +45,7 @@ function renderRequest(msg){
   const tot=R.statics*n, vid=Object.values(R.videos).reduce((a,b)=>a+b,0)*n;
   $('body').innerHTML=`<div class="pane-head"><h2 class="page-title">New ad pack</h2><span class="muted">Say what you need, check the form, then make the plan. Nothing is generated until you approve the plan.</span></div>
     <section class="card mb-2"><label class="fl" for="aText">In one sentence</label>
-      <div class="row"><input class="f" id="aText" placeholder="15 statics and 5 videos for Honey Mango and the Variety Box: 2 talking heads, 3 that worked before"><button class="btn" id="aParse">Fill the form</button></div>
+      <div class="row"><input class="f" id="aText" placeholder="15 statics and 5 videos for Sunrise Mango and the Variety Box: 2 talking heads, 3 that worked before"><button class="btn" id="aParse">Fill the form</button></div>
       <div class="chips mt-1">${O.templates.map((t,i)=>`<button class="chip" data-tpl="${i}" title="${t.saved?'Saved template':'Built-in'}">${esc(t.name)}</button>`).join('')}</div>
       <p class="muted" id="aMsg">${esc(msg||'')}</p></section>
     <div class="two">

@@ -17,7 +17,7 @@ def path(tmp_path, monkeypatch):
     init_db(p)
     c = get_connection(p)
     with c:
-        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Honey Mango', 'fruit')")
+        c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (1, 'Rosy Sunshine Mango', 'fruit')")
         c.execute("INSERT INTO adstudio_products (id, name, product_type) VALUES (92, 'Exotic Fruit Variety Box', 'box')")
     c.close()
     return p
@@ -72,14 +72,14 @@ class FakeClient:
 
 
 def test_parse_matches_products_and_lists_the_rest(conn):
-    fake = FakeClient({"product_names": ["honey mango", "Variety Box", "Durian"], "statics": 15,
+    fake = FakeClient({"product_names": ["rosy sunshine mango", "Variety Box", "Durian"], "statics": 15,
                        "videos": [{"style": "talking_head", "count": 2}, {"style": "proven", "count": 3}],
                        "sizes": [], "notes": "by Friday", "name": ""})
     out = adpack.parse(conn, "15 statics and 5 videos for the mango, the variety box and durian", client=fake)
     assert out["request"]["product_ids"] == [1, 92] and out["unknown_products"] == ["Durian"]
     assert out["request"]["videos"] == {"talking_head": 2, "proven": 3} and out["request"]["sizes"] == ["9:16", "4:5"]
     assert out["request"]["notes"] == "by Friday"
-    assert "Honey Mango" in fake.asked["messages"][0]["content"]
+    assert "Rosy Sunshine Mango" in fake.asked["messages"][0]["content"]
     assert adpack.parse(conn, "  ")["error"]
 
 
@@ -93,7 +93,7 @@ def test_pages_and_api(path, monkeypatch):
         assert page.status_code == 200 and b"Ad Pack" in page.data
         assert c.get("/adpack/nope").status_code == 404
         o = c.get("/api/adstudio/adpack/options").get_json()
-        assert {p["name"] for p in o["products"]} == {"Honey Mango", "Exotic Fruit Variety Box"}
+        assert {p["name"] for p in o["products"]} == {"Rosy Sunshine Mango", "Exotic Fruit Variety Box"}
         assert o["video_styles"][0][0] == "proven" and o["default"]["statics"] == 10
         assert c.post("/api/adstudio/adpack", json={"request": {"statics": 3}}).get_json()["error"]
         assert c.post("/api/adstudio/adpack", json={"request": {"product_ids": [1], "statics": 3}}).get_json()["id"]
